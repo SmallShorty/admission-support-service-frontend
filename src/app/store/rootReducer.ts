@@ -1,2 +1,6 @@
 import { combineReducers } from "@reduxjs/toolkit";
-export const rootReducer = combineReducers({});
+import accountReducer from "@/app/entities/account/model/accountSlice";
+
+export const rootReducer = combineReducers({
+  account: accountReducer,
+});

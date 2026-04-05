@@ -2,64 +2,79 @@ import axios, {
   AxiosInstance,
   InternalAxiosRequestConfig,
   AxiosResponse,
+  AxiosError,
 } from "axios";
 
 /**
  * Configures interceptors for a specific Axios instance
  * Includes: Auth token injection and Development logging
  */
-const setupInterceptors = (
+const logRequest = (service: string, config: InternalAxiosRequestConfig) => {
+  if (!import.meta.env.DEV) return;
+
+  console.groupCollapsed(
+    `%c🚀 [${service}] ${config.method?.toUpperCase()} -> ${config.url}`,
+    "color: #139BFE; font-weight: bold;",
+  );
+  console.log("Full URL:", `${config.baseURL}${config.url}`);
+  if (config.data) console.log("Payload:", config.data);
+  if (config.params) console.log("Params:", config.params);
+  console.groupEnd();
+};
+
+export const setupInterceptors = (
   instance: AxiosInstance,
   serviceName: string,
 ): AxiosInstance => {
   // --- Request Interceptor ---
-  instance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem("accessToken");
+  instance.interceptors.request.use(
+    (config) => {
+      const token = localStorage.getItem("accessToken");
 
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
 
-    // Log request only in development mode
-    if (import.meta.env.DEV) {
-      console.groupCollapsed(
-        `%c🚀 [${serviceName}] Request: ${config.method?.toUpperCase()} ${config.url}`,
-        "color: #61dafb; font-weight: bold;",
-      );
-      console.log("Base URL:", config.baseURL);
-      console.log("Full URL:", `${config.baseURL}${config.url}`);
-      if (config.data) console.log("Payload:", config.data);
-      console.groupEnd();
-    }
-
-    return config;
-  });
+      logRequest(serviceName, config);
+      return config;
+    },
+    (error: AxiosError) => Promise.reject(error),
+  );
 
   // --- Response Interceptor ---
   instance.interceptors.response.use(
     (response: AxiosResponse) => {
-      // Log successful response in development
       if (import.meta.env.DEV) {
         console.log(
-          `%c✅ [${serviceName}] Success: ${response.status} ${response.config.url}`,
-          "color: #4caf50; font-weight: bold;",
+          `%c✅ [${serviceName}] Success: ${response.status}`,
+          "color: #4CAF50; font-weight: bold;",
         );
       }
       return response;
     },
-    (error) => {
-      const status = error.response?.status || "NETWORK_ERROR";
-      const message = error.message || "Unknown error";
-      const url = error.config?.url || "unknown url";
+    async (error: AxiosError) => {
+      const status = error.response?.status;
+      const originalRequest = error.config;
 
-      // Error logging for debugging
+      // Логирование ошибки
       console.error(
-        `%c❌ [${serviceName}] Error ${status}: ${url}`,
-        "color: #f44336; font-weight: bold;",
-        message,
+        `%c❌ [${serviceName}] Error ${status || "NETWORK"}: ${originalRequest?.url}`,
+        "color: #F20404; font-weight: bold;",
+        error.message,
       );
 
-      // TODO: Add Toast notification logic here
+      // --- Обработка 401 (Unauthorized) ---
+      if (status === 401) {
+        // Здесь можно вызвать logout() из Redux или просто очистить storage
+        localStorage.removeItem("accessToken");
+
+        // Если ты не на странице логина — можно редиректнуть
+        if (!window.location.pathname.includes("/login")) {
+          window.location.href = "/login";
+        }
+      }
+
+      // TODO: Вызов toast.error(error.message) здесь будет очень кстати
 
       return Promise.reject(error);
     },
