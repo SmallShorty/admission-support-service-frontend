@@ -15,15 +15,6 @@ interface Props {
 export const RoleProtectedRoute = ({ allowedRoles }: Props) => {
   const isAuth = useAppSelector(selectIsAuth);
   const account = useAppSelector(selectAccount);
-  const isLoading = useAppSelector(selectIsLoading);
-
-  if (isLoading) {
-    return (
-      <Center h="100vh">
-        <Spinner size="xl" color="teal.500" />
-      </Center>
-    );
-  }
 
   if (!isAuth) return <Navigate to="/login" replace />;
 

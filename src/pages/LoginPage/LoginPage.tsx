@@ -1,4 +1,5 @@
 import { authApi } from "@/app/entities/account/api/accountApi";
+import { useAccount } from "@/app/entities/account/api/query";
 import { setAccount } from "@/app/entities/account/model/accountSlice";
 import { useAppDispatch } from "@/app/hooks";
 import { Card, Text, Field, Input, Stack, Button } from "@chakra-ui/react";
@@ -8,27 +9,12 @@ import { useNavigate } from "react-router-dom";
 export const LoginPage: FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { login, isLoggingIn } = useAccount();
 
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  const handleLogin = () => {
+    if (!email || !password) return;
 
-  const handleLogin = async () => {
-    try {
-      // 1. Отправляем запрос
-      const data = await authApi.login({ email, password });
-
-      dispatch(
-        setAccount({
-          account: data.account,
-          accessToken: data.token,
-        }),
-      );
-
-      // 3. Редирект на главную
-      navigate("/");
-    } catch (err: any) {
-      console.log(err.response?.data?.message || "Ошибка при входе");
-    }
+    login({ email, password });
   };
 
   return (
@@ -71,7 +57,12 @@ export const LoginPage: FC = () => {
       </Card.Body>
 
       <Card.Footer justifyContent="flex-end">
-        <Button width="full" onClick={handleLogin}>
+        <Button
+          width="full"
+          loading={isLoggingIn}
+          onClick={handleLogin}
+          disabled={!email || !password}
+        >
           Войти
         </Button>
       </Card.Footer>

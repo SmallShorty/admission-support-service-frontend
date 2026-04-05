@@ -5,10 +5,19 @@ import BareLayout from "@/shared/components/Layout/BareLayout";
 import Layout from "@/shared/components/Layout/Layout";
 import { createBrowserRouter } from "react-router-dom";
 import { RoleProtectedRoute } from "./RoleProtectedRoute";
+import { AccountRole } from "@/app/entities/account/model/types";
 
 export const router = createBrowserRouter([
   {
-    element: <RoleProtectedRoute allowedRoles={[]} />,
+    element: (
+      <RoleProtectedRoute
+        allowedRoles={[
+          AccountRole.OPERATOR,
+          AccountRole.ADMIN,
+          AccountRole.SUPERVISOR,
+        ]}
+      />
+    ),
     children: [
       {
         path: "/",
