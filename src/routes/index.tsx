@@ -1,4 +1,5 @@
 import HomePage from "@/pages/HomePage/HomePage";
+import { LoginPage } from "@/pages/LoginPage/LoginPage";
 import NotFoundPage from "@/pages/NotFoundPage/NotFoundPage";
 import BareLayout from "@/shared/components/Layout/BareLayout";
 import Layout from "@/shared/components/Layout/Layout";
@@ -17,6 +18,15 @@ export const router = createBrowserRouter([
   },
   {
     element: <BareLayout />,
-    children: [{ path: "*", element: <NotFoundPage /> }],
+    children: [
+      {
+        path: "*",
+        element: <NotFoundPage />,
+      },
+      {
+        path: "login",
+        element: <LoginPage />,
+      },
+    ],
   },
 ]);

@@ -1,13 +1,11 @@
-import { Box, Container } from "@chakra-ui/react";
+import { Box, Center, Container } from "@chakra-ui/react";
 import { Outlet } from "react-router-dom";
 
 const BareLayout = () => {
   return (
-    <Box bg="white" minH="100vh">
-      <Container maxW="container.xl" py={8}>
-        <Outlet />
-      </Container>
-    </Box>
+    <Center bg="#F9FBFB" minH="100vh">
+      <Outlet />
+    </Center>
   );
 };
 
