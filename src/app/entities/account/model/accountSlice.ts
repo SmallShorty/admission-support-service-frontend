@@ -8,11 +8,13 @@ interface AccountState {
   isLoading: boolean;
 }
 
+const token = localStorage.getItem("accessToken");
+
 const initialState: AccountState = {
   data: null,
-  accessToken: localStorage.getItem("accessToken"),
-  isAuth: !!localStorage.getItem("accessToken"),
-  isLoading: true,
+  accessToken: token,
+  isAuth: !!token,
+  isLoading: !!token,
 };
 
 export const accountSlice = createSlice({

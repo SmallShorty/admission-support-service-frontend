@@ -34,3 +34,8 @@ export interface StaffAccount extends BaseAccount {
   role: AccountRole.ADMIN | AccountRole.OPERATOR | AccountRole.SUPERVISOR;
 }
 export type Account = ApplicantAccount | StaffAccount;
+
+export interface AuthResponse {
+  token: string;
+  account: Account;
+}

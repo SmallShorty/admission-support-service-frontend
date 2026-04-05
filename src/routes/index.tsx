@@ -4,15 +4,21 @@ import NotFoundPage from "@/pages/NotFoundPage/NotFoundPage";
 import BareLayout from "@/shared/components/Layout/BareLayout";
 import Layout from "@/shared/components/Layout/Layout";
 import { createBrowserRouter } from "react-router-dom";
+import { RoleProtectedRoute } from "./RoleProtectedRoute";
 
 export const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Layout />,
+    element: <RoleProtectedRoute allowedRoles={[]} />,
     children: [
       {
-        index: true,
-        element: <HomePage />,
+        path: "/",
+        element: <Layout />,
+        children: [
+          {
+            index: true,
+            element: <HomePage />,
+          },
+        ],
       },
     ],
   },

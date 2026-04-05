@@ -1,13 +1,34 @@
+import { authApi } from "@/app/entities/account/api/accountApi";
+import { setAccount } from "@/app/entities/account/model/accountSlice";
+import { useAppDispatch } from "@/app/hooks";
 import { Card, Text, Field, Input, Stack, Button } from "@chakra-ui/react";
 import { FC, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const LoginPage: FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    console.log("Данные для входа:", { email, password });
-    // Здесь будет логика отправки данных на бэкенд
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    try {
+      // 1. Отправляем запрос
+      const data = await authApi.login({ email, password });
+
+      dispatch(
+        setAccount({
+          account: data.account,
+          accessToken: data.token,
+        }),
+      );
+
+      // 3. Редирект на главную
+      navigate("/");
+    } catch (err: any) {
+      console.log(err.response?.data?.message || "Ошибка при входе");
+    }
   };
 
   return (
