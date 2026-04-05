@@ -4,7 +4,7 @@ import { Navbar } from "./Navbar";
 
 const Layout = () => {
   return (
-    <Box minH="100vh">
+    <Box bg="white" minH="100vh">
       <Navbar />
       <Container maxW="container.xl" py={8}>
         <Outlet />
