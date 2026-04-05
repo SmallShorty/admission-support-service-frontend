@@ -1,18 +1,24 @@
-import { createSystem, defineConfig, defaultConfig } from "@chakra-ui/react";
+import {
+  createSystem,
+  defineConfig,
+  defaultConfig,
+  defineRecipe,
+} from "@chakra-ui/react";
+
+const buttonRecipe = defineRecipe({
+  base: {
+    colorPalette: "teal",
+  },
+});
+
 const config = defineConfig({
   theme: {
     tokens: {
       colors: {
         brand: {
-          50: {
-            value: "#e6f2ff",
-          },
-          500: {
-            value: "#0078ff",
-          },
-          900: {
-            value: "#003a80",
-          },
+          50: { value: "#e6f2ff" },
+          500: { value: "#0078ff" },
+          900: { value: "#003a80" },
         },
       },
     },
@@ -32,6 +38,10 @@ const config = defineConfig({
       lg: "960px",
       xl: "1200px",
     },
+    recipes: {
+      button: buttonRecipe,
+    },
   },
 });
+
 export const system = createSystem(defaultConfig, config);
