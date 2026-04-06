@@ -1,27 +1,23 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Account } from "./types";
-
 interface AccountState {
   data: Account | null;
   accessToken: string | null;
   refreshToken: string | null;
   isAuth: boolean;
-  isLoading: boolean; // true во время проверки токена/загрузки профиля
-  isInitialized: boolean; // добавим флаг, что первая проверка выполнена
+  isLoading: boolean;
+  isInitialized: boolean;
 }
-
 const accessToken = localStorage.getItem("accessToken");
 const refreshToken = localStorage.getItem("refreshToken");
-
 const initialState: AccountState = {
   data: null,
   accessToken: accessToken,
   refreshToken: refreshToken,
-  isAuth: false, // не доверяем токену, пока не проверим
-  isLoading: true, // начинаем проверку
+  isAuth: false,
+  isLoading: true,
   isInitialized: false,
 };
-
 export const accountSlice = createSlice({
   name: "account",
   initialState,
@@ -76,7 +72,6 @@ export const accountSlice = createSlice({
     },
   },
 });
-
 export const { setAccount, logout, setLoading, setInitialized, updateTokens } =
   accountSlice.actions;
 export default accountSlice.reducer;
