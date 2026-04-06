@@ -1,10 +1,6 @@
-import { authApi } from "@/app/entities/account/api/accountApi";
 import { useAccount } from "@/app/entities/account/api/query";
-import { setAccount } from "@/app/entities/account/model/accountSlice";
-import { useAppDispatch } from "@/app/hooks";
 import { Card, Text, Field, Input, Stack, Button } from "@chakra-ui/react";
 import { FC, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 export const LoginPage: FC = () => {
   const [email, setEmail] = useState("");

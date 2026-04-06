@@ -36,6 +36,7 @@ export interface StaffAccount extends BaseAccount {
 export type Account = ApplicantAccount | StaffAccount;
 
 export interface AuthResponse {
-  token: string;
   account: Account;
+  accessToken: string;
+  refreshToken: string;
 }

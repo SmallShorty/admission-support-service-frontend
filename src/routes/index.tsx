@@ -4,10 +4,25 @@ import NotFoundPage from "@/pages/NotFoundPage/NotFoundPage";
 import BareLayout from "@/shared/components/Layout/BareLayout";
 import Layout from "@/shared/components/Layout/Layout";
 import { createBrowserRouter } from "react-router-dom";
-import { RoleProtectedRoute } from "./RoleProtectedRoute";
+import { RoleProtectedRoute, PublicRoute } from "./RoleProtectedRoute";
 import { AccountRole } from "@/app/entities/account/model/types";
 
 export const router = createBrowserRouter([
+  {
+    // Группа публичных маршрутов
+    element: <PublicRoute redirectIfAuth="/" />,
+    children: [
+      {
+        element: <BareLayout />,
+        children: [
+          {
+            path: "/login",
+            element: <LoginPage />,
+          },
+        ],
+      },
+    ],
+  },
   {
     element: (
       <RoleProtectedRoute
@@ -16,15 +31,15 @@ export const router = createBrowserRouter([
           AccountRole.ADMIN,
           AccountRole.SUPERVISOR,
         ]}
+        redirectTo="/login"
       />
     ),
     children: [
       {
-        path: "/",
         element: <Layout />,
         children: [
           {
-            index: true,
+            path: "/",
             element: <HomePage />,
           },
         ],
@@ -32,16 +47,7 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    element: <BareLayout />,
-    children: [
-      {
-        path: "*",
-        element: <NotFoundPage />,
-      },
-      {
-        path: "login",
-        element: <LoginPage />,
-      },
-    ],
+    path: "*",
+    element: <NotFoundPage />,
   },
 ]);

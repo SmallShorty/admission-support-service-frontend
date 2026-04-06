@@ -13,12 +13,20 @@ export const authApi = {
     return data;
   },
 
+  refresh: async (refreshToken: string): Promise<AuthResponse> => {
+    const { data } = await coreApi.post<AuthResponse>("/auth/refresh", {
+      refreshToken,
+    });
+    return data;
+  },
+
   getProfile: async (): Promise<Account> => {
     const { data } = await coreApi.get<Account>("/auth/profile");
     return data;
   },
 
   logout: async (): Promise<void> => {
-    await coreApi.post("/auth/logout");
+    const refreshToken = localStorage.getItem("refreshToken");
+    await coreApi.post("/auth/logout", { refreshToken });
   },
 };

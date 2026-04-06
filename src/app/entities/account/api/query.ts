@@ -1,39 +1,60 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { setAccount, logout } from "../model/accountSlice";
+import { setAccount, logout, updateTokens } from "../model/accountSlice";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "@/app/hooks";
 import { authApi } from "./accountApi";
-
+import { useEffect } from "react";
 export const useAccount = () => {
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-
-  // 1. Запрос профиля (Query)
-  const profileQuery = useQuery({
-    queryKey: ["profile"],
-    queryFn: authApi.getProfile,
-    // Запрос пойдет только если есть токен в localStorage
-    enabled: !!localStorage.getItem("accessToken"),
-    retry: false,
-  });
-
-  // 2. Мутация логина (Mutation)
-  const loginMutation = useMutation({
-    mutationFn: authApi.login,
-    onSuccess: (data) => {
-      // Сохраняем в Redux и LocalStorage через наш существующий экшен
+  const restoreSession = async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (!refreshToken) return null;
+    try {
+      const data = await authApi.refresh(refreshToken);
       dispatch(
         setAccount({
           account: data.account,
-          accessToken: data.token,
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
         }),
       );
-
-      // Инвалидируем кэш профиля, чтобы React Query знал, что данные обновились
       queryClient.setQueryData(["profile"], data.account);
-
-      navigate("/"); // Редирект на главную
+      return data;
+    } catch (error) {
+      dispatch(logout());
+      return null;
+    }
+  };
+  useEffect(() => {
+    const initAuth = async () => {
+      const hasRefreshToken = !!localStorage.getItem("refreshToken");
+      if (hasRefreshToken && !profileQuery.data) {
+        await restoreSession();
+      }
+    };
+    initAuth();
+  }, []);
+  const profileQuery = useQuery({
+    queryKey: ["profile"],
+    queryFn: authApi.getProfile,
+    enabled: !!localStorage.getItem("accessToken"),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+  const loginMutation = useMutation({
+    mutationFn: authApi.login,
+    onSuccess: (data) => {
+      dispatch(
+        setAccount({
+          account: data.account,
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        }),
+      );
+      queryClient.setQueryData(["profile"], data.account);
+      navigate("/");
     },
     onError: (error: any) => {
       console.error(
@@ -42,16 +63,27 @@ export const useAccount = () => {
       );
     },
   });
-
+  const logoutMutation = useMutation({
+    mutationFn: authApi.logout,
+    onSuccess: () => {
+      dispatch(logout());
+      queryClient.clear();
+      navigate("/login");
+    },
+    onError: () => {
+      dispatch(logout());
+      queryClient.clear();
+      navigate("/login");
+    },
+  });
   return {
-    // Данные профиля
     profile: profileQuery.data,
     isProfileLoading: profileQuery.isLoading,
     profileError: profileQuery.error,
-
-    // Методы и состояния логина
     login: loginMutation.mutate,
     isLoggingIn: loginMutation.isPending,
     loginError: loginMutation.error,
+    logout: logoutMutation.mutate,
+    isLoggingOut: logoutMutation.isPending,
   };
 };

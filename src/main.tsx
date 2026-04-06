@@ -3,10 +3,10 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { Provider as ReduxProvider } from "react-redux";
 import { store } from "./app/store";
-import { Provider } from "@/components/ui/provider";
+import { Provider } from "@/shared/components/ui/provider";
 import { router } from "./routes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { AuthInitializer } from "./shared/components/AuthInitializer";
 
 const container = document.getElementById("root");
 if (!container) throw new Error("Root element not found");
@@ -28,7 +28,9 @@ root.render(
     <QueryClientProvider client={queryClient}>
       <ReduxProvider store={store}>
         <Provider>
-          <RouterProvider router={router} />
+          <AuthInitializer>
+            <RouterProvider router={router} />
+          </AuthInitializer>
         </Provider>
       </ReduxProvider>
     </QueryClientProvider>
