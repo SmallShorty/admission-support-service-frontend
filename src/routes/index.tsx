@@ -6,6 +6,7 @@ import Layout from "@/shared/components/Layout/Layout";
 import { createBrowserRouter } from "react-router-dom";
 import { RoleProtectedRoute, PublicRoute } from "./RoleProtectedRoute";
 import { AccountRole } from "@/app/entities/account/model/types";
+import WorkspacePage from "@/pages/WorkspacePage/WorkspacePage";
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +21,15 @@ export const router = createBrowserRouter([
             element: <LoginPage />,
           },
         ],
+      },
+    ],
+  },
+  {
+    element: <BareLayout />,
+    children: [
+      {
+        path: "*",
+        element: <NotFoundPage />,
       },
     ],
   },
@@ -42,12 +52,12 @@ export const router = createBrowserRouter([
             path: "/",
             element: <HomePage />,
           },
+          {
+            path: "/workspace",
+            element: <WorkspacePage />,
+          },
         ],
       },
     ],
-  },
-  {
-    path: "*",
-    element: <NotFoundPage />,
   },
 ]);
