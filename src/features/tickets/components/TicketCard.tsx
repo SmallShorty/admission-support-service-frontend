@@ -65,11 +65,9 @@ export const TicketCard = ({
       // ЭФФЕКТ LEVITATION (для IN_PROGRESS)
       // Если тикет в работе — поднимаем его и даем тень
       // Если выбран — добавляем четкую рамку
-      borderColor={isSelected ? "teal.500" : "border.subtle"}
-      shadow={isSelected ? "md" : isWorking ? "lg" : "none"}
+      borderColor={isSelected ? "teal.500" : "gray.200"}
       transform={isWorking && !isSelected ? "translateY(-4px)" : "none"}
       _hover={{
-        shadow: "xl",
         transform: "translateY(-4px)",
         borderColor: isSelected ? "teal.500" : "teal.300",
       }}
@@ -89,6 +87,11 @@ export const TicketCard = ({
           colorPalette={getPriorityPalette(priorityValue)}
           size="sm"
           borderRadius="md"
+          width="25px"
+          display="inline-flex"
+          alignItems="center"
+          justifyContent="center"
+          textAlign="center"
         >
           {priorityValue}
         </Badge>
@@ -107,7 +110,7 @@ export const TicketCard = ({
         Нажмите, чтобы просмотреть историю переписки и детали запроса...
       </Text>
 
-      <Separator borderColor="border.subtle/50" />
+      <Separator borderColor="gray.50" />
 
       {/* Footer */}
       <Flex
@@ -117,9 +120,7 @@ export const TicketCard = ({
         align="center"
         justify="space-between"
         fontSize="10px"
-        borderColor={
-          isSelected || isWorking ? "teal.200/50" : "border.subtle/50"
-        }
+        borderColor={isSelected || isWorking ? "teal.200/50" : "gray.50"}
       >
         <HStack gap="1.5" color="fg.muted">
           <Icon

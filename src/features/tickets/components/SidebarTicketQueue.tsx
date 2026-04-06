@@ -77,7 +77,6 @@ export const SidebarTicketQueue = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [hideInactive, setHideInactive] = useState(false);
 
-  // 2. Логика фильтрации и сортировки
   const filteredTickets = useMemo(() => {
     return MOCK_TICKETS.filter((t) => {
       const matchesSearch =
@@ -89,7 +88,7 @@ export const SidebarTicketQueue = () => {
         ? t.status === TicketStatus.IN_PROGRESS
         : true;
       return matchesSearch && matchesStatus;
-    }).sort((a, b) => b.priorityValue - a.priorityValue); // Высокий приоритет сверху
+    }).sort((a, b) => b.priorityValue - a.priorityValue);
   }, [searchQuery, hideInactive]);
 
   return (
@@ -97,18 +96,16 @@ export const SidebarTicketQueue = () => {
       direction="column"
       w="340px"
       h="100vh"
-      bg="bg.canvas"
       borderRightWidth="1px"
-      borderColor="border.subtle"
+      borderColor="gray.200"
     >
       {/* Header */}
       <Box p="4" bg="bg.panel" borderBottomWidth="1px">
-        <Flex align="center" justify="space-between" mb="4">
+        <Flex align="center" justify="space-between">
           <Heading size="md">Очередь</Heading>
         </Flex>
       </Box>
 
-      {/* Контент списка */}
       <Box
         flex="1"
         overflowY="auto"
@@ -120,6 +117,7 @@ export const SidebarTicketQueue = () => {
             borderRadius: "full",
           },
         }}
+        bg={"#F9FBFB"}
       >
         <VStack gap="3" align="stretch">
           {filteredTickets.length > 0 ? (
