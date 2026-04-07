@@ -6,7 +6,7 @@ const Layout = () => {
   return (
     <Box bg="#F9FBFB" minH="100vh">
       <Navbar />
-      <Container maxW="container.xl">
+      <Container maxW="container.xl" px="0" mx="0">
         <Outlet />
       </Container>
     </Box>

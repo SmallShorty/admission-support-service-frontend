@@ -1,28 +1,53 @@
+/* Убираем лишние отступы только у структурных элементов */
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ol,
+ul,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+  padding: 0;
+}
+
+/* Оставляем box-sizing для всех — это полезно и не ломает компоненты */
 *,
 *::before,
 *::after {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
-ol,
-ul {
+
+/* Списки без маркеров (применяем только к тем, где нет своих стилей) */
+ul,
+ol {
   list-style: none;
 }
+
 a {
   text-decoration: none;
   color: inherit;
 }
+
 img {
   max-width: 100%;
   display: block;
 }
+
+/* Кнопки и инпуты — наследуем шрифты, но не трогаем padding глобально */
 input,
 button,
 textarea,
 select {
   font: inherit;
 }
+
 button {
   cursor: pointer;
 }
