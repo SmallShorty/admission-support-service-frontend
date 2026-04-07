@@ -8,88 +8,105 @@ import {
   HStack,
   Input,
   Text,
+  Button,
+  Badge,
 } from "@chakra-ui/react";
-import { Search, FilterX } from "lucide-react";
+import { Search, FilterX, Users, UserCheck } from "lucide-react";
 import { TicketCard } from "./TicketCard";
 import { AdmissionIntentCategory, TicketStatus } from "../model/types";
-
-const MOCK_TICKETS = [
-  {
-    applicant: {
-      id: "user-1",
-      name: "Иван Иванов",
-      firstName: "Иван",
-      lastName: "Иванов",
-    },
-    category: AdmissionIntentCategory.TECHNICAL_ISSUES,
-    status: TicketStatus.IN_PROGRESS,
-    priorityValue: 9,
-  },
-  {
-    applicant: {
-      id: "user-2",
-      name: "Мария Петрова",
-      firstName: "Мария",
-      lastName: "Петрова",
-      middleName: "Сергеевна",
-    },
-    category: AdmissionIntentCategory.DOCUMENT_SUBMISSION,
-    status: TicketStatus.NEW,
-    priorityValue: 10, // Срочный новый тикет
-  },
-  {
-    applicant: {
-      id: "user-4",
-      name: "Анна Кузнецова",
-      firstName: "Анна",
-      lastName: "Кузнецова",
-    },
-    category: AdmissionIntentCategory.PAYMENTS_CONTRACTS,
-    status: TicketStatus.AWAITING_FEEDBACK,
-    priorityValue: 5,
-  },
-  {
-    applicant: {
-      id: "user-5",
-      name: "Дмитрий Волков",
-      firstName: "Дмитрий",
-      lastName: "Волков",
-    },
-    category: AdmissionIntentCategory.GENERAL_INFO,
-    status: TicketStatus.RESOLVED,
-    priorityValue: 2,
-  },
-  {
-    applicant: {
-      id: "user-6",
-      name: "Елена Соколова",
-      firstName: "Елена",
-      lastName: "Соколова",
-    },
-    category: AdmissionIntentCategory.STATUS_VERIFICATION,
-    status: TicketStatus.CLOSED,
-    priorityValue: 1,
-  },
-];
+import { useAvailableQueue } from "../hooks/queries/useAvailableQueue";
+import { useMyTickets } from "../hooks/queries/useMyTickets";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
+import { setSelectedTicketId } from "../model/ticketsSlice";
 
 export const SidebarTicketQueue = () => {
-  const [selectedId, setSelectedId] = useState<string>("user-1");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [hideInactive, setHideInactive] = useState(false);
+  const dispatch = useAppDispatch();
+  const selectedTicketId = useAppSelector(
+    (state) => state.tickets.selectedTicketId,
+  );
+  const [viewMode, setViewMode] = useState<"available" | "my">("available");
+  const [searchTerm, setSearchTerm] = useState("");
 
+  // Fetch data based on view mode
+  const {
+    data: availableData,
+    isLoading: isLoadingAvailable,
+    error: availableError,
+  } = useAvailableQueue(50, 0);
+
+  const {
+    data: myTicketsData,
+    isLoading: isLoadingMy,
+    error: myError,
+  } = useMyTickets();
+
+  // Get current data and loading state
+  const isLoading = viewMode === "available" ? isLoadingAvailable : isLoadingMy;
+  const error = viewMode === "available" ? availableError : myError;
+  const tickets =
+    viewMode === "available" ? availableData?.items || [] : myTicketsData || [];
+
+  // Filter tickets by search term
   const filteredTickets = useMemo(() => {
-    return MOCK_TICKETS.filter((t) => {
-      const matchesSearch =
-        t.applicant.lastName
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        t.applicant.firstName.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = hideInactive
-        ? t.status === TicketStatus.IN_PROGRESS
-        : true;
-      return matchesSearch && matchesStatus;
-    }).sort((a, b) => b.priorityValue - a.priorityValue);
-  }, [searchQuery, hideInactive]);
+    if (!searchTerm.trim()) return tickets;
+
+    return tickets.filter((ticket) =>
+      ticket.applicant.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  }, [tickets, searchTerm]);
+
+  const handleSelectTicket = (ticketId: string) => {
+    dispatch(setSelectedTicketId(ticketId));
+  };
+
+  // Render loading state
+  if (isLoading) {
+    return (
+      <Flex
+        direction="column"
+        w="340px"
+        h="100vh"
+        borderRightWidth="1px"
+        borderColor="gray.200"
+      >
+        <Box p="4" bg="bg.panel" borderBottomWidth="1px">
+          <Heading size="md">Очередь</Heading>
+        </Box>
+        <Flex flex="1" align="center" justify="center">
+          <Text>Загрузка...</Text>
+        </Flex>
+      </Flex>
+    );
+  }
+
+  // Render error state
+  if (error) {
+    return (
+      <Flex
+        direction="column"
+        w="340px"
+        h="100vh"
+        borderRightWidth="1px"
+        borderColor="gray.200"
+      >
+        <Box p="4" bg="bg.panel" borderBottomWidth="1px">
+          <Heading size="md">Очередь</Heading>
+        </Box>
+        <Flex
+          flex="1"
+          align="center"
+          justify="center"
+          direction="column"
+          gap="3"
+        >
+          <Text color="red.500">Ошибка загрузки</Text>
+          <Text fontSize="sm" color="gray.500">
+            {error.message}
+          </Text>
+        </Flex>
+      </Flex>
+    );
+  }
 
   return (
     <Flex
@@ -101,11 +118,44 @@ export const SidebarTicketQueue = () => {
     >
       {/* Header */}
       <Box p="4" bg="bg.panel" borderBottomWidth="1px">
-        <Flex align="center" justify="space-between">
-          <Heading size="md">Очередь</Heading>
-        </Flex>
+        <Heading size="md" mb="3">
+          Очередь тикетов
+        </Heading>
+
+        {/* Mode Toggle Buttons */}
+        <HStack gap="2" mb="4">
+          <Button
+            size="sm"
+            variant={viewMode === "available" ? "solid" : "outline"}
+            colorScheme="blue"
+            onClick={() => setViewMode("available")}
+            flex="1"
+          >
+            Доступные
+            {availableData?.total !== undefined && availableData.total > 0 && (
+              <Badge ml="2" colorScheme="blue" borderRadius="full">
+                {availableData.total}
+              </Badge>
+            )}
+          </Button>
+          <Button
+            size="sm"
+            variant={viewMode === "my" ? "solid" : "outline"}
+            colorScheme="green"
+            onClick={() => setViewMode("my")}
+            flex="1"
+          >
+            Мои тикеты
+            {myTicketsData && myTicketsData.length > 0 && (
+              <Badge ml="2" colorScheme="green" borderRadius="full">
+                {myTicketsData.length}
+              </Badge>
+            )}
+          </Button>
+        </HStack>
       </Box>
 
+      {/* Ticket List */}
       <Box
         flex="1"
         overflowY="auto"
@@ -117,21 +167,22 @@ export const SidebarTicketQueue = () => {
             borderRadius: "full",
           },
         }}
-        bg={"#F9FBFB"}
+        bg="#F9FBFB"
       >
         <VStack gap="3" align="stretch">
           {filteredTickets.length > 0 ? (
             filteredTickets.map((ticket) => (
               <TicketCard
-                key={ticket.applicant.id}
+                key={ticket.id}
+                id={ticket.id}
                 applicant={ticket.applicant}
                 category={ticket.category}
                 status={ticket.status}
                 priorityValue={ticket.priorityValue}
-                isSelected={selectedId === ticket.applicant.id}
-                onSelect={(id) => setSelectedId(id)}
-                createdAt={"24.05.2026"}
-                lastMessageAt={"24.05.2026 10:20"}
+                isSelected={selectedTicketId === ticket.id}
+                onSelect={() => handleSelectTicket(ticket.id)}
+                createdAt={ticket.createdAt}
+                lastMessageAt={ticket.lastMessageAt}
               />
             ))
           ) : (
@@ -142,7 +193,13 @@ export const SidebarTicketQueue = () => {
               py="10"
               color="fg.muted"
             >
-              <Text fontSize="sm">Никого не нашли</Text>
+              <Text fontSize="sm">
+                {searchTerm
+                  ? "Ничего не найдено"
+                  : viewMode === "available"
+                    ? "Нет доступных тикетов"
+                    : "У вас нет активных тикетов"}
+              </Text>
             </Flex>
           )}
         </VStack>

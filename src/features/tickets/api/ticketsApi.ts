@@ -1,23 +1,28 @@
 // src/features/tickets/api/ticketsApi.ts
 import { coreApi } from "@/shared/axiosInstance";
 import {
-  Ticket,
   TicketListItem,
   TakeTicketResponse,
   EscalateTicketPayload,
   UpdateTicketStatusPayload,
   AllQueueFilters,
+  TicketFilters,
+  TicketCounts,
+  TicketDetail,
+  TicketMessage,
 } from "../model/types";
 import { PaginatedResponse } from "@/shared/types/pagination";
 
 export const ticketsApi = {
-  // Получить мои активные тикеты (IN_PROGRESS, ESCALATED)
-  getMyTickets: async (): Promise<Ticket[]> => {
-    const { data } = await coreApi.get<Ticket[]>("/tickets/my");
+  // ========== Queue & List Operations ==========
+
+  // Get my active tickets (IN_PROGRESS, ESCALATED)
+  getMyTickets: async (): Promise<TicketListItem[]> => {
+    const { data } = await coreApi.get<TicketListItem[]>("/tickets/my");
     return data;
   },
 
-  // Получить доступную очередь (NEW, без агента)
+  // Get available queue (NEW, without agent)
   getAvailableQueue: async (
     limit: number = 50,
     offset: number = 0,
@@ -31,13 +36,13 @@ export const ticketsApi = {
     return data;
   },
 
-  // Получить общую очередь (только для ADMIN/SUPERVISOR)
+  // Get all queue (ADMIN/SUPERVISOR only)
   getAllQueue: async (
     limit: number = 50,
     offset: number = 0,
     filters?: AllQueueFilters,
-  ): Promise<PaginatedResponse<Ticket>> => {
-    const { data } = await coreApi.get<PaginatedResponse<Ticket>>(
+  ): Promise<PaginatedResponse<TicketListItem>> => {
+    const { data } = await coreApi.get<PaginatedResponse<TicketListItem>>(
       "/tickets/queue/all",
       {
         params: {
@@ -51,7 +56,39 @@ export const ticketsApi = {
     return data;
   },
 
-  // Взять тикет в работу
+  // Get paginated tickets with filters (universal Kanban endpoint)
+  getTickets: async (
+    filters?: TicketFilters,
+  ): Promise<PaginatedResponse<TicketListItem>> => {
+    const { data } = await coreApi.get<PaginatedResponse<TicketListItem>>(
+      "/tickets",
+      {
+        params: {
+          status: filters?.status,
+          agentId: filters?.agentId,
+          limit: filters?.limit,
+          offset: filters?.offset,
+        },
+      },
+    );
+    return data;
+  },
+
+  // Get ticket counts by status
+  getTicketCounts: async (): Promise<TicketCounts> => {
+    const { data } = await coreApi.get<TicketCounts>("/tickets/counts");
+    return data;
+  },
+
+  // ========== Ticket Management ==========
+
+  // Get ticket details with 360-degree data
+  getTicketById: async (ticketId: string): Promise<TicketDetail> => {
+    const { data } = await coreApi.get<TicketDetail>(`/tickets/${ticketId}`);
+    return data;
+  },
+
+  // Take a ticket (assign to current agent)
   takeTicket: async (ticketId: string): Promise<TakeTicketResponse> => {
     const { data } = await coreApi.post<TakeTicketResponse>(
       `/tickets/${ticketId}/take`,
@@ -59,33 +96,27 @@ export const ticketsApi = {
     return data;
   },
 
-  // Эскалировать тикет
+  // Escalate a ticket to another agent
   escalateTicket: async (
     ticketId: string,
     payload: EscalateTicketPayload,
-  ): Promise<Ticket> => {
-    const { data } = await coreApi.post<Ticket>(
+  ): Promise<TicketListItem> => {
+    const { data } = await coreApi.post<TicketListItem>(
       `/tickets/${ticketId}/escalate`,
       payload,
     );
     return data;
   },
 
-  // Обновить статус тикета
+  // Update ticket status (RESOLVED or CLOSED only)
   updateTicketStatus: async (
     ticketId: string,
     payload: UpdateTicketStatusPayload,
-  ): Promise<Ticket> => {
-    const { data } = await coreApi.patch<Ticket>(
+  ): Promise<TicketListItem> => {
+    const { data } = await coreApi.patch<TicketListItem>(
       `/tickets/${ticketId}/status`,
       payload,
     );
-    return data;
-  },
-
-  // Получить детали тикета
-  getTicketById: async (ticketId: string): Promise<Ticket> => {
-    const { data } = await coreApi.get<Ticket>(`/tickets/${ticketId}`);
     return data;
   },
 };

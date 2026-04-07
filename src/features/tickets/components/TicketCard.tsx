@@ -12,21 +12,22 @@ import { IntentCategoryBadge } from "./IntentCategoryBadge";
 import { AdmissionIntentCategory, TicketStatus } from "../model/types";
 
 interface TicketCardProps {
+  id: string;
   applicant: {
     id: string;
     name: string;
     firstName: string;
     lastName: string;
     middleName?: string;
+    email: string;
   };
-  category: string;
+  category: string | null;
   status: TicketStatus;
-  priorityValue: number;
-  createdAt: string;
-  lastMessageAt: string;
-  isSelected?: boolean;
-  onSelect?: (id: string) => void;
-  className?: string;
+  priorityValue: number | null;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
+  createdAt: string | Date;
+  lastMessageAt: string | Date;
 }
 
 export const TicketCard = ({
@@ -38,7 +39,6 @@ export const TicketCard = ({
   lastMessageAt,
   isSelected,
   onSelect,
-  className,
 }: TicketCardProps) => {
   const isWorking = status === TicketStatus.IN_PROGRESS;
 
@@ -50,9 +50,26 @@ export const TicketCard = ({
 
   const displayName = `${applicant.firstName} ${applicant.lastName}`;
 
+  const formatDate = (dateInput: string | Date) => {
+    const d = new Date(dateInput);
+    return isNaN(d.getTime()) ? "—" : d.toLocaleDateString("ru-RU");
+  };
+
+  const formatDateTime = (dateInput: string | Date) => {
+    const d = new Date(dateInput);
+    return isNaN(d.getTime())
+      ? "—"
+      : d.toLocaleString("ru-RU", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+  };
+
   return (
     <Box
-      className={className}
       onClick={() => onSelect?.(applicant.id)}
       cursor="pointer"
       p="3"
@@ -84,7 +101,7 @@ export const TicketCard = ({
         </Text>
         <Badge
           variant="solid"
-          colorPalette={getPriorityPalette(priorityValue)}
+          colorPalette={getPriorityPalette(priorityValue!)}
           size="sm"
           borderRadius="md"
           width="25px"
@@ -136,7 +153,7 @@ export const TicketCard = ({
               fontWeight="medium"
               color={isSelected || isWorking ? "teal.700" : "fg.default"}
             >
-              {createdAt}
+              {formatDate(createdAt)}
             </Text>
           </Text>
         </HStack>
@@ -147,7 +164,6 @@ export const TicketCard = ({
             h="1.5"
             borderRadius="full"
             bg={isSelected || isWorking ? "teal.500" : "border.emphasized"}
-            // Добавим пульсацию для эффекта "живого" тикета
             animation={isWorking ? "pulse 2s infinite" : "none"}
             css={{
               "@keyframes pulse": {
@@ -164,7 +180,7 @@ export const TicketCard = ({
               fontWeight="medium"
               color={isSelected || isWorking ? "teal.700" : "fg.default"}
             >
-              {lastMessageAt}
+              {formatDateTime(lastMessageAt)}
             </Text>
           </Text>
         </HStack>
