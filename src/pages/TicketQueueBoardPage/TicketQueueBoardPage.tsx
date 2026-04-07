@@ -1,5 +1,6 @@
 import { TicketCard } from "@/features/tickets/components/TicketCard";
 import { useAllQueue } from "@/features/tickets/hooks/queries/useAllQueue";
+import { useTicketCounts } from "@/features/tickets/hooks/queries/useTicketCounts";
 import { TicketStatus } from "@/features/tickets/model/types";
 import {
   Box,
@@ -15,9 +16,16 @@ import {
   Center,
 } from "@chakra-ui/react";
 import { MoreHorizontal } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useRef, useCallback, useEffect, useState } from "react";
 
 const COLUMNS = [
-  { id: "new", title: "Новые", color: "blue.500", status: TicketStatus.NEW },
+  {
+    id: "new",
+    title: "Новые",
+    color: "blue.500",
+    status: TicketStatus.NEW,
+  },
   {
     id: "in_progress",
     title: "В работе",
@@ -25,9 +33,9 @@ const COLUMNS = [
     status: TicketStatus.IN_PROGRESS,
   },
   {
-    id: "review",
-    title: "На проверке",
-    color: "purple.500",
+    id: "escalated",
+    title: "Сложные случаи",
+    color: "red.500",
     status: TicketStatus.ESCALATED,
   },
   {
@@ -38,30 +46,106 @@ const COLUMNS = [
   },
 ];
 
+const MotionBox = motion(Box);
+const MotionVStack = motion(VStack);
+
 export const TicketQueueBoardPage = () => {
+  const [page, setPage] = useState(1);
+  const [allTickets, setAllTickets] = useState<any[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
   const {
     data: ticketsData,
     isLoading,
     error,
-  } = useAllQueue(50, 0, { isAdmin: true });
+    isFetching,
+  } = useAllQueue(20, (page - 1) * 20, { isAdmin: true });
 
-  const allTickets = ticketsData?.items || [];
+  const { data: countsData, isLoading: countsLoading } = useTicketCounts();
 
-  if (isLoading) {
-    return (
-      <Center h="full" p="6">
-        <Spinner size="xl" />
-      </Center>
-    );
-  }
+  // Обновляем тикеты при получении новых данных
+  useEffect(() => {
+    if (ticketsData?.items) {
+      if (page === 1) {
+        setAllTickets(ticketsData.items);
+      } else {
+        setAllTickets((prev) => [...prev, ...ticketsData.items]);
+      }
+      setHasMore(ticketsData.items.length === 20);
+    }
+  }, [ticketsData, page]);
 
-  if (error) {
+  // Intersection Observer для бесконечной прокрутки
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [target] = entries;
+      if (target.isIntersecting && hasMore && !isFetching && !isLoading) {
+        setPage((prev) => prev + 1);
+      }
+    },
+    [hasMore, isFetching, isLoading],
+  );
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleObserver, {
+      threshold: 0.1,
+      rootMargin: "100px",
+    });
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current);
+      }
+    };
+  }, [handleObserver]);
+
+  if (error && page === 1) {
     return (
       <Center h="full" p="6">
         <Text color="red.500">Ошибка загрузки обращений: {error.message}</Text>
       </Center>
     );
   }
+
+  // Анимации для карточек
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+    exit: { opacity: 0, x: -100 },
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+      },
+    },
+  };
+
+  // Функция для получения счетчика по колонке
+  const getColumnCount = (status: TicketStatus) => {
+    if (!countsData) return 0;
+
+    switch (status) {
+      case TicketStatus.NEW:
+        return countsData.NEW || 0;
+      case TicketStatus.IN_PROGRESS:
+        return countsData.IN_PROGRESS || 0;
+      case TicketStatus.ESCALATED:
+        return countsData.ESCALATED || 0;
+      case TicketStatus.CLOSED:
+        return countsData.CLOSED || 0;
+      default:
+        return 0;
+    }
+  };
 
   return (
     <Box flex="1" overflowX="auto" p="6" h="full">
@@ -79,6 +163,9 @@ export const TicketQueueBoardPage = () => {
               (a: any, b: any) =>
                 (b.priorityValue || 0) - (a.priorityValue || 0),
             );
+
+          const count = getColumnCount(column.status);
+          const displayedCount = countsLoading ? "..." : count;
 
           return (
             <Flex
@@ -118,7 +205,7 @@ export const TicketQueueBoardPage = () => {
                     borderRadius="full"
                     color="fg.muted"
                   >
-                    {columnApplicants.length}
+                    {displayedCount}
                   </Box>
                 </HStack>
                 <IconButton
@@ -132,13 +219,16 @@ export const TicketQueueBoardPage = () => {
                 </IconButton>
               </Flex>
 
-              {/* Column Body */}
-              <VStack
+              {/* Column Body with Infinite Scroll */}
+              <MotionVStack
                 flex="1"
                 overflowY="auto"
                 p="3"
                 gap="3"
                 align="stretch"
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
                 css={{
                   "&::-webkit-scrollbar": { width: "4px" },
                   "&::-webkit-scrollbar-thumb": {
@@ -147,42 +237,82 @@ export const TicketQueueBoardPage = () => {
                   },
                 }}
               >
-                {columnApplicants.map((ticket: any) => (
-                  <Box key={ticket.id} position="relative" role="group">
-                    <TicketCard
-                      id={ticket.id}
-                      applicant={ticket.applicant}
-                      category={ticket.category}
-                      status={ticket.status}
-                      priorityValue={ticket.priorityValue}
-                      isSelected={false}
-                      onSelect={(id: string) => {
-                        // Implement selection logic if needed
-                        console.log("Selected ticket:", id);
+                <AnimatePresence mode="popLayout">
+                  {columnApplicants.map((ticket: any, index: number) => (
+                    <MotionBox
+                      key={ticket.id}
+                      position="relative"
+                      role="group"
+                      variants={cardVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      transition={{
+                        duration: 0.3,
+                        delay: index * 0.02,
                       }}
-                      createdAt={ticket.createdAt}
-                      lastMessageAt={ticket.lastMessageAt}
-                    />
-                  </Box>
-                ))}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <TicketCard
+                        id={ticket.id}
+                        applicant={ticket.applicant}
+                        category={ticket.category}
+                        status={ticket.status}
+                        priorityValue={ticket.priorityValue}
+                        isSelected={false}
+                        onSelect={(id: string) => {
+                          console.log("Selected ticket:", id);
+                        }}
+                        createdAt={ticket.createdAt}
+                        lastMessageAt={ticket.lastMessageAt}
+                      />
+                    </MotionBox>
+                  ))}
+                </AnimatePresence>
 
-                {columnApplicants.length === 0 && (
-                  <Flex
+                {columnApplicants.length === 0 && !isLoading && (
+                  <MotionBox
                     h="24"
                     borderWidth="2px"
                     borderStyle="dashed"
                     borderColor="border.subtle"
                     borderRadius="xl"
-                    align="center"
-                    justify="center"
+                    alignItems="center"
+                    justifyContent="center"
+                    display="flex"
                     m="2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
                   >
-                    <Text fontSize="sm" color="fg.muted">
+                    <Text fontSize="sm" color="fg.muted" textAlign="center">
                       Нет обращений
                     </Text>
-                  </Flex>
+                  </MotionBox>
                 )}
-              </VStack>
+
+                {/* Индикатор загрузки для бесконечной прокрутки */}
+                {isFetching && columnApplicants.length > 0 && (
+                  <MotionBox
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    p="3"
+                    textAlign="center"
+                  >
+                    <Spinner size="sm" color={column.color} />
+                    <Text fontSize="xs" color="fg.muted" mt="1">
+                      Загрузка...
+                    </Text>
+                  </MotionBox>
+                )}
+
+                {/* Элемент для отслеживания прокрутки */}
+                {column.id === COLUMNS[0].id && hasMore && (
+                  <Box ref={loadMoreRef} h="20px" />
+                )}
+              </MotionVStack>
             </Flex>
           );
         })}
