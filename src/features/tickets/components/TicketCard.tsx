@@ -74,20 +74,11 @@ export const TicketCard = ({
       cursor="pointer"
       p="3"
       borderRadius="xl"
-      transition="all 0.3s cubic-bezier(.25,.8,.25,1)"
       position="relative"
-      // БАЗОВЫЕ СТИЛИ
       borderWidth="1px"
       bg="bg.panel"
-      // ЭФФЕКТ LEVITATION (для IN_PROGRESS)
-      // Если тикет в работе — поднимаем его и даем тень
-      // Если выбран — добавляем четкую рамку
       borderColor={isSelected ? "teal.500" : "gray.200"}
       transform={isWorking && !isSelected ? "translateY(-4px)" : "none"}
-      _hover={{
-        transform: "translateY(-4px)",
-        borderColor: isSelected ? "teal.500" : "teal.300",
-      }}
     >
       {/* Header */}
       <Flex justify="space-between" align="flex-start" mb="2" gap="2">
@@ -164,14 +155,6 @@ export const TicketCard = ({
             h="1.5"
             borderRadius="full"
             bg={isSelected || isWorking ? "teal.500" : "border.emphasized"}
-            animation={isWorking ? "pulse 2s infinite" : "none"}
-            css={{
-              "@keyframes pulse": {
-                "0%": { opacity: 1, transform: "scale(1)" },
-                "50%": { opacity: 0.5, transform: "scale(1.2)" },
-                "100%": { opacity: 1, transform: "scale(1)" },
-              },
-            }}
           />
           <Text>
             Изменено:{" "}
