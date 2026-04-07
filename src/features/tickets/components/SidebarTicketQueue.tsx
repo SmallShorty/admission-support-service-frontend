@@ -4,30 +4,30 @@ import {
   Flex,
   Heading,
   VStack,
-  IconButton,
-  HStack,
-  Input,
   Text,
-  Button,
   Badge,
+  Tabs,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
-import { Search, FilterX, Users, UserCheck } from "lucide-react";
+import { Inbox, UserCheck } from "lucide-react";
 import { TicketCard } from "./TicketCard";
-import { AdmissionIntentCategory, TicketStatus } from "../model/types";
 import { useAvailableQueue } from "../hooks/queries/useAvailableQueue";
 import { useMyTickets } from "../hooks/queries/useMyTickets";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { setSelectedTicketId } from "../model/ticketsSlice";
+
+type ViewMode = "available" | "my";
 
 export const SidebarTicketQueue = () => {
   const dispatch = useAppDispatch();
   const selectedTicketId = useAppSelector(
     (state) => state.tickets.selectedTicketId,
   );
-  const [viewMode, setViewMode] = useState<"available" | "my">("available");
-  const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch data based on view mode
+  const [viewMode, setViewMode] = useState<ViewMode>("available");
+
+  // Загрузка данных
   const {
     data: availableData,
     isLoading: isLoadingAvailable,
@@ -40,73 +40,22 @@ export const SidebarTicketQueue = () => {
     error: myError,
   } = useMyTickets();
 
-  // Get current data and loading state
+  // Вычисляемые состояния
   const isLoading = viewMode === "available" ? isLoadingAvailable : isLoadingMy;
   const error = viewMode === "available" ? availableError : myError;
-  const tickets =
-    viewMode === "available" ? availableData?.items || [] : myTicketsData || [];
 
-  // Filter tickets by search term
-  const filteredTickets = useMemo(() => {
-    if (!searchTerm.trim()) return tickets;
+  const currentTickets = useMemo(() => {
+    const tickets =
+      viewMode === "available"
+        ? availableData?.items || []
+        : myTicketsData || [];
 
-    return tickets.filter((ticket) =>
-      ticket.applicant.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  }, [tickets, searchTerm]);
+    return tickets;
+  }, [viewMode, availableData, myTicketsData]);
 
   const handleSelectTicket = (ticketId: string) => {
     dispatch(setSelectedTicketId(ticketId));
   };
-
-  // Render loading state
-  if (isLoading) {
-    return (
-      <Flex
-        direction="column"
-        w="340px"
-        h="100vh"
-        borderRightWidth="1px"
-        borderColor="gray.200"
-      >
-        <Box p="4" bg="bg.panel" borderBottomWidth="1px">
-          <Heading size="md">Очередь</Heading>
-        </Box>
-        <Flex flex="1" align="center" justify="center">
-          <Text>Загрузка...</Text>
-        </Flex>
-      </Flex>
-    );
-  }
-
-  // Render error state
-  if (error) {
-    return (
-      <Flex
-        direction="column"
-        w="340px"
-        h="100vh"
-        borderRightWidth="1px"
-        borderColor="gray.200"
-      >
-        <Box p="4" bg="bg.panel" borderBottomWidth="1px">
-          <Heading size="md">Очередь</Heading>
-        </Box>
-        <Flex
-          flex="1"
-          align="center"
-          justify="center"
-          direction="column"
-          gap="3"
-        >
-          <Text color="red.500">Ошибка загрузки</Text>
-          <Text fontSize="sm" color="gray.500">
-            {error.message}
-          </Text>
-        </Flex>
-      </Flex>
-    );
-  }
 
   return (
     <Flex
@@ -114,51 +63,61 @@ export const SidebarTicketQueue = () => {
       w="340px"
       h="100vh"
       borderRightWidth="1px"
-      borderColor="gray.200"
+      borderColor="border.muted"
+      bg="bg.panel"
     >
-      {/* Header */}
-      <Box p="4" bg="bg.panel" borderBottomWidth="1px">
-        <Heading size="md" mb="3">
+      {/* Header & Navigation */}
+      <Box p="4" borderBottomWidth="1px">
+        <Heading size="md" mb="4">
           Очередь тикетов
         </Heading>
 
-        {/* Mode Toggle Buttons */}
-        <HStack gap="2" mb="4">
-          <Button
-            size="sm"
-            variant={viewMode === "available" ? "solid" : "outline"}
-            colorScheme="blue"
-            onClick={() => setViewMode("available")}
-            flex="1"
-          >
-            Доступные
-            {availableData?.total !== undefined && availableData.total > 0 && (
-              <Badge ml="2" colorScheme="blue" borderRadius="full">
-                {availableData.total}
-              </Badge>
-            )}
-          </Button>
-          <Button
-            size="sm"
-            variant={viewMode === "my" ? "solid" : "outline"}
-            colorScheme="green"
-            onClick={() => setViewMode("my")}
-            flex="1"
-          >
-            Мои тикеты
-            {myTicketsData && myTicketsData.length > 0 && (
-              <Badge ml="2" colorScheme="green" borderRadius="full">
-                {myTicketsData.length}
-              </Badge>
-            )}
-          </Button>
-        </HStack>
+        <Tabs.Root
+          value={viewMode}
+          onValueChange={(details) => setViewMode(details.value as ViewMode)}
+          variant="plain"
+          size="sm"
+        >
+          <Tabs.List bg="bg.muted" rounded="l3" p="1">
+            <Tabs.Trigger value="available" flex="1" justifyContent="center">
+              <Inbox size={16} />
+              Доступные
+              {availableData?.total ? (
+                <Badge
+                  variant="solid"
+                  colorPalette="blue"
+                  rounded="full"
+                  ms="2"
+                >
+                  {availableData.total}
+                </Badge>
+              ) : null}
+            </Tabs.Trigger>
+
+            <Tabs.Trigger value="my" flex="1" justifyContent="center">
+              <UserCheck size={16} />
+              Мои
+              {myTicketsData?.length ? (
+                <Badge
+                  variant="solid"
+                  colorPalette="green"
+                  rounded="full"
+                  ms="2"
+                >
+                  {myTicketsData.length}
+                </Badge>
+              ) : null}
+            </Tabs.Trigger>
+            <Tabs.Indicator rounded="l2" />
+          </Tabs.List>
+        </Tabs.Root>
       </Box>
 
-      {/* Ticket List */}
+      {/* Main Content Area */}
       <Box
         flex="1"
         overflowY="auto"
+        bg="bg.subtle" // Более мягкий фон для списка
         p="3"
         css={{
           "&::-webkit-scrollbar": { width: "4px" },
@@ -167,11 +126,30 @@ export const SidebarTicketQueue = () => {
             borderRadius: "full",
           },
         }}
-        bg="#F9FBFB"
       >
-        <VStack gap="3" align="stretch">
-          {filteredTickets.length > 0 ? (
-            filteredTickets.map((ticket) => (
+        {isLoading ? (
+          <Center h="40">
+            <VStack gap="2">
+              <Spinner size="sm" color="blue.500" />
+              <Text fontSize="xs" color="fg.muted">
+                Загрузка...
+              </Text>
+            </VStack>
+          </Center>
+        ) : error ? (
+          <Center h="40" p="4" textAlign="center">
+            <VStack gap="1">
+              <Text color="red.500" fontSize="sm" fontWeight="medium">
+                Ошибка загрузки
+              </Text>
+              <Text fontSize="xs" color="fg.subtle">
+                {(error as any)?.message}
+              </Text>
+            </VStack>
+          </Center>
+        ) : currentTickets.length > 0 ? (
+          <VStack gap="3" align="stretch">
+            {currentTickets.map((ticket) => (
               <TicketCard
                 key={ticket.id}
                 id={ticket.id}
@@ -184,25 +162,17 @@ export const SidebarTicketQueue = () => {
                 createdAt={ticket.createdAt}
                 lastMessageAt={ticket.lastMessageAt}
               />
-            ))
-          ) : (
-            <Flex
-              direction="column"
-              align="center"
-              justify="center"
-              py="10"
-              color="fg.muted"
-            >
-              <Text fontSize="sm">
-                {searchTerm
-                  ? "Ничего не найдено"
-                  : viewMode === "available"
-                    ? "Нет доступных тикетов"
-                    : "У вас нет активных тикетов"}
-              </Text>
-            </Flex>
-          )}
-        </VStack>
+            ))}
+          </VStack>
+        ) : (
+          <Center h="40">
+            <Text fontSize="sm" color="fg.muted">
+              {viewMode === "available"
+                ? "Нет доступных тикетов"
+                : "У вас нет активных тикетов"}
+            </Text>
+          </Center>
+        )}
       </Box>
     </Flex>
   );
