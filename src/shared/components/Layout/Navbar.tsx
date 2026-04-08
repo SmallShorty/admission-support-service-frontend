@@ -111,9 +111,9 @@ export const Navbar: FC = () => {
             />
             <NavbarItem href="/queue" icon={Users} label="Очередь" />
             <NavbarItem
-              href="/resources"
+              href="/knowledge-base"
               icon={Database}
-              label="База ресурсов"
+              label="База знаний"
             />
             <NavbarItem
               href="/integrations"

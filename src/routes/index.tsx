@@ -15,6 +15,9 @@ const WorkspacePage = lazy(() => import("@/pages/WorkspacePage/WorkspacePage"));
 const TicketQueueBoardPage = lazy(
   () => import("@/pages/TicketQueueBoardPage/TicketQueueBoardPage"),
 );
+const KnowledgeBasePage = lazy(
+  () => import("@/pages/KnowledgeBasePage/KnowledgeBasePage"),
+);
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage/NotFoundPage"));
 
 const PageLoader = ({ children }: { children: React.ReactNode }) => (
@@ -69,6 +72,14 @@ export const router = createBrowserRouter([
             element: (
               <PageLoader>
                 <WorkspacePage />
+              </PageLoader>
+            ),
+          },
+          {
+            path: "knowledge-base",
+            element: (
+              <PageLoader>
+                <KnowledgeBasePage />
               </PageLoader>
             ),
           },
