@@ -1,7 +1,12 @@
 import { coreApi } from "@/shared/axiosInstance";
-import { Account, AuthResponse } from "../model/types";
+import {
+  Account,
+  AccountPaginatedResponse,
+  AuthResponse,
+  GetAccountsFilters,
+} from "../model/types";
 
-export const authApi = {
+export const accountApi = {
   login: async (credentials: {
     email: string;
     password: string;
@@ -22,6 +27,15 @@ export const authApi = {
 
   getProfile: async (): Promise<Account> => {
     const { data } = await coreApi.get<Account>("/auth/profile");
+    return data;
+  },
+
+  getAccounts: async (
+    params: GetAccountsFilters,
+  ): Promise<AccountPaginatedResponse> => {
+    const { data } = await coreApi.get<AccountPaginatedResponse>("/accounts", {
+      params,
+    });
     return data;
   },
 

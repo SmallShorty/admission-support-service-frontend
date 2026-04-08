@@ -6,6 +6,7 @@ import { RoleProtectedRoute, PublicRoute } from "./RoleProtectedRoute";
 
 import Layout from "@/shared/components/Layout/Layout";
 import BareLayout from "@/shared/components/Layout/BareLayout";
+import AdminControlPanelPage from "@/pages/AdminControlPanelPage/AdminControlPanelPage";
 
 const HomePage = lazy(() => import("@/pages/HomePage/HomePage"));
 const LoginPage = lazy(() =>
@@ -95,7 +96,10 @@ export const router = createBrowserRouter([
     children: [
       {
         element: <Layout />,
-        children: [{ path: "/queue", element: <TicketQueueBoardPage /> }],
+        children: [
+          { path: "/queue", element: <TicketQueueBoardPage /> },
+          { path: "/admin-control-panel", element: <AdminControlPanelPage /> },
+        ],
       },
     ],
   },

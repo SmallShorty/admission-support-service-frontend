@@ -1,3 +1,4 @@
+import { PaginatedResponse, PaginationParams } from "@/shared/types/pagination";
 import { ApplicantProfile } from "../../applicant/model/types";
 
 export enum AccountRole {
@@ -40,3 +41,10 @@ export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface GetAccountsFilters extends PaginationParams {
+  searchTerm?: string;
+  isStaff?: boolean;
+}
+
+export type AccountPaginatedResponse = PaginatedResponse<Account>;

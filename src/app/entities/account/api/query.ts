@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { setAccount, logout, updateTokens } from "../model/accountSlice";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "@/app/hooks";
-import { authApi } from "./accountApi";
+import { accountApi } from "./accountApi";
 import { useEffect } from "react";
 export const useAccount = () => {
   const dispatch = useAppDispatch();
@@ -12,7 +12,7 @@ export const useAccount = () => {
     const refreshToken = localStorage.getItem("refreshToken");
     if (!refreshToken) return null;
     try {
-      const data = await authApi.refresh(refreshToken);
+      const data = await accountApi.refresh(refreshToken);
       dispatch(
         setAccount({
           account: data.account,
@@ -38,13 +38,13 @@ export const useAccount = () => {
   }, []);
   const profileQuery = useQuery({
     queryKey: ["profile"],
-    queryFn: authApi.getProfile,
+    queryFn: accountApi.getProfile,
     enabled: !!localStorage.getItem("accessToken"),
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
   const loginMutation = useMutation({
-    mutationFn: authApi.login,
+    mutationFn: accountApi.login,
     onSuccess: (data) => {
       dispatch(
         setAccount({
@@ -64,7 +64,7 @@ export const useAccount = () => {
     },
   });
   const logoutMutation = useMutation({
-    mutationFn: authApi.logout,
+    mutationFn: accountApi.logout,
     onSuccess: () => {
       dispatch(logout());
       queryClient.clear();

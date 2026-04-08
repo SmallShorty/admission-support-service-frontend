@@ -122,7 +122,7 @@ export const Navbar: FC = () => {
             />
             <NavbarItem href="/analytics" icon={BarChart3} label="Аналитика" />
             <NavbarItem
-              href="/admin"
+              href="/admin-control-panel"
               icon={Settings}
               label="Панель управления"
             />
