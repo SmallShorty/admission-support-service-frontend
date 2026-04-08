@@ -3,8 +3,8 @@
 import { FC } from "react";
 import { Tabs, Box } from "@chakra-ui/react";
 import { LuMessageSquare, LuLayers, LuBook } from "react-icons/lu";
-import { Container } from "lucide-react";
 import { TicketCategories } from "./TicketCategories";
+import { VariableDictionary } from "../VariableDictionary";
 
 export const KnowledgeBaseTabs: FC = () => {
   return (
@@ -43,7 +43,7 @@ export const KnowledgeBaseTabs: FC = () => {
           </Tabs.Content>
 
           <Tabs.Content value="variableDictionary">
-            {/* <VariableDictionary /> */}
+            <VariableDictionary />
           </Tabs.Content>
         </Box>
       </Tabs.Root>
