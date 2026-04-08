@@ -1,4 +1,4 @@
-// Базовый тип для пагинированного ответа
+// Соответствует PaginatedResponseDto на бэкенде
 export interface PaginatedResponse<T> {
   items: T[];
   total: number;
@@ -7,28 +7,26 @@ export interface PaginatedResponse<T> {
   limit: number;
 }
 
-// Базовый тип для пагинированного запроса (offset-based)
+// Базовые параметры запроса (Query Params)
 export interface PaginationParams {
   limit?: number;
   offset?: number;
 }
 
-// Базовый тип для пагинированного запроса (cursor-based)
+// Курсорная пагинация (если бэк поддерживает CursorPaginatedResponseDto)
 export interface CursorPaginationParams {
   limit?: number;
   cursor?: string;
 }
 
-// Тип для пагинированного ответа с cursor-based пагинацией
 export interface CursorPaginatedResponse<T> {
   items: T[];
   hasMore: boolean;
   nextCursor: string | null;
 }
 
-// Тип для состояния пагинации в Redux
-export interface PaginationState {
-  items: any[];
+export interface PaginationState<T = any> {
+  items: T[];
   total: number;
   hasMore: boolean;
   offset: number;
@@ -37,26 +35,25 @@ export interface PaginationState {
   error: string | null;
 }
 
-// Тип для начального состояния пагинации
 export const initialPaginationState: PaginationState = {
   items: [],
   total: 0,
   hasMore: false,
   offset: 0,
-  limit: 50,
+  limit: 20, // Синхронизировано с дефолтом бэкенда
   loading: false,
   error: null,
 };
 
-// Тип для параметров бесконечного скролла (React Query)
+// Параметры, которые React Query передает в fetcher
 export interface InfiniteScrollParams {
-  pageParam?: number;
+  offsetParam?: number; // Раньше был pageParam
   limit?: number;
 }
 
-// Тип для ответа бесконечного скролла
+// Ответ, который удобно ложится в getNextPageParam
 export interface InfiniteScrollResponse<T> {
-  data: T[];
+  items: T[]; // На бэке это поле называется items
   nextOffset: number | null;
   hasMore: boolean;
   total: number;
