@@ -45,7 +45,7 @@ export const TemplateInfoCard = ({ template }: Props) => {
               fontSize="10px"
             >
               <Icon as={LuUser} />
-              {template.authorName}
+              {template.author}
             </Badge>
           </Flex>
           <Flex align="center" gap="1.5" color="fg.muted" fontSize="11px">
