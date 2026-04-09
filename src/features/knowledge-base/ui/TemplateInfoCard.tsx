@@ -1,20 +1,19 @@
+import { JSONContent } from "@tiptap/core";
 import { Template } from "@/features/templates/model/types";
-import { Box, Flex, Text, Badge, Stack, Icon } from "@chakra-ui/react";
+import { Box, Flex, Text, Badge, Icon } from "@chakra-ui/react";
 import { LuUser, LuClock } from "react-icons/lu";
 
 interface Props {
   template: Template;
+  onClick: () => void;
 }
 
-export const TemplateInfoCard = ({ template }: Props) => {
-  const renderContent = (jsonStr: string) => {
-    try {
-      const parsed = JSON.parse(jsonStr);
-      return parsed.content || jsonStr;
-    } catch {
-      return jsonStr;
-    }
-  };
+const extractText = (node: JSONContent): string => {
+  if (node.type === "text") return node.text ?? "";
+  return (node.content ?? []).map(extractText).join("");
+};
+
+export const TemplateInfoCard = ({ template, onClick }: Props) => {
 
   return (
     <Box
@@ -25,6 +24,10 @@ export const TemplateInfoCard = ({ template }: Props) => {
       borderColor="border.subtle"
       display="flex"
       flexDirection="column"
+      cursor="pointer"
+      onClick={onClick}
+      _hover={{ borderColor: "blue.300", shadow: "sm" }}
+      transition="all 0.15s"
     >
       <Flex justify="space-between" align="start" mb="3" gap="4">
         <Box minW="0" flex="1">
@@ -45,7 +48,7 @@ export const TemplateInfoCard = ({ template }: Props) => {
               fontSize="10px"
             >
               <Icon as={LuUser} />
-              {template.author}
+              {template.createdBy}
             </Badge>
           </Flex>
           <Flex align="center" gap="1.5" color="fg.muted" fontSize="11px">
@@ -82,7 +85,7 @@ export const TemplateInfoCard = ({ template }: Props) => {
         flex="1"
         transition="colors"
       >
-        {renderContent(template.content)}
+        {extractText(template.content)}
       </Box>
     </Box>
   );
