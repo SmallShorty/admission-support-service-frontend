@@ -3,6 +3,7 @@
 import { FC } from "react";
 import { Tabs, Box } from "@chakra-ui/react";
 import { LuMessageSquare, LuLayers, LuBook } from "react-icons/lu";
+import { MessageTemplates } from "./MessageTemplates";
 import { TicketCategories } from "./TicketCategories";
 import { VariableDictionary } from "./VariableDictionary";
 
@@ -35,7 +36,7 @@ export const KnowledgeBaseTabs: FC = () => {
         {/* Контентная часть */}
         <Box mt={6}>
           <Tabs.Content value="messageTemplates">
-            {/* <MessageTemplates /> */}
+            <MessageTemplates />
           </Tabs.Content>
 
           <Tabs.Content value="ticketCategories">

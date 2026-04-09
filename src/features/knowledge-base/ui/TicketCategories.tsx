@@ -11,27 +11,13 @@ import {
   List,
 } from "@chakra-ui/react";
 import { LuMessageSquare } from "react-icons/lu";
-
-const CATEGORY_COLORS: Record<string, string> = {
-  "Технические проблемы": "#3b82f6",
-  "Сроки и дедлайны": "#8b5cf6",
-  "Подача документов": "#ec4899",
-  "Проверка статуса": "#10b981",
-  "Баллы и конкурс": "#f59e0b",
-  "Оплата и договоры": "#ef4444",
-  Зачисление: "#06b6d4",
-  Общежитие: "#84cc16",
-  "Учеба и расписание": "#a855f7",
-  Мероприятия: "#f97316",
-  "Общая информация": "#14b8a6",
-  Консультация: "#6366f1",
-  "Консультация по программам": "#6366f1",
-};
+import { AdmissionIntentCategory } from "@features/tickets/model/types";
+import { INTENT_METADATA } from "@features/tickets/model/intentMetadata";
 
 export const requestCategories = [
   {
     id: 1,
-    category: "Технические проблемы",
+    intent: AdmissionIntentCategory.TECHNICAL_ISSUES,
     content:
       "Трудности с доступом к системе, ошибки в работе сайта или мобильного приложения.",
     examples:
@@ -39,7 +25,7 @@ export const requestCategories = [
   },
   {
     id: 2,
-    category: "Сроки и дедлайны",
+    intent: AdmissionIntentCategory.DEADLINES_TIMELINES,
     content:
       "Информация о датах начала и окончания приема документов, экзаменов и этапов зачисления.",
     examples:
@@ -47,7 +33,7 @@ export const requestCategories = [
   },
   {
     id: 3,
-    category: "Подача документов",
+    intent: AdmissionIntentCategory.DOCUMENT_SUBMISSION,
     content:
       "Вопросы о перечне необходимых документов, способах их отправки и требованиях к копиям.",
     examples:
@@ -55,7 +41,7 @@ export const requestCategories = [
   },
   {
     id: 4,
-    category: "Проверка статуса",
+    intent: AdmissionIntentCategory.STATUS_VERIFICATION,
     content:
       "Отслеживание положения в списках, подтверждение получения документов приемной комиссией.",
     examples:
@@ -63,7 +49,7 @@ export const requestCategories = [
   },
   {
     id: 5,
-    category: "Баллы и конкурс",
+    intent: AdmissionIntentCategory.SCORES_COMPETITION,
     content:
       "Проходные баллы прошлых лет, учет индивидуальных достижений и расчет рейтинга.",
     examples:
@@ -71,7 +57,7 @@ export const requestCategories = [
   },
   {
     id: 6,
-    category: "Оплата и договоры",
+    intent: AdmissionIntentCategory.PAYMENTS_CONTRACTS,
     content:
       "Стоимость обучения, оформление договора, оплата материнским капиталом или образовательным кредитом.",
     examples:
@@ -79,7 +65,7 @@ export const requestCategories = [
   },
   {
     id: 7,
-    category: "Зачисление",
+    intent: AdmissionIntentCategory.ENROLLMENT,
     content:
       "Процедура выхода приказов, подписание согласия на зачисление и следующие шаги после приказа.",
     examples:
@@ -87,7 +73,7 @@ export const requestCategories = [
   },
   {
     id: 8,
-    category: "Общежитие",
+    intent: AdmissionIntentCategory.DORMITORY_HOUSING,
     content:
       "Условия предоставления жилья, необходимые документы для заселения и стоимость проживания.",
     examples:
@@ -95,7 +81,7 @@ export const requestCategories = [
   },
   {
     id: 9,
-    category: "Учеба и расписание",
+    intent: AdmissionIntentCategory.STUDIES_SCHEDULE,
     content:
       "Информация о графике занятий, дисциплинах, преподавателях и учебном процессе.",
     examples:
@@ -103,7 +89,7 @@ export const requestCategories = [
   },
   {
     id: 10,
-    category: "Мероприятия",
+    intent: AdmissionIntentCategory.EVENTS,
     content:
       "Дни открытых дверей, олимпиады, вебинары и другие события для абитуриентов и студентов.",
     examples:
@@ -111,7 +97,7 @@ export const requestCategories = [
   },
   {
     id: 11,
-    category: "Общая информация",
+    intent: AdmissionIntentCategory.GENERAL_INFO,
     content:
       "Любые другие вопросы, которые не попадают в специализированные категории.",
     examples:
@@ -119,7 +105,7 @@ export const requestCategories = [
   },
   {
     id: 12,
-    category: "Консультация по программам",
+    intent: AdmissionIntentCategory.PROGRAM_CONSULTATION,
     content:
       "Помощь в выборе направления подготовки, информация о специальностях и будущей профессии.",
     examples:
@@ -132,7 +118,7 @@ interface CategoryCardProps {
 }
 
 const CategoryCard: FC<CategoryCardProps> = ({ category }) => {
-  const catColor = CATEGORY_COLORS[category.category] || "#94a3b8";
+  const meta = INTENT_METADATA[category.intent];
   const examplesList = category.examples.match(/«[^»]+»/g)
     ? category.examples.match(/«[^»]+»/g)!.map((s) => s.replace(/[«»]/g, ""))
     : [category.examples];
@@ -144,7 +130,7 @@ const CategoryCard: FC<CategoryCardProps> = ({ category }) => {
       borderRadius="xl"
       borderWidth="1px"
       borderColor="border.subtle"
-      boxShadow={`inset 4px 0 0 0 ${catColor}`}
+      boxShadow={`inset 4px 0 0 0 ${meta.color}`}
       display="flex"
       flexDirection="column"
     >
@@ -155,11 +141,11 @@ const CategoryCard: FC<CategoryCardProps> = ({ category }) => {
               w="2.5"
               h="2.5"
               borderRadius="full"
-              bg={catColor}
+              bg={meta.color}
               shadow="sm"
             />
             <Text fontWeight="semibold" fontSize="15px" color="fg.default">
-              {category.category}
+              {meta.label}
             </Text>
           </HStack>
           <Text fontSize="13px" color="fg.muted" lineHeight="relaxed">
@@ -205,7 +191,7 @@ const CategoryCard: FC<CategoryCardProps> = ({ category }) => {
                   w="1.5"
                   h="1.5"
                   borderRadius="full"
-                  bg={catColor}
+                  bg={meta.color}
                   mt="1.5"
                   opacity="0.8"
                   flexShrink="0"
