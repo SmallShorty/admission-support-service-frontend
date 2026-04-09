@@ -16,6 +16,10 @@ export const useAccountsFilters = (initialLimit = 20) => {
   const handlePrev = () =>
     setOffset((prev) => Math.max(0, prev - initialLimit));
 
+  const handlePageChange = (details: { page: number }) => {
+    setOffset((details.page - 1) * initialLimit);
+  };
+
   return {
     filters: {
       searchTerm: debouncedSearch,
@@ -28,9 +32,9 @@ export const useAccountsFilters = (initialLimit = 20) => {
       setSearchTerm,
       isStaff,
       setIsStaff,
-      setOffset, // Добавляем этот метод для ручного управления (пагинация по номерам)
       handleNext,
       handlePrev,
+      handlePageChange,
     },
   };
 };

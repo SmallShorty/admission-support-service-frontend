@@ -14,29 +14,86 @@ import {
   createListCollection,
 } from "@chakra-ui/react";
 import { Check } from "lucide-react";
+import { useState } from "react";
+import {
+  Account,
+  AccountRole,
+  StaffRole,
+} from "@/app/entities/account/model/types";
+
+export interface AccountFormData {
+  firstName: string;
+  lastName: string;
+  middleName: string;
+  email: string;
+  role: StaffRole;
+  password: string;
+}
 
 interface AccountInfoModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  account?: any; // Если передано — режим редактирования
-  onSave: (data: any) => void;
+  account: Account | null;
+  onSave: (data: AccountFormData) => void;
+  isLoading?: boolean;
 }
 
-const roles = createListCollection({
+const staffRoles = createListCollection({
   items: [
-    { label: "Оператор", value: "Operator" },
-    { label: "Старший оператор", value: "Senior Op" },
-    { label: "Администратор", value: "Admin" },
+    { label: "Оператор", value: AccountRole.OPERATOR },
+    { label: "Супервизор", value: AccountRole.SUPERVISOR },
+    { label: "Администратор", value: AccountRole.ADMIN },
   ],
 });
+
+const getInitialRole = (account: Account | null): string => {
+  if (!account || account.role === AccountRole.APPLICANT) return "";
+  return account.role;
+};
 
 export const AccountInfoModal = ({
   open,
   onOpenChange,
   account,
   onSave,
+  isLoading = false,
 }: AccountInfoModalProps) => {
   const isEdit = !!account;
+
+  const [form, setForm] = useState({
+    firstName: account?.firstName ?? "",
+    lastName: account?.lastName ?? "",
+    middleName: account?.middleName ?? "",
+    email: account?.email ?? "",
+    role: getInitialRole(account),
+    password: "",
+  });
+
+  const setField =
+    (field: keyof typeof form) => (value: string) =>
+      setForm((prev) => ({ ...prev, [field]: value }));
+
+  const handleSubmit = () => {
+    if (!form.firstName || !form.lastName || !form.email || !form.role) return;
+    if (!isEdit && !form.password) return;
+
+    onSave({
+      firstName: form.firstName,
+      lastName: form.lastName,
+      middleName: form.middleName,
+      email: form.email,
+      role: form.role as StaffRole,
+      password: form.password,
+    });
+  };
+
+  const isSubmitDisabled =
+    isLoading ||
+    !form.firstName ||
+    !form.lastName ||
+    !form.email ||
+    !form.role ||
+    (!isEdit && !form.password);
 
   return (
     <Dialog.Root
@@ -51,9 +108,7 @@ export const AccountInfoModal = ({
           <Dialog.Content rounded="2xl" boxShadow="2xl">
             <Dialog.Header py="5">
               <Dialog.Title fontSize="xl" fontWeight="bold">
-                {isEdit
-                  ? "Редактировать сотрудника"
-                  : "Добавить нового сотрудника"}
+                {isEdit ? "Редактировать сотрудника" : "Добавить нового сотрудника"}
               </Dialog.Title>
               <Dialog.CloseTrigger asChild>
                 <CloseButton
@@ -66,45 +121,63 @@ export const AccountInfoModal = ({
 
             <Dialog.Body p="6">
               <Stack gap="4">
-                {/* Поле: Полное имя */}
-                <Field.Root>
-                  <Field.Label fontWeight="semibold">Полное имя</Field.Label>
+                <Field.Root required>
+                  <Field.Label fontWeight="semibold">Фамилия</Field.Label>
                   <Input
-                    placeholder="Введите полное имя"
+                    placeholder="Иванов"
                     py="2.5"
                     rounded="lg"
-                    defaultValue={
-                      isEdit ? `${account.lastName} ${account.firstName}` : ""
-                    }
+                    value={form.lastName}
+                    onChange={(e) => setField("lastName")(e.target.value)}
                   />
                 </Field.Root>
 
-                {/* Поле: Email */}
+                <Field.Root required>
+                  <Field.Label fontWeight="semibold">Имя</Field.Label>
+                  <Input
+                    placeholder="Иван"
+                    py="2.5"
+                    rounded="lg"
+                    value={form.firstName}
+                    onChange={(e) => setField("firstName")(e.target.value)}
+                  />
+                </Field.Root>
+
                 <Field.Root>
-                  <Field.Label fontWeight="semibold">
-                    Корпоративный email
-                  </Field.Label>
+                  <Field.Label fontWeight="semibold">Отчество</Field.Label>
+                  <Input
+                    placeholder="Иванович"
+                    py="2.5"
+                    rounded="lg"
+                    value={form.middleName}
+                    onChange={(e) => setField("middleName")(e.target.value)}
+                  />
+                </Field.Root>
+
+                <Field.Root required>
+                  <Field.Label fontWeight="semibold">Email</Field.Label>
                   <Input
                     type="email"
                     placeholder="username@university.edu"
                     py="2.5"
                     rounded="lg"
-                    defaultValue={account?.corporateEmail ?? ""}
+                    value={form.email}
+                    onChange={(e) => setField("email")(e.target.value)}
                   />
                 </Field.Root>
 
-                {/* Поле: Роль */}
-                <Field.Root>
+                <Field.Root required>
                   <Field.Label fontWeight="semibold">Роль</Field.Label>
                   <SelectRoot
-                    collection={roles}
-                    defaultValue={account ? [account.role] : undefined}
+                    collection={staffRoles}
+                    value={form.role ? [form.role] : []}
+                    onValueChange={(e) => setField("role")(e.value[0])}
                   >
                     <SelectTrigger rounded="lg" py="2.5">
                       <SelectValueText placeholder="Выберите роль" />
                     </SelectTrigger>
                     <SelectContent>
-                      {roles.items.map((role) => (
+                      {staffRoles.items.map((role) => (
                         <SelectItem item={role} key={role.value}>
                           {role.label}
                         </SelectItem>
@@ -112,6 +185,20 @@ export const AccountInfoModal = ({
                     </SelectContent>
                   </SelectRoot>
                 </Field.Root>
+
+                {!isEdit && (
+                  <Field.Root required>
+                    <Field.Label fontWeight="semibold">Пароль</Field.Label>
+                    <Input
+                      type="password"
+                      placeholder="Временный пароль"
+                      py="2.5"
+                      rounded="lg"
+                      value={form.password}
+                      onChange={(e) => setField("password")(e.target.value)}
+                    />
+                  </Field.Root>
+                )}
               </Stack>
             </Dialog.Body>
 
@@ -133,7 +220,9 @@ export const AccountInfoModal = ({
                 flex="1"
                 py="2.5"
                 rounded="lg"
-                onClick={() => onSave({})} // Логика сбора данных
+                onClick={handleSubmit}
+                disabled={isSubmitDisabled}
+                loading={isLoading}
               >
                 <Check size={16} />
                 {isEdit ? "Сохранить" : "Добавить"}

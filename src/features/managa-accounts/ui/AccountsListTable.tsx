@@ -17,18 +17,19 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { Account } from "@/app/entities/account/model/types";
 import { RoleBadge } from "@/app/entities/account/ui/RoleBadge";
 import { StatusBadge } from "@/app/entities/account/ui/StatusBadge";
 
 interface AccountsListTableProps {
-  accounts: any[];
+  accounts: Account[];
   isLoading: boolean;
   offset: number;
   limit: number;
-  totalCount: number; // Добавляем общее кол-во для расчета страниц
+  totalCount: number;
   onPageChange: (details: { page: number }) => void;
-  onEdit: (acc: any) => void;
-  onBlock: (acc: any) => void;
+  onEdit: (acc: Account) => void;
+  onBlock: (acc: Account) => void;
   onShowLogs: () => void;
 }
 
@@ -67,9 +68,8 @@ export const AccountsListTable = ({
           </Table.Row>
         </Table.Header>
 
-        <Table.Body>
-          {!isLoading &&
-            accounts.map((acc) => (
+        <Table.Body opacity={isLoading ? 0.5 : 1} transition="opacity 0.15s">
+          {accounts.map((acc) => (
               <Table.Row key={acc.id} _hover={{ bg: "gray.50/50" }}>
                 <Table.Cell>
                   <Box>
@@ -135,7 +135,7 @@ export const AccountsListTable = ({
                   </Menu.Root>
                 </Table.Cell>
               </Table.Row>
-            ))}
+          ))}
         </Table.Body>
 
         <Table.Footer bg="gray.50/50">

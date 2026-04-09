@@ -48,3 +48,25 @@ export interface GetAccountsFilters extends PaginationParams {
 }
 
 export type AccountPaginatedResponse = PaginatedResponse<Account>;
+
+export type StaffRole =
+  | AccountRole.ADMIN
+  | AccountRole.OPERATOR
+  | AccountRole.SUPERVISOR;
+
+export interface CreateAccountDto {
+  firstName: string;
+  lastName: string;
+  middleName?: string;
+  email: string;
+  role: StaffRole;
+  password: string;
+}
+
+export interface UpdateAccountDto {
+  firstName?: string;
+  lastName?: string;
+  middleName?: string;
+  email?: string;
+  role?: StaffRole;
+}

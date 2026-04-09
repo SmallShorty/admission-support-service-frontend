@@ -1,73 +1,77 @@
 import { Stack } from "@chakra-ui/react";
-import { useAccountsQuery } from "../api/useAccountsQuery";
+import { useAccountsQuery } from "../hooks/queries/useAccountsQuery";
 import { useAccountsFilters } from "../hooks/useAccountsFilters";
+import { useCreateAccountMutation } from "../hooks/mutations/useCreateAccountMutation";
+import { useUpdateAccountMutation } from "../hooks/mutations/useUpdateAccountMutation";
 import { AccountsControls } from "./AccountsControls";
 import { AccountsListTable } from "./AccountsListTable";
+import { AccountInfoModal, AccountFormData } from "./AccountInfoModal";
 import { useState } from "react";
 import { Account } from "@/app/entities/account/model/types";
-import { AccountInfoModal } from "./AccountInfoModal";
 
 export const ManageAccounts = () => {
   const { filters, ui } = useAccountsFilters(20);
-  // React Query автоматически подхватит debouncedSearch из filters
-  const { data, isLoading } = useAccountsQuery(filters);
+  const { data, isFetching } = useAccountsQuery(filters);
+
+  const createMutation = useCreateAccountMutation();
+  const updateMutation = useUpdateAccountMutation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
 
-  // 1. Открытие для создания
   const handleOpenCreate = () => {
     setSelectedAccount(null);
     setIsModalOpen(true);
   };
 
-  // 2. Открытие для редактирования (вызывается из таблицы)
-  const handleOpenEdit = (account: any) => {
+  const handleOpenEdit = (account: Account) => {
     setSelectedAccount(account);
     setIsModalOpen(true);
   };
 
-  const handleSave = (formData: any) => {
-    console.log("Данные из формы:", formData);
-    // Здесь вызывай мутацию (useMutation) для API
-    setIsModalOpen(false);
-  };
-
-  // Обработчик изменения страницы через компоненты пагинации Chakra
-  const handlePageChange = (details: { page: number }) => {
-    const newOffset = (details.page - 1) * filters.limit;
-    ui.setOffset(newOffset);
+  const handleSave = (formData: AccountFormData) => {
+    if (selectedAccount) {
+      const { password, ...updateData } = formData;
+      updateMutation.mutate(
+        { id: selectedAccount.id, ...updateData },
+        { onSuccess: () => setIsModalOpen(false) },
+      );
+    } else {
+      createMutation.mutate(formData, {
+        onSuccess: () => setIsModalOpen(false),
+      });
+    }
   };
 
   return (
     <Stack gap="4">
       <AccountsControls
-        search={ui.searchTerm} // Используем "быстрый" стейт для инпута
+        search={ui.searchTerm}
         onSearch={ui.setSearchTerm}
         showApplicants={!ui.isStaff}
         onToggleApplicants={(val) => ui.setIsStaff(!val)}
-        onAddClick={() => console.log("Open Add Modal")}
+        onAddClick={handleOpenCreate}
       />
 
       <AccountsListTable
         accounts={data?.items ?? []}
-        isLoading={isLoading}
+        isLoading={isFetching}
         offset={filters.offset}
         limit={filters.limit}
         totalCount={data?.total ?? 0}
-        onPageChange={handlePageChange}
-        onEdit={(acc) => console.log("Редактировать", acc)}
-        onBlock={(acc) => console.log("Удалить", acc)}
-        onShowLogs={function (): void {
-          throw new Error("Function not implemented.");
-        }}
+        onPageChange={ui.handlePageChange}
+        onEdit={handleOpenEdit}
+        onBlock={(acc) => console.log("Заблокировать", acc)}
+        onShowLogs={() => {}}
       />
 
       <AccountInfoModal
+        key={selectedAccount?.id ?? "create"}
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         account={selectedAccount}
         onSave={handleSave}
+        isLoading={createMutation.isPending || updateMutation.isPending}
       />
     </Stack>
   );
