@@ -9,7 +9,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import Placeholder from "@tiptap/extension-placeholder";
-import { useEditor } from "@tiptap/react";
+import { JSONContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Check, ChevronDown } from "lucide-react";
 import { useState } from "react";
@@ -21,7 +21,7 @@ import { Template } from "../model/types";
 export interface TemplateFormData {
   title: string;
   alias: string;
-  content: string;
+  content: JSONContent;
   category: string;
 }
 
@@ -66,7 +66,9 @@ export const TemplateInfoModal = ({
 
   const handleSubmit = () => {
     if (!form.title || !form.alias || !editor || editor.isEmpty) return;
-    onSave({ ...form, content: editor.getHTML() });
+    const data = { ...form, content: editor.getJSON()};
+    console.log("TemplateInfoModal submit:", data);
+    onSave(data);
   };
 
   const isSubmitDisabled =
