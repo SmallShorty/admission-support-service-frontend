@@ -7,12 +7,15 @@ import {
   Menu,
   Portal,
   Stack,
-  Textarea,
 } from "@chakra-ui/react";
+import Placeholder from "@tiptap/extension-placeholder";
+import { useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import { Check, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { INTENT_METADATA } from "@features/tickets/model/intentMetadata";
 import { AdmissionIntentCategory } from "@features/tickets/model/types";
+import { Control, RichTextEditor } from "@shared/components/ui/rich-text-editor";
 import { Template } from "../model/types";
 
 export interface TemplateFormData {
@@ -46,20 +49,28 @@ export const TemplateInfoModal = ({
   const [form, setForm] = useState({
     title: template?.title ?? "",
     alias: template?.alias ?? "",
-    content: template?.content ?? "",
     category: (template as any)?.category ?? AdmissionIntentCategory.GENERAL_INFO,
+  });
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Placeholder.configure({ placeholder: "Введите текст шаблона..." }),
+    ],
+    content: template?.content ?? "",
+    immediatelyRender: false,
   });
 
   const setField = (field: keyof typeof form) => (value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleSubmit = () => {
-    if (!form.title || !form.alias || !form.content) return;
-    onSave(form);
+    if (!form.title || !form.alias || !editor || editor.isEmpty) return;
+    onSave({ ...form, content: editor.getHTML() });
   };
 
   const isSubmitDisabled =
-    isLoading || !form.title || !form.alias || !form.content;
+    isLoading || !form.title || !form.alias || !editor || editor.isEmpty;
 
   const currentCategoryLabel =
     CATEGORIES.find((c) => c.value === form.category)?.label ||
@@ -114,7 +125,6 @@ export const TemplateInfoModal = ({
                   />
                 </Field.Root>
 
-                {/* Поле выбора категории */}
                 <Field.Root required>
                   <Field.Label fontWeight="semibold">Категория</Field.Label>
                   <Menu.Root positioning={{ sameWidth: true }}>
@@ -150,14 +160,30 @@ export const TemplateInfoModal = ({
 
                 <Field.Root required>
                   <Field.Label fontWeight="semibold">Текст шаблона</Field.Label>
-                  <Textarea
-                    placeholder="Введите текст шаблона..."
+                  <RichTextEditor.Root
+                    editor={editor}
+                    borderWidth="1px"
                     rounded="lg"
-                    rows={6}
-                    resize="vertical"
-                    value={form.content}
-                    onChange={(e) => setField("content")(e.target.value)}
-                  />
+                    width="full"
+                    css={{ "& .ProseMirror": { maxHeight: "10rem", overflowY: "auto" } }}
+                  >
+                    <RichTextEditor.Toolbar>
+                      <RichTextEditor.ControlGroup>
+                        <Control.Bold />
+                        <Control.Italic />
+                        <Control.Underline />
+                      </RichTextEditor.ControlGroup>
+                      <RichTextEditor.ControlGroup>
+                        <Control.BulletList />
+                        <Control.OrderedList />
+                      </RichTextEditor.ControlGroup>
+                      <RichTextEditor.ControlGroup>
+                        <Control.Undo />
+                        <Control.Redo />
+                      </RichTextEditor.ControlGroup>
+                    </RichTextEditor.Toolbar>
+                    <RichTextEditor.Content />
+                  </RichTextEditor.Root>
                 </Field.Root>
               </Stack>
             </Dialog.Body>
