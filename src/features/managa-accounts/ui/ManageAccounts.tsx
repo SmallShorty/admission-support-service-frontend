@@ -6,7 +6,7 @@ import { useUpdateAccountMutation } from "../hooks/mutations/useUpdateAccountMut
 import { AccountsControls } from "./AccountsControls";
 import { AccountsListTable } from "./AccountsListTable";
 import { AccountInfoModal, AccountFormData } from "./AccountInfoModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Account } from "@/app/entities/account/model/types";
 
 export const ManageAccounts = () => {
@@ -18,6 +18,13 @@ export const ManageAccounts = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+
+  useEffect(() => {
+    if (!isModalOpen) {
+      document.body.style.overflow = "";
+      document.body.style.pointerEvents = "";
+    }
+  }, [isModalOpen]);
 
   const handleOpenCreate = () => {
     setSelectedAccount(null);
