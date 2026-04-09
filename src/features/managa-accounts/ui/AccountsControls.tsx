@@ -42,7 +42,7 @@ export const AccountsControls = ({
         </Checkbox.Root>
       </HStack>
 
-      <Button colorPalette="blue" onClick={onAddClick} gap="2">
+      <Button onClick={onAddClick} gap="2">
         <Plus size={18} />
         Добавить аккаунт
       </Button>

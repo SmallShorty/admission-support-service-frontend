@@ -4,7 +4,7 @@ import { FC } from "react";
 import { Tabs, Box } from "@chakra-ui/react";
 import { LuMessageSquare, LuLayers, LuBook } from "react-icons/lu";
 import { TicketCategories } from "./TicketCategories";
-import { VariableDictionary } from "../VariableDictionary";
+import { VariableDictionary } from "./VariableDictionary";
 
 export const KnowledgeBaseTabs: FC = () => {
   return (

@@ -70,71 +70,67 @@ export const AccountsListTable = ({
 
         <Table.Body opacity={isLoading ? 0.5 : 1} transition="opacity 0.15s">
           {accounts.map((acc) => (
-              <Table.Row key={acc.id} _hover={{ bg: "gray.50/50" }}>
-                <Table.Cell>
-                  <Box>
-                    <Text fontWeight="bold" fontSize="sm">
-                      {acc.lastName} {acc.firstName} {acc.middleName}
-                    </Text>
-                    <Text fontSize="xs" color="gray.500">
-                      {acc.corporateEmail}
-                    </Text>
-                  </Box>
-                </Table.Cell>
-                <Table.Cell>
-                  <RoleBadge role={acc.role} />
-                </Table.Cell>
-                <Table.Cell>
-                  <StatusBadge status={acc.status} />
-                </Table.Cell>
-                <Table.Cell textAlign="right">
-                  <Menu.Root positioning={{ placement: "bottom-end" }}>
-                    <Menu.Trigger asChild>
-                      <IconButton
-                        variant="ghost"
-                        size="sm"
-                        aria-label="Действия"
-                      >
-                        <MoreVertical size={18} />
-                      </IconButton>
-                    </Menu.Trigger>
-                    <Portal>
-                      <Menu.Positioner>
-                        <Menu.Content>
-                          {/* Изменить */}
-                          <Menu.Item value="edit" onClick={() => onEdit(acc)}>
-                            <HStack gap="2">
-                              <Edit size={14} />
-                              <Text>Изменить</Text>
-                            </HStack>
-                          </Menu.Item>
+            <Table.Row key={acc.id} _hover={{ bg: "gray.50/50" }}>
+              <Table.Cell>
+                <Box>
+                  <Text fontWeight="bold" fontSize="sm">
+                    {acc.lastName} {acc.firstName} {acc.middleName}
+                  </Text>
+                  <Text fontSize="xs" color="gray.500">
+                    {acc.email}
+                  </Text>
+                </Box>
+              </Table.Cell>
+              <Table.Cell>
+                <RoleBadge role={acc.role} />
+              </Table.Cell>
+              <Table.Cell>
+                <StatusBadge status={acc.status} />
+              </Table.Cell>
+              <Table.Cell textAlign="right">
+                <Menu.Root positioning={{ placement: "bottom-end" }}>
+                  <Menu.Trigger asChild>
+                    <IconButton variant="ghost" size="sm" aria-label="Действия">
+                      <MoreVertical size={18} />
+                    </IconButton>
+                  </Menu.Trigger>
+                  <Portal>
+                    <Menu.Positioner>
+                      <Menu.Content>
+                        {/* Изменить */}
+                        <Menu.Item value="edit" onClick={() => onEdit(acc)}>
+                          <HStack gap="2">
+                            <Edit size={14} />
+                            <Text>Изменить</Text>
+                          </HStack>
+                        </Menu.Item>
 
-                          {/* Журнал действий */}
-                          <Menu.Item value="logs" onClick={() => onShowLogs()}>
-                            <HStack gap="2">
-                              <History size={14} />
-                              <Text>Журнал действий</Text>
-                            </HStack>
-                          </Menu.Item>
+                        {/* Журнал действий */}
+                        <Menu.Item value="logs" onClick={() => onShowLogs()}>
+                          <HStack gap="2">
+                            <History size={14} />
+                            <Text>Журнал действий</Text>
+                          </HStack>
+                        </Menu.Item>
 
-                          {/* Удалить */}
-                          <Menu.Item
-                            value="delete"
-                            color="red.600"
-                            _hover={{ bg: "red.50", color: "red.700" }}
-                            onClick={() => onBlock(acc)}
-                          >
-                            <HStack gap="2">
-                              <Trash2 size={14} />
-                              <Text>Удалить</Text>
-                            </HStack>
-                          </Menu.Item>
-                        </Menu.Content>
-                      </Menu.Positioner>
-                    </Portal>
-                  </Menu.Root>
-                </Table.Cell>
-              </Table.Row>
+                        {/* Удалить */}
+                        <Menu.Item
+                          value="delete"
+                          color="red.600"
+                          _hover={{ bg: "red.50", color: "red.700" }}
+                          onClick={() => onBlock(acc)}
+                        >
+                          <HStack gap="2">
+                            <Trash2 size={14} />
+                            <Text>Удалить</Text>
+                          </HStack>
+                        </Menu.Item>
+                      </Menu.Content>
+                    </Menu.Positioner>
+                  </Portal>
+                </Menu.Root>
+              </Table.Cell>
+            </Table.Row>
           ))}
         </Table.Body>
 
