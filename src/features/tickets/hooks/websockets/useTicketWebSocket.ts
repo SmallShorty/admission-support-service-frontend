@@ -1,10 +1,8 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { io, Socket } from "socket.io-client";
-import { TicketListItem, TicketDetail } from "../../model/types";
+import { chatSocket } from "@/features/chat/api/chatSocket";
+import { TicketDetail, TicketListItem } from "../../model/types";
 import { ticketKeys } from "../queries/queryKeys";
-
-let socket: Socket | null = null;
 
 export const useTicketWebSocket = (
   token: string | null,
@@ -13,86 +11,82 @@ export const useTicketWebSocket = (
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!isAuthenticated || !token) {
-      if (socket) {
-        socket.disconnect();
-        socket = null;
-      }
-      return;
-    }
+    if (!isAuthenticated || !token) return;
 
-    // Connect to WebSocket
-    socket = io("http://localhost:3000", {
-      path: "/tickets",
-      auth: { token },
-      transports: ["websocket"],
-    });
+    const socket = chatSocket.getSocket();
+    if (!socket) return;
 
-    // Handle ticket updates
-    socket.on(
-      "ticket:updated",
-      (data: { ticket: TicketListItem; updatedBy: string }) => {
-        console.log("WebSocket: ticket updated", data.ticket.id);
+    const handleTicketUpdated = (data: {
+      ticket: TicketDetail;
+      updatedBy: string;
+      timestamp: string;
+    }) => {
+      console.log("[TicketWS] ticketUpdated:", data.ticket.id);
+      queryClient.setQueryData(ticketKeys.detail(data.ticket.id), data.ticket);
+      queryClient.invalidateQueries({ queryKey: ticketKeys.my() });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.counts() });
+    };
 
-        // Update individual ticket in cache
-        queryClient.setQueryData(
-          ticketKeys.detail(data.ticket.id),
-          data.ticket,
-        );
+    const handleQueueUpdated = (data: {
+      action: string;
+      ticket?: TicketListItem;
+      ticketId?: string;
+      timestamp: string;
+    }) => {
+      console.log("[TicketWS] queueUpdated:", data.action);
+      queryClient.invalidateQueries({ queryKey: ticketKeys.all });
+    };
 
-        // Invalidate list queries to reflect changes in queues
-        queryClient.invalidateQueries({
-          queryKey: ticketKeys.available(50, 0),
-        });
-        queryClient.invalidateQueries({
-          queryKey: ticketKeys.my(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: ticketKeys.counts(),
-        });
-      },
-    );
+    const handleAllQueueUpdated = (data: {
+      action: string;
+      ticket?: TicketListItem;
+      timestamp: string;
+    }) => {
+      console.log("[TicketWS] allQueueUpdated:", data.action);
+      queryClient.invalidateQueries({ queryKey: ticketKeys.allQueue(50, 0) });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.counts() });
+    };
 
-    // Handle queue updates
-    socket.on(
-      "queue:updated",
-      (data: { action: string; ticketId?: string }) => {
-        console.log("WebSocket: queue updated", data.action);
+    const handleNewTicketAvailable = (data: {
+      ticket: TicketListItem;
+      timestamp: string;
+    }) => {
+      console.log("[TicketWS] newTicketAvailable:", data.ticket.id);
+      queryClient.invalidateQueries({ queryKey: ticketKeys.available(50, 0) });
+    };
 
-        // Invalidate queue queries
-        queryClient.invalidateQueries({
-          queryKey: ticketKeys.available(50, 0),
-        });
-        queryClient.invalidateQueries({
-          queryKey: ticketKeys.allQueue(50, 0),
-        });
-      },
-    );
+    const handleNewTicketCreated = (data: {
+      ticket: TicketListItem;
+      timestamp: string;
+    }) => {
+      console.log("[TicketWS] newTicketCreated:", data.ticket.id);
+      queryClient.invalidateQueries({ queryKey: ticketKeys.allQueue(50, 0) });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.counts() });
+    };
 
-    // Handle new messages
-    socket.on("message:new", (data: { ticketId: string; message: any }) => {
-      console.log("WebSocket: new message for ticket", data.ticketId);
+    const handleTicketAssigned = (data: {
+      ticket: TicketListItem;
+      timestamp: string;
+    }) => {
+      console.log("[TicketWS] ticketAssigned:", data.ticket.id);
+      queryClient.invalidateQueries({ queryKey: ticketKeys.my() });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.counts() });
+    };
 
-      // Update ticket's lastMessageAt in cache
-      queryClient.setQueryData(
-        ticketKeys.detail(data.ticketId),
-        (old: TicketDetail | undefined) => {
-          if (!old) return old;
-          return {
-            ...old,
-            lastMessageAt: data.message.createdAt,
-          };
-        },
-      );
-    });
+    socket.on("ticketUpdated", handleTicketUpdated);
+    socket.on("queueUpdated", handleQueueUpdated);
+    socket.on("allQueueUpdated", handleAllQueueUpdated);
+    socket.on("newTicketAvailable", handleNewTicketAvailable);
+    socket.on("newTicketCreated", handleNewTicketCreated);
+    socket.on("ticketAssigned", handleTicketAssigned);
 
     return () => {
-      if (socket) {
-        socket.disconnect();
-        socket = null;
-      }
+      socket.off("ticketUpdated", handleTicketUpdated);
+      socket.off("queueUpdated", handleQueueUpdated);
+      socket.off("allQueueUpdated", handleAllQueueUpdated);
+      socket.off("newTicketAvailable", handleNewTicketAvailable);
+      socket.off("newTicketCreated", handleNewTicketCreated);
+      socket.off("ticketAssigned", handleTicketAssigned);
     };
   }, [token, isAuthenticated, queryClient]);
-
-  return socket;
 };

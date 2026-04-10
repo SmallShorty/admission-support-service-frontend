@@ -1,4 +1,5 @@
 // src/features/chat/hooks/chatQueries.ts
+import React from "react";
 import {
   useQuery,
   useMutation,
@@ -6,6 +7,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { chatSocket } from "../api/chatSocket";
+import { chatApi } from "./chatApi";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import {
   setMessages,
@@ -30,12 +32,6 @@ export const chatQueryKeys = {
 // Hook для получения истории сообщений с пагинацией (бесконечный скролл)
 export const useTicketMessages = (ticketId: string, limit: number = 50) => {
   const dispatch = useAppDispatch();
-  const hasMore = useAppSelector(
-    (state) => state.chat.hasMoreMessages[ticketId] ?? true,
-  );
-  const nextCursor = useAppSelector(
-    (state) => state.chat.nextCursors[ticketId] ?? null,
-  );
 
   return useInfiniteQuery({
     queryKey: chatQueryKeys.messages(ticketId),
@@ -44,7 +40,6 @@ export const useTicketMessages = (ticketId: string, limit: number = 50) => {
       const response = await chatApi.getMessages(ticketId, limit, pageParam);
 
       if (!pageParam) {
-        // Первая загрузка
         dispatch(
           setMessages({
             ticketId,
@@ -54,7 +49,6 @@ export const useTicketMessages = (ticketId: string, limit: number = 50) => {
           }),
         );
       } else {
-        // Подгрузка старых сообщений
         dispatch(
           addOldMessages({
             ticketId,
@@ -92,7 +86,6 @@ export const useSendMessage = () => {
     }) => {
       if (!user) throw new Error("User not authenticated");
 
-      // Определяем тип автора
       const authorType: MessageType =
         userRole === "APPLICANT"
           ? MessageType.FROM_CUSTOMER
@@ -105,7 +98,6 @@ export const useSendMessage = () => {
         authorType,
       };
 
-      // Оптимистичное обновление
       const tempMessage: TicketMessage = {
         id: Date.now(),
         ticketId,
@@ -125,14 +117,11 @@ export const useSendMessage = () => {
       };
 
       dispatch(addMessage(tempMessage));
-
-      // Отправляем через WebSocket
       chatSocket.sendMessage(payload);
 
       return tempMessage;
     },
     onSuccess: (_, { ticketId }) => {
-      // Инвалидируем кэш после успешной отправки
       queryClient.invalidateQueries({
         queryKey: chatQueryKeys.messages(ticketId),
       });
@@ -153,7 +142,7 @@ export const useUnreadCount = (ticketId: string) => {
     },
     enabled: !!ticketId,
     staleTime: 30 * 1000,
-    refetchInterval: 30000, // Каждые 30 секунд
+    refetchInterval: 30000,
   });
 };
 
@@ -182,29 +171,19 @@ export const useMarkMessagesRead = () => {
 
 // Hook для управления WebSocket соединением
 export const useChatConnection = () => {
-  const user = useAppSelector((state) => state.account.data);
-  const myTickets = useAppSelector((state) => state.tickets.myTickets.items);
+  const accessToken = useAppSelector((state) => state.account.accessToken);
   const openChats = useAppSelector((state) => state.chat.openChats);
 
-  // Подключение при авторизации
   React.useEffect(() => {
-    if (user?.id && user?.role) {
-      chatSocket.connect(user.id, user.role);
+    if (accessToken) {
+      chatSocket.connect(accessToken);
     }
 
     return () => {
       chatSocket.disconnect();
     };
-  }, [user?.id, user?.role]);
+  }, [accessToken]);
 
-  // Подписка на мои тикеты
-  React.useEffect(() => {
-    myTickets.forEach((ticket) => {
-      chatSocket.joinTicketChat(ticket.id);
-    });
-  }, [myTickets]);
-
-  // Подписка на открытые чаты
   React.useEffect(() => {
     openChats.forEach((ticketId) => {
       chatSocket.joinTicketChat(ticketId);
@@ -219,7 +198,3 @@ export const useChatConnection = () => {
     leaveTicketChat: chatSocket.leaveTicketChat.bind(chatSocket),
   };
 };
-
-// Импортируем React для useEffect
-import React from "react";
-import { chatApi } from "./chatApi";
