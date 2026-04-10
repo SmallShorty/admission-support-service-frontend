@@ -1,16 +1,14 @@
 import React, { useState, useMemo } from "react";
 import {
   Box,
+  Button,
   Flex,
   Heading,
   VStack,
   Text,
-  Badge,
-  Tabs,
   Spinner,
   Center,
 } from "@chakra-ui/react";
-import { Inbox, UserCheck } from "lucide-react";
 import { TicketCard } from "./TicketCard";
 import { useAvailableQueue } from "../hooks/queries/useAvailableQueue";
 import { useMyTickets } from "../hooks/queries/useMyTickets";
@@ -60,58 +58,46 @@ export const SidebarTicketQueue = () => {
   return (
     <Flex
       direction="column"
-      w="340px"
-      h="100vh"
+      w="full"
+      h="full"
       borderRightWidth="1px"
       borderColor="border.muted"
       bg="bg.panel"
     >
       {/* Header & Navigation */}
-      <Box p="4" borderBottomWidth="1px">
-        <Heading size="md" mb="4">
+      <Flex
+        px="3"
+        py="2"
+        borderBottomWidth="1px"
+        align="center"
+        justify="space-between"
+        gap="2"
+      >
+        <Heading size="sm" flexShrink={0}>
           Очередь тикетов
         </Heading>
 
-        <Tabs.Root
-          value={viewMode}
-          onValueChange={(details) => setViewMode(details.value as ViewMode)}
-          variant="plain"
-          size="sm"
-        >
-          <Tabs.List bg="bg.muted" rounded="l3" p="1">
-            <Tabs.Trigger value="available" flex="1" justifyContent="center">
-              <Inbox size={16} />
-              Доступные
-              {availableData?.total ? (
-                <Badge
-                  variant="solid"
-                  colorPalette="blue"
-                  rounded="full"
-                  ms="2"
-                >
-                  {availableData.total}
-                </Badge>
-              ) : null}
-            </Tabs.Trigger>
-
-            <Tabs.Trigger value="my" flex="1" justifyContent="center">
-              <UserCheck size={16} />
-              Мои
-              {myTicketsData?.length ? (
-                <Badge
-                  variant="solid"
-                  colorPalette="green"
-                  rounded="full"
-                  ms="2"
-                >
-                  {myTicketsData.length}
-                </Badge>
-              ) : null}
-            </Tabs.Trigger>
-            <Tabs.Indicator rounded="l2" />
-          </Tabs.List>
-        </Tabs.Root>
-      </Box>
+        <Flex bg="bg.muted" rounded="l3" p="0.5" gap="0.5">
+          <Button
+            size="xs"
+            variant={viewMode === "available" ? "solid" : "ghost"}
+            colorPalette="teal"
+            onClick={() => setViewMode("available")}
+            fontSize="11px"
+          >
+            Доступные
+          </Button>
+          <Button
+            size="xs"
+            variant={viewMode === "my" ? "solid" : "ghost"}
+            colorPalette="teal"
+            onClick={() => setViewMode("my")}
+            fontSize="11px"
+          >
+            Мои
+          </Button>
+        </Flex>
+      </Flex>
 
       {/* Main Content Area */}
       <Box

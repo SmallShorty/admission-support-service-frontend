@@ -11,7 +11,6 @@ import { chatSocket } from "../api/chatSocket";
 import { useTicketMessages } from "../hooks/chatQueries";
 import { useTicketDetail } from "@/features/tickets/hooks/queries/useTicketDetail";
 import { DeliveryStatus, MessageType } from "../model/types";
-import { ChatHeader } from "./ChatHeader";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
 import { ChatInput } from "./ChatInput";
@@ -87,8 +86,6 @@ export const ChatWindow = ({ ticketId }: ChatWindowProps) => {
         </Flex>
       ) : ticket ? (
         <>
-          <ChatHeader ticket={ticket} />
-
           <Flex direction="column" flex="1" overflow="hidden">
             {/* Load older messages */}
             {hasMore && (

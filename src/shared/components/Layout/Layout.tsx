@@ -4,9 +4,9 @@ import { Navbar } from "./Navbar";
 
 const Layout = () => {
   return (
-    <Box bg="#F9FBFB" minH="100vh">
+    <Box bg="#F9FBFB" h="100vh" display="flex" flexDirection="column">
       <Navbar />
-      <Container maxW="container.xl" px="0" mx="0">
+      <Container maxW="container.xl" px="0" mx="0" flex="1" minH="0" overflow="hidden">
         <Outlet />
       </Container>
     </Box>

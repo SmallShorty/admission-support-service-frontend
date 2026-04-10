@@ -9,20 +9,20 @@ interface MessageBubbleProps {
 
 const formatTime = (iso: string) => {
   const date = new Date(iso);
-  return date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+  return date.toLocaleTimeString("ru-RU", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };
 
-export const MessageBubble = ({ message, isOwnMessage }: MessageBubbleProps) => {
+export const MessageBubble = ({
+  message,
+  isOwnMessage,
+}: MessageBubbleProps) => {
   if (message.authorType === MessageType.SYSTEM) {
     return (
       <Flex justify="center" my="1">
-        <Box
-          px="3"
-          py="1"
-          borderRadius="full"
-          bg="bg.muted"
-          maxW="80%"
-        >
+        <Box px="3" py="1" borderRadius="full" bg="bg.muted" maxW="80%">
           <Text fontSize="xs" color="fg.muted" textAlign="center">
             {message.content}
           </Text>
@@ -32,11 +32,7 @@ export const MessageBubble = ({ message, isOwnMessage }: MessageBubbleProps) => 
   }
 
   return (
-    <Flex
-      justify={isOwnMessage ? "flex-end" : "flex-start"}
-      mb="1"
-      px="2"
-    >
+    <Flex justify={isOwnMessage ? "flex-end" : "flex-start"} mb="1" px="2">
       <Box maxW="72%">
         {!isOwnMessage && (
           <Text fontSize="11px" color="fg.muted" mb="0.5" ml="1">
@@ -49,8 +45,9 @@ export const MessageBubble = ({ message, isOwnMessage }: MessageBubbleProps) => 
           borderRadius="xl"
           borderBottomRightRadius={isOwnMessage ? "sm" : "xl"}
           borderBottomLeftRadius={isOwnMessage ? "xl" : "sm"}
-          bg={isOwnMessage ? "colorPalette.solid" : "bg.subtle"}
-          colorPalette="blue"
+          bg={isOwnMessage ? "colorPalette.solid" : "white"}
+          colorPalette="teal"
+          boxShadow="sm"
         >
           <Text
             fontSize="sm"
@@ -73,7 +70,9 @@ export const MessageBubble = ({ message, isOwnMessage }: MessageBubbleProps) => 
           </Text>
           {isOwnMessage && (
             <Icon
-              color={message.status === DeliveryStatus.SEEN ? "blue.400" : "fg.muted"}
+              color={
+                message.status === DeliveryStatus.SEEN ? "teal.400" : "fg.muted"
+              }
               boxSize="3"
             >
               {message.status === DeliveryStatus.SEEN ? (

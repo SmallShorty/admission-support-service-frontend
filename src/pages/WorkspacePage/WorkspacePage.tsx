@@ -17,30 +17,22 @@ const WorkspacePage = () => {
   useTicketWebSocket(accessToken, isAuth);
 
   return (
-    <Grid templateColumns="300px 1fr 350px" h="full" overflow="hidden">
+    <Grid templateColumns="340px 1fr" h="full" overflow="hidden">
       <SidebarTicketQueue />
 
       {/* Chat area */}
-      <Flex
-        direction="column"
-        h="full"
-        overflow="hidden"
-        borderLeftWidth="1px"
-        borderColor="border.muted"
-      >
-        {selectedTicketId ? (
-          <ChatWindow key={selectedTicketId} ticketId={selectedTicketId} />
-        ) : (
-          <Flex flex="1" align="center" justify="center">
-            <Text fontSize="sm" color="fg.muted">
-              Выберите тикет для начала чата
-            </Text>
-          </Flex>
-        )}
-      </Flex>
+      {selectedTicketId ? (
+        <ChatWindow key={selectedTicketId} ticketId={selectedTicketId} />
+      ) : (
+        <Flex flex="1" align="center" justify="center">
+          <Text fontSize="sm" color="fg.muted">
+            Выберите тикет для начала чата
+          </Text>
+        </Flex>
+      )}
 
       {/* Detail panel */}
-      <Flex
+      {/* <Flex
         direction="column"
         h="full"
         overflow="hidden"
@@ -59,7 +51,7 @@ const WorkspacePage = () => {
             </Text>
           </Flex>
         )}
-      </Flex>
+      </Flex> */}
     </Grid>
   );
 };
