@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
-import { Box, Flex, IconButton, Textarea } from "@chakra-ui/react";
-import { Send } from "lucide-react";
+import { Box, Button, Flex, IconButton, Text, Textarea } from "@chakra-ui/react";
+import { ChevronDown, Send } from "lucide-react";
 import { chatSocket } from "../api/chatSocket";
 import { useSendMessage } from "../hooks/chatQueries";
 
@@ -54,33 +54,80 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
 
   return (
     <Box px="3" py="3" borderTopWidth="1px" borderColor="border.muted" flexShrink={0}>
-      <Flex gap="2" align="flex-end">
+      <Box
+        position="relative"
+        borderRadius="xl"
+        borderWidth="1px"
+        borderColor="border.muted"
+        bg="bg.subtle"
+        overflow="hidden"
+        boxShadow="sm"
+        transition="all 0.2s"
+        _focusWithin={{
+          borderColor: "blue.500",
+          boxShadow: "0 0 0 3px var(--chakra-colors-blue-100)",
+        }}
+      >
         <Textarea
           value={content}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          placeholder="Напишите сообщение..."
+          placeholder="Введите сообщение... (Нажмите '/' для вызова шаблонов)"
           resize="none"
-          rows={1}
-          maxH="120px"
-          flex="1"
-          disabled={disabled || isPending}
-          borderRadius="xl"
+          rows={3}
+          bg="transparent"
+          border="none"
+          outline="none"
+          boxShadow="none"
+          _focus={{ boxShadow: "none" }}
+          _focusVisible={{ boxShadow: "none" }}
           fontSize="sm"
+          fontWeight="medium"
+          color="fg"
+          _placeholder={{ color: "fg.subtle" }}
+          pb="10"
+          disabled={disabled || isPending}
           css={{ overflow: "auto" }}
         />
-        <IconButton
-          aria-label="Отправить"
-          onClick={handleSubmit}
-          disabled={!content.trim() || isPending || disabled}
-          colorPalette="blue"
-          borderRadius="xl"
-          size="md"
-          flexShrink={0}
+
+        <Flex
+          position="absolute"
+          bottom="0"
+          left="0"
+          right="0"
+          align="center"
+          justify="space-between"
+          px="3"
+          py="1.5"
+          borderTopWidth="1px"
+          borderColor="border.muted"
+          bg="bg"
         >
-          <Send size={16} />
-        </IconButton>
-      </Flex>
+          <Flex gap="2">
+            <Button size="xs" variant="outline" colorPalette="gray" fontWeight="semibold">
+              <Text color="fg.muted" fontSize="xs">/</Text>
+              Шаблоны
+              <ChevronDown size={13} />
+            </Button>
+            <Button size="xs" variant="outline" colorPalette="gray" fontWeight="semibold">
+              <Text color="fg.muted" fontSize="xs">{"{ }"}</Text>
+              Переменные
+              <ChevronDown size={13} />
+            </Button>
+          </Flex>
+
+          <IconButton
+            aria-label="Отправить"
+            onClick={handleSubmit}
+            disabled={!content.trim() || isPending || disabled}
+            colorPalette="blue"
+            borderRadius="lg"
+            size="sm"
+          >
+            <Send size={16} />
+          </IconButton>
+        </Flex>
+      </Box>
     </Box>
   );
 };

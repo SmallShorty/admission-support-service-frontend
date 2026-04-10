@@ -6,6 +6,8 @@ import {
   createListCollection,
   Dialog,
   Flex,
+  IconButton,
+  Menu,
   Portal,
   Select,
   Spinner,
@@ -13,15 +15,13 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
+import { MoreHorizontal, AlertTriangle, StickyNote, Tag } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { useTicketDetail } from "../hooks/queries/useTicketDetail";
 import { useTakeTicket } from "../hooks/mutations/useTakeTicket";
 import { useUpdateTicketStatus } from "../hooks/mutations/useUpdateTicketStatus";
 import { useEscalateTicket } from "../hooks/mutations/useEscalateTicket";
-import {
-  openEscalateModal,
-  closeEscalateModal,
-} from "../model/ticketsSlice";
+import { openEscalateModal, closeEscalateModal } from "../model/ticketsSlice";
 import {
   TicketStatus,
   EscalationCause,
@@ -70,8 +70,10 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
 
   const { data: ticket, isLoading } = useTicketDetail(ticketId);
   const { mutate: takeTicket, isPending: isTaking } = useTakeTicket();
-  const { mutate: updateStatus, isPending: isUpdating } = useUpdateTicketStatus();
-  const { mutate: escalateTicket, isPending: isEscalating } = useEscalateTicket();
+  const { mutate: updateStatus, isPending: isUpdating } =
+    useUpdateTicketStatus();
+  const { mutate: escalateTicket, isPending: isEscalating } =
+    useEscalateTicket();
 
   if (isLoading) {
     return (
@@ -93,7 +95,13 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
   };
 
   return (
-    <Flex direction="column" h="full" overflow="hidden">
+    <Flex
+      direction="column"
+      h="full"
+      w="full"
+      borderLeftWidth="1px"
+      borderColor="gray.200"
+    >
       <Box
         flex="1"
         overflowY="auto"
@@ -104,7 +112,13 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
         <Stack gap="5">
           {/* Applicant info */}
           <Stack gap="1">
-            <Text fontSize="xs" fontWeight="semibold" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+            <Text
+              fontSize="xs"
+              fontWeight="semibold"
+              color="fg.muted"
+              textTransform="uppercase"
+              letterSpacing="wider"
+            >
               Абитуриент
             </Text>
             <Text fontWeight="semibold" fontSize="sm">
@@ -123,7 +137,13 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
 
           {/* Ticket meta */}
           <Stack gap="2">
-            <Text fontSize="xs" fontWeight="semibold" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+            <Text
+              fontSize="xs"
+              fontWeight="semibold"
+              color="fg.muted"
+              textTransform="uppercase"
+              letterSpacing="wider"
+            >
               Тикет
             </Text>
             <Flex wrap="wrap" gap="2">
@@ -160,7 +180,13 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
           {/* Exam scores */}
           {ticket.examScores && ticket.examScores.length > 0 && (
             <Stack gap="2">
-              <Text fontSize="xs" fontWeight="semibold" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+              <Text
+                fontSize="xs"
+                fontWeight="semibold"
+                color="fg.muted"
+                textTransform="uppercase"
+                letterSpacing="wider"
+              >
                 Баллы
               </Text>
               <Stack gap="1">
@@ -181,7 +207,13 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
           {/* Programs */}
           {ticket.applicantPrograms && ticket.applicantPrograms.length > 0 && (
             <Stack gap="2">
-              <Text fontSize="xs" fontWeight="semibold" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+              <Text
+                fontSize="xs"
+                fontWeight="semibold"
+                color="fg.muted"
+                textTransform="uppercase"
+                letterSpacing="wider"
+              >
                 Программы
               </Text>
               <Stack gap="1">
@@ -202,62 +234,95 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
       </Box>
 
       {/* Actions */}
-      <Box px="4" py="3" borderTopWidth="1px" borderColor="border.muted" flexShrink={0}>
-        <Stack gap="2">
-          {ticket.status === TicketStatus.NEW && (
-            <Button
-              colorPalette="blue"
-              size="sm"
-              w="full"
-              loading={isTaking}
-              onClick={() => takeTicket(ticketId)}
-            >
-              Взять тикет
-            </Button>
-          )}
+      <Flex
+        px="4"
+        py="3"
+        borderTopWidth="1px"
+        borderColor="border.muted"
+        flexShrink={0}
+        align="center"
+        justify="space-between"
+        gap="2"
+      >
+        <Menu.Root>
+          <Menu.Trigger asChild>
+            <IconButton variant="outline" size="sm" aria-label="Действия">
+              <MoreHorizontal size={16} />
+            </IconButton>
+          </Menu.Trigger>
+          <Portal>
+            <Menu.Positioner>
+              <Menu.Content>
+                <Menu.Item
+                  value="note"
+                  onClick={() => {/* TODO: open leave note modal */}}
+                >
+                  <StickyNote size={14} />
+                  Оставить заметку
+                </Menu.Item>
+                <Menu.Item
+                  value="category"
+                  onClick={() => {/* TODO: open change category modal */}}
+                >
+                  <Tag size={14} />
+                  Изменить категорию
+                </Menu.Item>
+                <Menu.Separator />
+                <Menu.Item
+                  value="escalate"
+                  color="red.500"
+                  onClick={() => dispatch(openEscalateModal(ticketId))}
+                >
+                  <AlertTriangle size={14} />
+                  Эскалировать
+                </Menu.Item>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Portal>
+        </Menu.Root>
 
-          {(ticket.status === TicketStatus.IN_PROGRESS ||
-            ticket.status === TicketStatus.ESCALATED) && (
-            <>
-              <Button
-                colorPalette="green"
-                size="sm"
-                w="full"
-                loading={isUpdating}
-                onClick={() =>
-                  updateStatus({ ticketId, status: TicketStatus.RESOLVED })
-                }
-              >
-                Решить
-              </Button>
-              <Button
-                colorPalette="orange"
-                variant="outline"
-                size="sm"
-                w="full"
-                onClick={() => dispatch(openEscalateModal(ticketId))}
-              >
-                Эскалировать
-              </Button>
-            </>
-          )}
+        {ticket.status === TicketStatus.NEW && (
+          <Button
+            colorPalette="blue"
+            size="sm"
+            flex="1"
+            loading={isTaking}
+            onClick={() => takeTicket(ticketId)}
+          >
+            Взять тикет
+          </Button>
+        )}
 
-          {ticket.status === TicketStatus.RESOLVED && (
-            <Button
-              colorPalette="gray"
-              variant="outline"
-              size="sm"
-              w="full"
-              loading={isUpdating}
-              onClick={() =>
-                updateStatus({ ticketId, status: TicketStatus.CLOSED })
-              }
-            >
-              Закрыть
-            </Button>
-          )}
-        </Stack>
-      </Box>
+        {(ticket.status === TicketStatus.IN_PROGRESS ||
+          ticket.status === TicketStatus.ESCALATED) && (
+          <Button
+            colorPalette="green"
+            size="sm"
+            flex="1"
+            loading={isUpdating}
+            onClick={() =>
+              updateStatus({ ticketId, status: TicketStatus.RESOLVED })
+            }
+          >
+            Решить
+          </Button>
+        )}
+
+        {ticket.status === TicketStatus.RESOLVED && (
+          <Button
+            colorPalette="gray"
+            variant="outline"
+            size="sm"
+            flex="1"
+            loading={isUpdating}
+            onClick={() =>
+              updateStatus({ ticketId, status: TicketStatus.CLOSED })
+            }
+          >
+            Закрыть
+          </Button>
+        )}
+      </Flex>
 
       {/* Escalate modal */}
       <Dialog.Root
@@ -276,7 +341,9 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
               <Dialog.Body>
                 <Stack gap="4">
                   <Stack gap="1">
-                    <Text fontSize="sm" fontWeight="medium">Причина</Text>
+                    <Text fontSize="sm" fontWeight="medium">
+                      Причина
+                    </Text>
                     <Select.Root
                       collection={escalationCauses}
                       value={[escalateCause]}
@@ -303,7 +370,9 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
                   </Stack>
 
                   <Stack gap="1">
-                    <Text fontSize="sm" fontWeight="medium">Комментарий (опционально)</Text>
+                    <Text fontSize="sm" fontWeight="medium">
+                      Комментарий (опционально)
+                    </Text>
                     <Textarea
                       value={escalateComment}
                       onChange={(e) => setEscalateComment(e.target.value)}
