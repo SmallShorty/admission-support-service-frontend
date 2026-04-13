@@ -60,6 +60,10 @@ export interface CreateAccountDto {
   middleName?: string;
   email: string;
   role: StaffRole;
+}
+
+export interface RegisterAccountResponse {
+  email: string;
   password: string;
 }
 

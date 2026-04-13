@@ -6,6 +6,7 @@ import { useUpdateAccountMutation } from "../hooks/mutations/useUpdateAccountMut
 import { AccountsControls } from "./AccountsControls";
 import { AccountsListTable } from "./AccountsListTable";
 import { AccountInfoModal, AccountFormData } from "./AccountInfoModal";
+import { AccountCreatedModal } from "./AccountCreatedModal";
 import { useEffect, useState } from "react";
 import { Account } from "@/app/entities/account/model/types";
 
@@ -18,6 +19,12 @@ export const ManageAccounts = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+  const [createdCredentials, setCreatedCredentials] = useState<{
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -38,14 +45,21 @@ export const ManageAccounts = () => {
 
   const handleSave = (formData: AccountFormData) => {
     if (selectedAccount) {
-      const { password, ...updateData } = formData;
       updateMutation.mutate(
-        { id: selectedAccount.id, ...updateData },
+        { id: selectedAccount.id, ...formData },
         { onSuccess: () => setIsModalOpen(false) },
       );
     } else {
       createMutation.mutate(formData, {
-        onSuccess: () => setIsModalOpen(false),
+        onSuccess: (data) => {
+          setIsModalOpen(false);
+          setCreatedCredentials({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: data.email,
+            password: data.password,
+          });
+        },
       });
     }
   };
@@ -79,6 +93,15 @@ export const ManageAccounts = () => {
         account={selectedAccount}
         onSave={handleSave}
         isLoading={createMutation.isPending || updateMutation.isPending}
+      />
+
+      <AccountCreatedModal
+        open={!!createdCredentials}
+        onClose={() => setCreatedCredentials(null)}
+        firstName={createdCredentials?.firstName ?? ""}
+        lastName={createdCredentials?.lastName ?? ""}
+        email={createdCredentials?.email ?? ""}
+        password={createdCredentials?.password ?? ""}
       />
     </Stack>
   );

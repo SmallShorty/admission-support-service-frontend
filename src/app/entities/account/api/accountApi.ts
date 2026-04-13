@@ -5,6 +5,7 @@ import {
   AuthResponse,
   CreateAccountDto,
   GetAccountsFilters,
+  RegisterAccountResponse,
   UpdateAccountDto,
 } from "../model/types";
 
@@ -41,8 +42,8 @@ export const accountApi = {
     return data;
   },
 
-  register: async (dto: CreateAccountDto): Promise<Account> => {
-    const { data } = await coreApi.post<Account>("/auth/register", dto);
+  register: async (dto: CreateAccountDto): Promise<RegisterAccountResponse> => {
+    const { data } = await coreApi.post<RegisterAccountResponse>("/accounts/register", dto);
     return data;
   },
 

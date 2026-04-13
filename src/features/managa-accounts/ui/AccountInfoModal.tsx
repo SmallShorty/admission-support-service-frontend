@@ -27,7 +27,6 @@ export interface AccountFormData {
   middleName: string;
   email: string;
   role: StaffRole;
-  password: string;
 }
 
 interface AccountInfoModalProps {
@@ -66,7 +65,6 @@ export const AccountInfoModal = ({
     middleName: account?.middleName ?? "",
     email: account?.email ?? "",
     role: getInitialRole(account),
-    password: "",
   });
 
   const setField =
@@ -75,7 +73,6 @@ export const AccountInfoModal = ({
 
   const handleSubmit = () => {
     if (!form.firstName || !form.lastName || !form.email || !form.role) return;
-    if (!isEdit && !form.password) return;
 
     onSave({
       firstName: form.firstName,
@@ -83,7 +80,6 @@ export const AccountInfoModal = ({
       middleName: form.middleName,
       email: form.email,
       role: form.role as StaffRole,
-      password: form.password,
     });
   };
 
@@ -92,8 +88,7 @@ export const AccountInfoModal = ({
     !form.firstName ||
     !form.lastName ||
     !form.email ||
-    !form.role ||
-    (!isEdit && !form.password);
+    !form.role;
 
   return (
     <Dialog.Root
@@ -187,19 +182,6 @@ export const AccountInfoModal = ({
                   </SelectRoot>
                 </Field.Root>
 
-                {!isEdit && (
-                  <Field.Root required>
-                    <Field.Label fontWeight="semibold">Пароль</Field.Label>
-                    <Input
-                      type="password"
-                      placeholder="Временный пароль"
-                      py="2.5"
-                      rounded="lg"
-                      value={form.password}
-                      onChange={(e) => setField("password")(e.target.value)}
-                    />
-                  </Field.Root>
-                )}
               </Stack>
             </Dialog.Body>
 
