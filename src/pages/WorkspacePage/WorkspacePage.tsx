@@ -21,7 +21,7 @@ const WorkspacePage = () => {
       <SidebarTicketQueue />
 
       {selectedTicketId ? (
-        <ChatWindow key={selectedTicketId} ticketId={selectedTicketId} />
+        <ChatWindow key={`chat-${selectedTicketId}`} ticketId={selectedTicketId} />
       ) : (
         <Flex align="center" justify="center" gridColumn="span 2">
           <Text fontSize="sm" color="fg.muted">
@@ -31,7 +31,7 @@ const WorkspacePage = () => {
       )}
 
       {selectedTicketId && (
-        <TicketDetailPanel key={selectedTicketId} ticketId={selectedTicketId} />
+        <TicketDetailPanel key={`detail-${selectedTicketId}`} ticketId={selectedTicketId} />
       )}
     </Grid>
   );
