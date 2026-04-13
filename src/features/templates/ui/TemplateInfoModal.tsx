@@ -15,7 +15,10 @@ import { Check, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { INTENT_METADATA } from "@features/tickets/model/intentMetadata";
 import { AdmissionIntentCategory } from "@features/tickets/model/types";
-import { Control, RichTextEditor } from "@shared/components/ui/rich-text-editor";
+import {
+  Control,
+  RichTextEditor,
+} from "@shared/components/ui/rich-text-editor";
 import { Template } from "../model/types";
 
 export interface TemplateFormData {
@@ -34,8 +37,14 @@ interface TemplateInfoModalProps {
 }
 
 const CATEGORIES = (
-  Object.entries(INTENT_METADATA) as [AdmissionIntentCategory, { label: string; color: string }][]
+  Object.entries(INTENT_METADATA) as [
+    AdmissionIntentCategory,
+    { label: string; color: string },
+  ][]
 ).map(([value, { label }]) => ({ value, label }));
+
+// FIXME Добавить открытие текста
+// FIXME Dropdown расширяет окно
 
 export const TemplateInfoModal = ({
   open,
@@ -49,7 +58,8 @@ export const TemplateInfoModal = ({
   const [form, setForm] = useState({
     title: template?.title ?? "",
     alias: template?.alias ?? "",
-    category: (template as any)?.category ?? AdmissionIntentCategory.GENERAL_INFO,
+    category:
+      (template as any)?.category ?? AdmissionIntentCategory.GENERAL_INFO,
   });
 
   const editor = useEditor({
@@ -66,7 +76,7 @@ export const TemplateInfoModal = ({
 
   const handleSubmit = () => {
     if (!form.title || !form.alias || !editor || editor.isEmpty) return;
-    const data = { ...form, content: editor.getJSON()};
+    const data = { ...form, content: editor.getJSON() };
     console.log("TemplateInfoModal submit:", data);
     onSave(data);
   };
@@ -168,7 +178,12 @@ export const TemplateInfoModal = ({
                     borderWidth="1px"
                     rounded="lg"
                     width="full"
-                    css={{ "& .ProseMirror": { maxHeight: "10rem", overflowY: "auto" } }}
+                    css={{
+                      "& .ProseMirror": {
+                        maxHeight: "10rem",
+                        overflowY: "auto",
+                      },
+                    }}
                   >
                     <RichTextEditor.Toolbar>
                       <RichTextEditor.ControlGroup>
