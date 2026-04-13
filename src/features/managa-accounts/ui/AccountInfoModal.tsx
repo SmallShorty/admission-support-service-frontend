@@ -21,6 +21,8 @@ import {
   StaffRole,
 } from "@/app/entities/account/model/types";
 
+// FIXME Dropdown расширяет окно
+
 export interface AccountFormData {
   firstName: string;
   lastName: string;
@@ -67,9 +69,8 @@ export const AccountInfoModal = ({
     role: getInitialRole(account),
   });
 
-  const setField =
-    (field: keyof typeof form) => (value: string) =>
-      setForm((prev) => ({ ...prev, [field]: value }));
+  const setField = (field: keyof typeof form) => (value: string) =>
+    setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleSubmit = () => {
     if (!form.firstName || !form.lastName || !form.email || !form.role) return;
@@ -84,11 +85,7 @@ export const AccountInfoModal = ({
   };
 
   const isSubmitDisabled =
-    isLoading ||
-    !form.firstName ||
-    !form.lastName ||
-    !form.email ||
-    !form.role;
+    isLoading || !form.firstName || !form.lastName || !form.email || !form.role;
 
   return (
     <Dialog.Root
@@ -104,7 +101,9 @@ export const AccountInfoModal = ({
           <Dialog.Content rounded="2xl" boxShadow="2xl">
             <Dialog.Header py="5">
               <Dialog.Title fontSize="xl" fontWeight="bold">
-                {isEdit ? "Редактировать сотрудника" : "Добавить нового сотрудника"}
+                {isEdit
+                  ? "Редактировать сотрудника"
+                  : "Добавить нового сотрудника"}
               </Dialog.Title>
               <Dialog.CloseTrigger asChild>
                 <CloseButton
@@ -181,7 +180,6 @@ export const AccountInfoModal = ({
                     </SelectContent>
                   </SelectRoot>
                 </Field.Root>
-
               </Stack>
             </Dialog.Body>
 

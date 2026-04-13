@@ -20,6 +20,9 @@ const KnowledgeBasePage = lazy(
   () => import("@/pages/KnowledgeBasePage/KnowledgeBasePage"),
 );
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage/NotFoundPage"));
+const IntegrationsPage = lazy(
+  () => import("@/pages/IntegrationsPage/IntegrationsPage"),
+);
 
 const PageLoader = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={null}>{children}</Suspense>
@@ -99,6 +102,14 @@ export const router = createBrowserRouter([
         children: [
           { path: "/queue", element: <TicketQueueBoardPage /> },
           { path: "/admin-control-panel", element: <AdminControlPanelPage /> },
+          {
+            path: "/integrations",
+            element: (
+              <PageLoader>
+                <IntegrationsPage />
+              </PageLoader>
+            ),
+          },
         ],
       },
     ],
