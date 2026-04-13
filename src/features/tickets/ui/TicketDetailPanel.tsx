@@ -330,6 +330,7 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
         onOpenChange={(details) => {
           if (!details.open) dispatch(closeEscalateModal());
         }}
+        unmountOnExit
       >
         <Portal>
           <Dialog.Backdrop />

@@ -84,6 +84,7 @@ export const TemplateInfoModal = ({
       onOpenChange={(e) => onOpenChange(e.open)}
       placement="center"
       motionPreset="slide-in-bottom"
+      unmountOnExit
     >
       <Portal>
         <Dialog.Backdrop />
