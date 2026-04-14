@@ -4,7 +4,7 @@ import { IntegrationTabs } from "@features/integrations/ui/IntegrationTabs";
 
 const IntegrationsPage: FC = () => {
   return (
-    <Box p={6}>
+    <Box>
       <IntegrationTabs />
     </Box>
   );
