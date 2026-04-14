@@ -172,7 +172,7 @@ export const TicketQueueBoardPage = () => {
               key={column.id}
               flexDirection="column"
               h="full"
-              bg="bg.muted"
+              bg="bg.soft"
               borderRadius="xl"
               borderWidth="1px"
               overflow="hidden"
@@ -180,7 +180,7 @@ export const TicketQueueBoardPage = () => {
               {/* Column Header */}
               <Flex
                 p="4"
-                bg="bg.muted/80"
+                bg="bg.pure"
                 borderBottomWidth="1px"
                 align="center"
                 justify="space-between"
