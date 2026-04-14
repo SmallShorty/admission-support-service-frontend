@@ -33,13 +33,11 @@ export const MessageTemplates: FC = () => {
 
   const handleModalClose = (open: boolean) => {
     setModalOpen(open);
-    if (!open) setSelectedTemplate(null);
   };
 
   const handleSave = (data: TemplateFormData) => {
     console.log(data);
     setModalOpen(false);
-    setSelectedTemplate(null);
   };
 
   return (

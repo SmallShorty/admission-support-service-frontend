@@ -7,7 +7,7 @@ import { AccountsControls } from "./AccountsControls";
 import { AccountsListTable } from "./AccountsListTable";
 import { AccountInfoModal, AccountFormData } from "./AccountInfoModal";
 import { AccountCreatedModal } from "./AccountCreatedModal";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Account } from "@/app/entities/account/model/types";
 
 export const ManageAccounts = () => {
@@ -25,13 +25,6 @@ export const ManageAccounts = () => {
     email: string;
     password: string;
   } | null>(null);
-
-  useEffect(() => {
-    if (!isModalOpen) {
-      document.body.style.overflow = "";
-      document.body.style.pointerEvents = "";
-    }
-  }, [isModalOpen]);
 
   const handleOpenCreate = () => {
     setSelectedAccount(null);
@@ -95,14 +88,16 @@ export const ManageAccounts = () => {
         isLoading={createMutation.isPending || updateMutation.isPending}
       />
 
-      <AccountCreatedModal
-        open={!!createdCredentials}
-        onClose={() => setCreatedCredentials(null)}
-        firstName={createdCredentials?.firstName ?? ""}
-        lastName={createdCredentials?.lastName ?? ""}
-        email={createdCredentials?.email ?? ""}
-        password={createdCredentials?.password ?? ""}
-      />
+      {createdCredentials && (
+        <AccountCreatedModal
+          open={!!createdCredentials}
+          onClose={() => setCreatedCredentials(null)}
+          firstName={createdCredentials.firstName}
+          lastName={createdCredentials.lastName}
+          email={createdCredentials.email}
+          password={createdCredentials.password}
+        />
+      )}
     </Stack>
   );
 };

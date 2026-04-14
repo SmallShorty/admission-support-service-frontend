@@ -97,7 +97,7 @@ export const TemplatesControls = ({
       </HStack>
 
       {/* Кнопка добавления */}
-      <Button onClick={onAddClick} variant="solid" colorPalette="blue" gap="2">
+      <Button onClick={onAddClick} variant="solid" gap="2">
         <Plus size={18} />
         Добавить шаблон
       </Button>

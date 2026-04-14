@@ -4,7 +4,6 @@ import {
   Dialog,
   Field,
   Input,
-  Portal,
   SelectContent,
   SelectItem,
   SelectRoot,
@@ -95,10 +94,9 @@ export const AccountInfoModal = ({
       motionPreset="slide-in-bottom"
       unmountOnExit
     >
-      <Portal>
-        <Dialog.Backdrop />
-        <Dialog.Positioner>
-          <Dialog.Content rounded="2xl" boxShadow="2xl">
+      <Dialog.Backdrop />
+      <Dialog.Positioner>
+        <Dialog.Content rounded="2xl" boxShadow="2xl">
             <Dialog.Header py="5">
               <Dialog.Title fontSize="xl" fontWeight="bold">
                 {isEdit
@@ -209,9 +207,8 @@ export const AccountInfoModal = ({
                 {isEdit ? "Сохранить" : "Добавить"}
               </Button>
             </Dialog.Footer>
-          </Dialog.Content>
-        </Dialog.Positioner>
-      </Portal>
+        </Dialog.Content>
+      </Dialog.Positioner>
     </Dialog.Root>
   );
 };
