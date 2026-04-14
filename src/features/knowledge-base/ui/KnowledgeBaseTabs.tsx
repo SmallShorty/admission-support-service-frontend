@@ -1,7 +1,7 @@
 "use client";
 
 import { FC } from "react";
-import { Tabs, Box } from "@chakra-ui/react";
+import { Tabs, Box, Link } from "@chakra-ui/react";
 import { LuMessageSquare, LuLayers, LuBook } from "react-icons/lu";
 import { MessageTemplates } from "./MessageTemplates";
 import { TicketCategories } from "./TicketCategories";
@@ -17,19 +17,25 @@ export const KnowledgeBaseTabs: FC = () => {
         variant="line" // Или оставьте стандартный, стиль с иконками хорошо смотрится на line
       >
         <Tabs.List>
-          <Tabs.Trigger value="messageTemplates">
-            <LuMessageSquare />
-            Шаблоны сообщений
+          <Tabs.Trigger value="messageTemplates" asChild>
+            <Link unstyled href="#message-templates">
+              <LuMessageSquare />
+              Шаблоны сообщений
+            </Link>
           </Tabs.Trigger>
 
-          <Tabs.Trigger value="ticketCategories">
-            <LuLayers />
-            Категории обращений
+          <Tabs.Trigger value="ticketCategories" asChild>
+            <Link unstyled href="#ticket-categories">
+              <LuLayers />
+              Категории обращений
+            </Link>
           </Tabs.Trigger>
 
-          <Tabs.Trigger value="variableDictionary">
-            <LuBook />
-            Словарь переменных
+          <Tabs.Trigger value="variableDictionary" asChild>
+            <Link unstyled href="#variable-dictionary">
+              <LuBook />
+              Словарь переменных
+            </Link>
           </Tabs.Trigger>
         </Tabs.List>
 
