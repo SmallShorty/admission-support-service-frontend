@@ -14,7 +14,6 @@ const extractText = (node: JSONContent): string => {
 };
 
 export const TemplateInfoCard = ({ template, onClick }: Props) => {
-
   return (
     <Box
       bg="bg.panel"
@@ -51,17 +50,12 @@ export const TemplateInfoCard = ({ template, onClick }: Props) => {
               {template.createdBy}
             </Badge>
           </Flex>
-          <Flex align="center" gap="1.5" color="fg.muted" fontSize="11px">
-            <Icon as={LuClock} />
-            <Text>Обновлено: {template.updatedAt}</Text>
-          </Flex>
         </Box>
 
         <Badge
           fontFamily="mono"
           fontSize="xs"
           fontWeight="bold"
-          colorPalette="blue"
           variant="surface"
           px="2.5"
           py="1.5"
@@ -87,6 +81,10 @@ export const TemplateInfoCard = ({ template, onClick }: Props) => {
       >
         {extractText(template.content)}
       </Box>
+      <Flex align="center" gap="1.5" color="fg.muted" fontSize="11px">
+        <Icon as={LuClock} />
+        <Text>Обновлено: {template.updatedAt}</Text>
+      </Flex>
     </Box>
   );
 };
