@@ -6,6 +6,7 @@ import {
   Badge,
   Icon,
   Separator,
+  useRecipe,
 } from "@chakra-ui/react";
 import { Clock } from "lucide-react";
 import { IntentCategoryBadge } from "./IntentCategoryBadge";
@@ -41,6 +42,8 @@ export const TicketCard = ({
   onSelect,
 }: TicketCardProps) => {
   const isWorking = status === TicketStatus.IN_PROGRESS;
+  const cardRecipe = useRecipe({ key: "card" });
+  const cardStyles = cardRecipe({ variant: "editable" });
 
   const getPriorityPalette = (val: number) => {
     if (val >= 8) return "red";
@@ -71,7 +74,7 @@ export const TicketCard = ({
   return (
     <Box
       onClick={() => onSelect?.(applicant.id)}
-      cursor="pointer"
+      css={cardStyles}
       p="3"
       borderRadius="xl"
       position="relative"

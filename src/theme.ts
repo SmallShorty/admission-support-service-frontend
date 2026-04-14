@@ -11,6 +11,24 @@ const buttonRecipe = defineRecipe({
   },
 });
 
+const cardRecipe = defineRecipe({
+  base: {
+    borderRadius: "lg",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+    transition: "box-shadow 0.2s ease",
+  },
+  variants: {
+    variant: {
+      editable: {
+        cursor: "pointer",
+        _hover: {
+          boxShadow: "0 4px 16px rgba(0,0,0,0.16)",
+        },
+      },
+    },
+  },
+});
+
 const config = defineConfig({
   theme: {
     tokens: {
@@ -40,6 +58,7 @@ const config = defineConfig({
     },
     recipes: {
       button: buttonRecipe,
+      card: cardRecipe,
     },
   },
 });
