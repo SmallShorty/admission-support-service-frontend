@@ -16,7 +16,6 @@ import {
   SimpleGrid,
   createListCollection,
 } from "@chakra-ui/react";
-import { Check } from "lucide-react";
 import { useState } from "react";
 import {
   IntegrationDto,
