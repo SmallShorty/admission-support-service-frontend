@@ -4,11 +4,8 @@ import {
   Dialog,
   Field,
   Input,
-  SelectContent,
-  SelectItem,
-  SelectRoot,
-  SelectTrigger,
-  SelectValueText,
+  Portal,
+  Select,
   Stack,
   createListCollection,
 } from "@chakra-ui/react";
@@ -19,8 +16,6 @@ import {
   AccountRole,
   StaffRole,
 } from "@/app/entities/account/model/types";
-
-// FIXME Dropdown расширяет окно
 
 export interface AccountFormData {
   firstName: string;
@@ -94,9 +89,10 @@ export const AccountInfoModal = ({
       motionPreset="slide-in-bottom"
       unmountOnExit
     >
-      <Dialog.Backdrop />
-      <Dialog.Positioner>
-        <Dialog.Content rounded="2xl" boxShadow="2xl">
+      <Portal>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content rounded="2xl" boxShadow="2xl">
             <Dialog.Header py="5">
               <Dialog.Title fontSize="xl" fontWeight="bold">
                 {isEdit
@@ -161,22 +157,29 @@ export const AccountInfoModal = ({
 
                 <Field.Root required>
                   <Field.Label fontWeight="semibold">Роль</Field.Label>
-                  <SelectRoot
+                  <Select.Root
                     collection={staffRoles}
                     value={form.role ? [form.role] : []}
                     onValueChange={(e) => setField("role")(e.value[0])}
                   >
-                    <SelectTrigger rounded="lg" py="2.5">
-                      <SelectValueText placeholder="Выберите роль" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {staffRoles.items.map((role) => (
-                        <SelectItem item={role} key={role.value}>
-                          {role.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </SelectRoot>
+                    <Select.Control>
+                      <Select.Trigger rounded="lg" py="2.5">
+                        <Select.ValueText placeholder="Выберите роль" />
+                      </Select.Trigger>
+                      <Select.IndicatorGroup>
+                        <Select.Indicator />
+                      </Select.IndicatorGroup>
+                    </Select.Control>
+                    <Select.Positioner>
+                      <Select.Content>
+                        {staffRoles.items.map((role) => (
+                          <Select.Item item={role} key={role.value}>
+                            {role.label}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Select.Root>
                 </Field.Root>
               </Stack>
             </Dialog.Body>
@@ -207,8 +210,9 @@ export const AccountInfoModal = ({
                 {isEdit ? "Сохранить" : "Добавить"}
               </Button>
             </Dialog.Footer>
-        </Dialog.Content>
-      </Dialog.Positioner>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Portal>
     </Dialog.Root>
   );
 };

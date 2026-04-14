@@ -4,11 +4,8 @@ import {
   Dialog,
   Field,
   Input,
-  SelectContent,
-  SelectItem,
-  SelectRoot,
-  SelectTrigger,
-  SelectValueText,
+  Portal,
+  Select,
   Stack,
   createListCollection,
 } from "@chakra-ui/react";
@@ -128,128 +125,137 @@ export const TemplateInfoModal = ({
       motionPreset="slide-in-bottom"
       size="lg"
     >
-      <Dialog.Backdrop />
-      <Dialog.Positioner>
-        <Dialog.Content rounded="2xl" boxShadow="2xl">
-          <Dialog.Header py="5">
-            <Dialog.Title fontSize="xl" fontWeight="bold">
-              {isEdit ? "Редактировать шаблон" : "Добавить шаблон"}
-            </Dialog.Title>
-            <Dialog.CloseTrigger asChild>
-              <CloseButton
-                size="sm"
-                color="gray.400"
-                _hover={{ color: "gray.600", bg: "gray.100" }}
-              />
-            </Dialog.CloseTrigger>
-          </Dialog.Header>
+      <Portal>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content rounded="2xl" boxShadow="2xl">
+            <Dialog.Header py="5">
+              <Dialog.Title fontSize="xl" fontWeight="bold">
+                {isEdit ? "Редактировать шаблон" : "Добавить шаблон"}
+              </Dialog.Title>
+              <Dialog.CloseTrigger asChild>
+                <CloseButton
+                  size="sm"
+                  color="gray.400"
+                  _hover={{ color: "gray.600", bg: "gray.100" }}
+                />
+              </Dialog.CloseTrigger>
+            </Dialog.Header>
 
-          <Dialog.Body p="6">
-            <Stack gap="4">
-              <Field.Root required>
-                <Field.Label fontWeight="semibold">Название</Field.Label>
-                <Input
-                  placeholder="Приветствие абитуриента"
+            <Dialog.Body p="6">
+              <Stack gap="4">
+                <Field.Root required>
+                  <Field.Label fontWeight="semibold">Название</Field.Label>
+                  <Input
+                    placeholder="Приветствие абитуриента"
+                    py="2.5"
+                    rounded="lg"
+                    value={form.title}
+                    onChange={(e) => setField("title")(e.target.value)}
+                  />
+                </Field.Root>
+
+                <Field.Root required>
+                  <Field.Label fontWeight="semibold">Alias</Field.Label>
+                  <Input
+                    placeholder="welcome"
+                    py="2.5"
+                    rounded="lg"
+                    fontFamily="mono"
+                    value={form.alias}
+                    onChange={(e) => setField("alias")(e.target.value)}
+                  />
+                </Field.Root>
+
+                <Field.Root required>
+                  <Field.Label fontWeight="semibold">Категория</Field.Label>
+                  <Select.Root
+                    collection={CATEGORIES}
+                    value={form.category ? [form.category] : []}
+                    onValueChange={(e) => setField("category")(e.value[0])}
+                  >
+                    <Select.Control>
+                      <Select.Trigger rounded="lg" py="2.5">
+                        <Select.ValueText placeholder="Выберите категорию" />
+                      </Select.Trigger>
+                      <Select.IndicatorGroup>
+                        <Select.Indicator />
+                      </Select.IndicatorGroup>
+                    </Select.Control>
+                    <Select.Positioner>
+                      <Select.Content>
+                        {CATEGORIES.items.map((cat) => (
+                          <Select.Item item={cat} key={cat.value}>
+                            {cat.label}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Select.Root>
+                </Field.Root>
+
+                <Field.Root required>
+                  <Field.Label fontWeight="semibold">Текст шаблона</Field.Label>
+                  <RichTextEditor.Root
+                    editor={editor}
+                    borderWidth="1px"
+                    rounded="lg"
+                    width="full"
+                    css={{
+                      "& .ProseMirror": {
+                        maxHeight: "10rem",
+                        overflowY: "auto",
+                      },
+                    }}
+                  >
+                    <RichTextEditor.Toolbar>
+                      <RichTextEditor.ControlGroup>
+                        <Control.Bold />
+                        <Control.Italic />
+                        <Control.Underline />
+                      </RichTextEditor.ControlGroup>
+                      <RichTextEditor.ControlGroup>
+                        <Control.BulletList />
+                        <Control.OrderedList />
+                      </RichTextEditor.ControlGroup>
+                      <RichTextEditor.ControlGroup>
+                        <Control.Undo />
+                        <Control.Redo />
+                      </RichTextEditor.ControlGroup>
+                    </RichTextEditor.Toolbar>
+                    <RichTextEditor.Content />
+                  </RichTextEditor.Root>
+                </Field.Root>
+              </Stack>
+            </Dialog.Body>
+
+            <Dialog.Footer p="6" gap="3">
+              <Dialog.ActionTrigger asChild>
+                <Button
+                  variant="subtle"
+                  flex="1"
                   py="2.5"
                   rounded="lg"
-                  value={form.title}
-                  onChange={(e) => setField("title")(e.target.value)}
-                />
-              </Field.Root>
-
-              <Field.Root required>
-                <Field.Label fontWeight="semibold">Alias</Field.Label>
-                <Input
-                  placeholder="welcome"
-                  py="2.5"
-                  rounded="lg"
-                  fontFamily="mono"
-                  value={form.alias}
-                  onChange={(e) => setField("alias")(e.target.value)}
-                />
-              </Field.Root>
-
-              <Field.Root required>
-                <Field.Label fontWeight="semibold">Категория</Field.Label>
-                <SelectRoot
-                  collection={CATEGORIES}
-                  value={form.category ? [form.category] : []}
-                  onValueChange={(e) => setField("category")(e.value[0])}
+                  bg="gray.100"
+                  _hover={{ bg: "gray.200" }}
                 >
-                  <SelectTrigger rounded="lg" py="2.5">
-                    <SelectValueText placeholder="Выберите категорию" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CATEGORIES.items.map((cat) => (
-                      <SelectItem item={cat} key={cat.value}>
-                        {cat.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </SelectRoot>
-              </Field.Root>
-
-              <Field.Root required>
-                <Field.Label fontWeight="semibold">Текст шаблона</Field.Label>
-                <RichTextEditor.Root
-                  editor={editor}
-                  borderWidth="1px"
-                  rounded="lg"
-                  width="full"
-                  css={{
-                    "& .ProseMirror": {
-                      maxHeight: "10rem",
-                      overflowY: "auto",
-                    },
-                  }}
-                >
-                  <RichTextEditor.Toolbar>
-                    <RichTextEditor.ControlGroup>
-                      <Control.Bold />
-                      <Control.Italic />
-                      <Control.Underline />
-                    </RichTextEditor.ControlGroup>
-                    <RichTextEditor.ControlGroup>
-                      <Control.BulletList />
-                      <Control.OrderedList />
-                    </RichTextEditor.ControlGroup>
-                    <RichTextEditor.ControlGroup>
-                      <Control.Undo />
-                      <Control.Redo />
-                    </RichTextEditor.ControlGroup>
-                  </RichTextEditor.Toolbar>
-                  <RichTextEditor.Content />
-                </RichTextEditor.Root>
-              </Field.Root>
-            </Stack>
-          </Dialog.Body>
-
-          <Dialog.Footer p="6" gap="3">
-            <Dialog.ActionTrigger asChild>
+                  Отмена
+                </Button>
+              </Dialog.ActionTrigger>
               <Button
-                variant="subtle"
                 flex="1"
                 py="2.5"
                 rounded="lg"
-                bg="gray.100"
-                _hover={{ bg: "gray.200" }}
+                onClick={handleSubmit}
+                disabled={isSubmitDisabled}
+                loading={isLoading}
               >
-                Отмена
+                {isEdit ? "Сохранить" : "Добавить"}
               </Button>
-            </Dialog.ActionTrigger>
-            <Button
-              flex="1"
-              py="2.5"
-              rounded="lg"
-              onClick={handleSubmit}
-              disabled={isSubmitDisabled}
-              loading={isLoading}
-            >
-              {isEdit ? "Сохранить" : "Добавить"}
-            </Button>
-          </Dialog.Footer>
-        </Dialog.Content>
-      </Dialog.Positioner>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Portal>
     </Dialog.Root>
   );
 };
