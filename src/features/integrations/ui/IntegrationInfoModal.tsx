@@ -18,7 +18,12 @@ import {
 } from "@chakra-ui/react";
 import { Check } from "lucide-react";
 import { useState } from "react";
-import { IntegrationDto, EventType, CreateIntegrationPayload, UpdateIntegrationPayload } from "../model/types";
+import {
+  IntegrationDto,
+  EventType,
+  CreateIntegrationPayload,
+  UpdateIntegrationPayload,
+} from "../model/types";
 
 const eventTypeOptions = createListCollection({
   items: [
@@ -137,7 +142,9 @@ export const IntegrationInfoModal = ({
                     rounded="lg"
                     value={form.slug}
                     onChange={(e) =>
-                      setField("slug")(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))
+                      setField("slug")(
+                        e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""),
+                      )
                     }
                   />
                 </Field.Root>
@@ -185,7 +192,9 @@ export const IntegrationInfoModal = ({
                 </Field.Root>
 
                 <Field.Root>
-                  <Field.Label fontWeight="semibold">Содержимое (JSON)</Field.Label>
+                  <Field.Label fontWeight="semibold">
+                    Содержимое (JSON)
+                  </Field.Label>
                   <Textarea
                     placeholder='{"text": "Ticket {{id}} failed", "chatId": "-100123"}'
                     rounded="lg"
@@ -198,11 +207,15 @@ export const IntegrationInfoModal = ({
                 </Field.Root>
 
                 <Field.Root>
-                  <Field.Label fontWeight="semibold">Редактируемые поля</Field.Label>
+                  <Field.Label fontWeight="semibold">
+                    Редактируемые поля
+                  </Field.Label>
                   <SimpleGrid columns={2} gap="3" mt="1">
                     <Checkbox.Root
                       checked={form.isTypeEditable}
-                      onCheckedChange={(e) => setField("isTypeEditable")(!!e.checked)}
+                      onCheckedChange={(e) =>
+                        setField("isTypeEditable")(!!e.checked)
+                      }
                     >
                       <Checkbox.HiddenInput />
                       <Checkbox.Control />
@@ -211,7 +224,9 @@ export const IntegrationInfoModal = ({
 
                     <Checkbox.Root
                       checked={form.isThemeEditable}
-                      onCheckedChange={(e) => setField("isThemeEditable")(!!e.checked)}
+                      onCheckedChange={(e) =>
+                        setField("isThemeEditable")(!!e.checked)
+                      }
                     >
                       <Checkbox.HiddenInput />
                       <Checkbox.Control />
@@ -220,16 +235,22 @@ export const IntegrationInfoModal = ({
 
                     <Checkbox.Root
                       checked={form.isSourceEditable}
-                      onCheckedChange={(e) => setField("isSourceEditable")(!!e.checked)}
+                      onCheckedChange={(e) =>
+                        setField("isSourceEditable")(!!e.checked)
+                      }
                     >
                       <Checkbox.HiddenInput />
                       <Checkbox.Control />
-                      <Checkbox.Label fontSize="sm">URL источника</Checkbox.Label>
+                      <Checkbox.Label fontSize="sm">
+                        URL источника
+                      </Checkbox.Label>
                     </Checkbox.Root>
 
                     <Checkbox.Root
                       checked={form.isContentEditable}
-                      onCheckedChange={(e) => setField("isContentEditable")(!!e.checked)}
+                      onCheckedChange={(e) =>
+                        setField("isContentEditable")(!!e.checked)
+                      }
                     >
                       <Checkbox.HiddenInput />
                       <Checkbox.Control />
@@ -254,7 +275,6 @@ export const IntegrationInfoModal = ({
                 </Button>
               </Dialog.ActionTrigger>
               <Button
-                colorPalette="blue"
                 flex="1"
                 py="2.5"
                 rounded="lg"
@@ -262,7 +282,6 @@ export const IntegrationInfoModal = ({
                 disabled={isSubmitDisabled}
                 loading={isLoading}
               >
-                <Check size={16} />
                 {isEdit ? "Сохранить" : "Добавить"}
               </Button>
             </Dialog.Footer>
