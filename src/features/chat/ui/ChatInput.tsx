@@ -1,5 +1,12 @@
 import React, { useRef } from "react";
-import { Box, Button, Flex, IconButton, Text, Textarea } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  IconButton,
+  Text,
+  Textarea,
+} from "@chakra-ui/react";
 import { ChevronDown, Send } from "lucide-react";
 import { chatSocket } from "../api/chatSocket";
 import { useSendMessage } from "../hooks/chatQueries";
@@ -53,7 +60,13 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
   };
 
   return (
-    <Box px="3" py="3" borderTopWidth="1px" borderColor="border.muted" flexShrink={0}>
+    <Box
+      px="3"
+      py="3"
+      borderTopWidth="1px"
+      borderColor="border.muted"
+      flexShrink={0}
+    >
       <Box
         position="relative"
         borderRadius="xl"
@@ -104,13 +117,27 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
           bg="bg"
         >
           <Flex gap="2">
-            <Button size="xs" variant="outline" colorPalette="gray" fontWeight="semibold">
-              <Text color="fg.muted" fontSize="xs">/</Text>
+            <Button
+              size="xs"
+              variant="outline"
+              colorPalette="gray"
+              fontWeight="semibold"
+            >
+              <Text color="fg.muted" fontSize="xs">
+                /
+              </Text>
               Шаблоны
               <ChevronDown size={13} />
             </Button>
-            <Button size="xs" variant="outline" colorPalette="gray" fontWeight="semibold">
-              <Text color="fg.muted" fontSize="xs">{"{ }"}</Text>
+            <Button
+              size="xs"
+              variant="outline"
+              colorPalette="gray"
+              fontWeight="semibold"
+            >
+              <Text color="fg.muted" fontSize="xs">
+                {"{ }"}
+              </Text>
               Переменные
               <ChevronDown size={13} />
             </Button>
@@ -120,7 +147,6 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
             aria-label="Отправить"
             onClick={handleSubmit}
             disabled={!content.trim() || isPending || disabled}
-            colorPalette="blue"
             borderRadius="lg"
             size="sm"
           >

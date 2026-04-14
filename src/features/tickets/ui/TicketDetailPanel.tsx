@@ -195,7 +195,7 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
                     <Text fontSize="sm" color="fg.muted">
                       {score.subjectName}
                     </Text>
-                    <Badge variant="surface" size="sm" colorPalette="blue">
+                    <Badge variant="surface" size="sm">
                       {score.score}
                     </Badge>
                   </Flex>
@@ -255,14 +255,18 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
               <Menu.Content>
                 <Menu.Item
                   value="note"
-                  onClick={() => {/* TODO: open leave note modal */}}
+                  onClick={() => {
+                    /* TODO: open leave note modal */
+                  }}
                 >
                   <StickyNote size={14} />
                   Оставить заметку
                 </Menu.Item>
                 <Menu.Item
                   value="category"
-                  onClick={() => {/* TODO: open change category modal */}}
+                  onClick={() => {
+                    /* TODO: open change category modal */
+                  }}
                 >
                   <Tag size={14} />
                   Изменить категорию
@@ -283,7 +287,6 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
 
         {ticket.status === TicketStatus.NEW && (
           <Button
-            colorPalette="blue"
             size="sm"
             flex="1"
             loading={isTaking}
