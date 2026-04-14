@@ -15,10 +15,10 @@ const config = defineConfig({
   theme: {
     tokens: {
       colors: {
-        brand: {
-          50: { value: "#e6f2ff" },
-          500: { value: "#0078ff" },
-          900: { value: "#003a80" },
+        bg: {
+          pure: { value: "#FFFFFF" },
+          soft: { value: "#F9FBFB" },
+          muted: { value: "#F0F4F4" },
         },
       },
     },
@@ -26,7 +26,7 @@ const config = defineConfig({
       colors: {
         mainBg: {
           value: {
-            base: "{colors.white}",
+            base: "{colors.bg.muted}",
             _dark: "{colors.gray.900}",
           },
         },

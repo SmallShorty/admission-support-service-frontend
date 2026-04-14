@@ -1,12 +1,24 @@
 import { Box, Container } from "@chakra-ui/react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Navbar } from "./Navbar";
 
+const NO_PADDING_PATHS = ["/workspace", "/queue"];
+
 const Layout = () => {
+  const { pathname } = useLocation();
+  const noPadding = NO_PADDING_PATHS.includes(pathname);
+
   return (
-    <Box bg="#F9FBFB" h="100vh" display="flex" flexDirection="column">
+    <Box bg="mainBg" height="100vh" display="flex" flexDirection="column">
       <Navbar />
-      <Container maxW="full" px="0" mx="0" flex="1" minH="0" overflow="hidden">
+      <Container
+        maxW="full"
+        p={noPadding ? "0" : { base: "4", md: "6", lg: "8" }}
+        mx="0"
+        flex="1"
+        minH="0"
+        overflow="hidden"
+      >
         <Outlet />
       </Container>
     </Box>
