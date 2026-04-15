@@ -72,7 +72,7 @@ export const IntegrationsListTable: FC<IntegrationsListTableProps> = ({
             <Table.ColumnHeader>Статус</Table.ColumnHeader>
             <Table.ColumnHeader>Автор</Table.ColumnHeader>
             <Table.ColumnHeader>Дата</Table.ColumnHeader>
-            <Table.ColumnHeader textAlign="right">Действия</Table.ColumnHeader>
+            <Table.ColumnHeader textAlign="right"></Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
 
@@ -92,7 +92,9 @@ export const IntegrationsListTable: FC<IntegrationsListTableProps> = ({
 
               <Table.Cell>
                 <Badge
-                  colorPalette={item.eventType === EventType.FAILURE ? "red" : "blue"}
+                  colorPalette={
+                    item.eventType === EventType.FAILURE ? "red" : "blue"
+                  }
                   variant="subtle"
                   size="sm"
                 >
@@ -130,7 +132,7 @@ export const IntegrationsListTable: FC<IntegrationsListTableProps> = ({
               <Table.Cell textAlign="right">
                 <Menu.Root positioning={{ placement: "bottom-end" }}>
                   <Menu.Trigger asChild>
-                    <IconButton variant="ghost" size="sm" aria-label="Действия">
+                    <IconButton variant="ghost" size="sm" aria-label="">
                       <MoreVertical size={18} />
                     </IconButton>
                   </Menu.Trigger>
@@ -144,7 +146,10 @@ export const IntegrationsListTable: FC<IntegrationsListTableProps> = ({
                           </HStack>
                         </Menu.Item>
 
-                        <Menu.Item value="test" onClick={() => onTestCall(item)}>
+                        <Menu.Item
+                          value="test"
+                          onClick={() => onTestCall(item)}
+                        >
                           <HStack gap="2">
                             <Play size={14} />
                             <Text>Тестовый вызов</Text>
@@ -199,9 +204,17 @@ export const IntegrationsListTable: FC<IntegrationsListTableProps> = ({
                   page={page}
                   onPageChange={onPageChange}
                 >
-                  <ButtonGroup variant="outline" size="xs" attached={false} gap="1">
+                  <ButtonGroup
+                    variant="outline"
+                    size="xs"
+                    attached={false}
+                    gap="1"
+                  >
                     <Pagination.PrevTrigger asChild>
-                      <IconButton variant="ghost" disabled={page === 1 || isLoading}>
+                      <IconButton
+                        variant="ghost"
+                        disabled={page === 1 || isLoading}
+                      >
                         <ChevronLeft size={14} />
                       </IconButton>
                     </Pagination.PrevTrigger>

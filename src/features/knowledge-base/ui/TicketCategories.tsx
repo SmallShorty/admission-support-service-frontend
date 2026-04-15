@@ -9,6 +9,7 @@ import {
   HStack,
   Icon,
   List,
+  useRecipe,
 } from "@chakra-ui/react";
 import { LuMessageSquare } from "react-icons/lu";
 import { AdmissionIntentCategory } from "@features/tickets/model/types";
@@ -119,18 +120,21 @@ interface CategoryCardProps {
 
 const CategoryCard: FC<CategoryCardProps> = ({ category }) => {
   const meta = INTENT_METADATA[category.intent];
+  const cardRecipe = useRecipe({ key: "card" });
+  const cardStyles = cardRecipe({});
   const examplesList = category.examples.match(/«[^»]+»/g)
     ? category.examples.match(/«[^»]+»/g)!.map((s) => s.replace(/[«»]/g, ""))
     : [category.examples];
 
   return (
     <Box
+      css={cardStyles}
       bg="bg.panel"
       p="5"
       borderRadius="xl"
       borderWidth="1px"
       borderColor="border.subtle"
-      boxShadow={`inset 4px 0 0 0 ${meta.color}`}
+      boxShadow={`inset 4px 0 0 0 ${meta.color}, 0 1px 4px rgba(0,0,0,0.08)`}
       display="flex"
       flexDirection="column"
     >

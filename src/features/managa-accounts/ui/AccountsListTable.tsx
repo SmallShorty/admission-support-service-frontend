@@ -64,7 +64,7 @@ export const AccountsListTable = ({
             <Table.ColumnHeader>Пользователь</Table.ColumnHeader>
             <Table.ColumnHeader>Роль</Table.ColumnHeader>
             <Table.ColumnHeader>Статус</Table.ColumnHeader>
-            <Table.ColumnHeader textAlign="right">Действия</Table.ColumnHeader>
+            <Table.ColumnHeader textAlign="right"></Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
 
@@ -90,7 +90,7 @@ export const AccountsListTable = ({
               <Table.Cell textAlign="right">
                 <Menu.Root positioning={{ placement: "bottom-end" }}>
                   <Menu.Trigger asChild>
-                    <IconButton variant="ghost" size="sm" aria-label="Действия">
+                    <IconButton variant="ghost" size="sm" aria-label="">
                       <MoreVertical size={18} />
                     </IconButton>
                   </Menu.Trigger>

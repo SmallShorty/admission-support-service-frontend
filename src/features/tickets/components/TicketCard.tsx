@@ -29,6 +29,7 @@ interface TicketCardProps {
   onSelect: (id: string) => void;
   createdAt: string | Date;
   lastMessageAt: string | Date;
+  cardVariant?: "editable";
 }
 
 export const TicketCard = ({
@@ -40,10 +41,11 @@ export const TicketCard = ({
   lastMessageAt,
   isSelected,
   onSelect,
+  cardVariant,
 }: TicketCardProps) => {
   const isWorking = status === TicketStatus.IN_PROGRESS;
   const cardRecipe = useRecipe({ key: "card" });
-  const cardStyles = cardRecipe({ variant: "editable" });
+  const cardStyles = cardRecipe({ variant: cardVariant });
 
   const getPriorityPalette = (val: number) => {
     if (val >= 8) return "red";

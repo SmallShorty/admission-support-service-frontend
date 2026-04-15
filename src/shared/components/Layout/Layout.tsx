@@ -17,7 +17,7 @@ const Layout = () => {
         mx="0"
         flex="1"
         minH="0"
-        overflow="hidden"
+        overflowY="auto"
       >
         <Outlet />
       </Container>

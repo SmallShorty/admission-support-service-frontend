@@ -246,7 +246,7 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
       >
         <Menu.Root>
           <Menu.Trigger asChild>
-            <IconButton variant="outline" size="sm" aria-label="Действия">
+            <IconButton variant="outline" size="sm" aria-label="">
               <MoreHorizontal size={16} />
             </IconButton>
           </Menu.Trigger>
