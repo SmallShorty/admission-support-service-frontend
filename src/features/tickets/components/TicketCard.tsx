@@ -78,7 +78,6 @@ export const TicketCard = ({
       onClick={() => onSelect?.(applicant.id)}
       css={cardStyles}
       p="3"
-      borderRadius="xl"
       position="relative"
       borderWidth="1px"
       bg="bg.panel"
