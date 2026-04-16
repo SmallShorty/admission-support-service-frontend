@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { Box, useRecipe } from "@chakra-ui/react";
 import { Bar } from "react-chartjs-2";
 import {
@@ -12,6 +12,7 @@ import {
 import { HourlyVolumeEntry } from "../../model/types";
 import { useColorMode } from "@/shared/components/ui/color-mode";
 
+// Регистрация необходимых модулей Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 interface TicketVolumeChartProps {
@@ -23,22 +24,29 @@ export const TicketVolumeChart: FC<TicketVolumeChartProps> = ({ data }) => {
   const { colorMode } = useColorMode();
 
   const chartData = useMemo(() => {
+    const incomingColor = colorMode === "dark" ? "#4FD1C5" : "#2C7A7B"; // Teal / Turquoise
+    const completedColor = colorMode === "dark" ? "#68D391" : "#38A169"; // Green
+
     return {
       labels: data.map((d) => d.label),
       datasets: [
         {
           label: "Входящие",
-          data: data.map((d) => d.incoming),
-          backgroundColor: colorMode === "dark" ? "#4FCCC9" : "#0AAEA4",
+          data: data.map((d) => {
+            const val = d.incoming > 0 ? d.incoming : d.count || 0;
+            return Number(val);
+          }),
+          backgroundColor: incomingColor,
           borderRadius: 4,
-          opacity: 0.8,
+          // minBarLength позволяет видеть тонкую полоску даже при значении 0
+          minBarLength: 5,
         },
         {
           label: "Завершено",
           data: data.map((d) => d.completed),
-          backgroundColor: colorMode === "dark" ? "#86EFAC" : "#22C55E",
+          backgroundColor: completedColor,
           borderRadius: 4,
-          opacity: 0.8,
+          minBarLength: 5,
         },
       ],
     };
@@ -48,16 +56,27 @@ export const TicketVolumeChart: FC<TicketVolumeChartProps> = ({ data }) => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: true, position: "top" as const },
+      legend: {
+        display: true,
+        position: "top" as const,
+        labels: {
+          usePointStyle: true,
+          boxWidth: 8,
+        },
+      },
       tooltip: { enabled: true },
     },
     scales: {
       x: {
+        stacked: true,
         grid: { display: false },
       },
       y: {
+        stacked: true,
         beginAtZero: true,
-        ticks: { stepSize: 20 },
+        ticks: {
+          precision: 0,
+        },
       },
     },
   };
