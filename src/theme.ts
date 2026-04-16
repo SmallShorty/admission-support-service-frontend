@@ -13,7 +13,8 @@ const buttonRecipe = defineRecipe({
 
 const cardRecipe = defineRecipe({
   base: {
-    borderRadius: "lg",
+    bg: "bg.panel",
+    borderRadius: "xl",
     boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
     transition: "box-shadow 0.2s ease",
   },
