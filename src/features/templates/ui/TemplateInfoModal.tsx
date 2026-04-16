@@ -1,24 +1,28 @@
 import {
+  Box,
   Button,
   CloseButton,
   Dialog,
   Field,
+  Flex,
   Input,
   Portal,
   Select,
   Stack,
+  Text,
   createListCollection,
 } from "@chakra-ui/react";
 import Placeholder from "@tiptap/extension-placeholder";
-import { JSONContent, useEditor } from "@tiptap/react";
+import { Editor, JSONContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { INTENT_METADATA } from "@features/tickets/model/intentMetadata";
 import { AdmissionIntentCategory } from "@features/tickets/model/types";
 import {
   Control,
   RichTextEditor,
 } from "@shared/components/ui/rich-text-editor";
+import { useVariables } from "@features/knowledge-base/hooks/queries/useVariables";
 import { Template } from "../model/types";
 
 export interface TemplateFormData {
@@ -34,6 +38,10 @@ interface TemplateInfoModalProps {
   template: Template | null;
   onSave: (data: TemplateFormData) => void;
   isLoading?: boolean;
+  onDeactivate?: () => void;
+  onActivate?: () => void;
+  isDeactivating?: boolean;
+  isActivating?: boolean;
 }
 
 const NODE_TYPE_MAP: Record<string, string> = {
@@ -63,12 +71,37 @@ const CATEGORIES = createListCollection({
   ).map(([value, { label }]) => ({ value, label })),
 });
 
+function getEditorVariableQuery(editor: Editor): string | null {
+  const { $anchor } = editor.state.selection;
+  const textBefore = editor.state.doc.textBetween($anchor.start(), $anchor.pos, "");
+  const match = textBefore.match(/\$([а-яёa-z_0-9]*)$/i);
+  return match !== null ? match[1] : null;
+}
+
+function insertVariableInEditor(editor: Editor, varName: string): void {
+  const { $anchor } = editor.state.selection;
+  const textBefore = editor.state.doc.textBetween($anchor.start(), $anchor.pos, "");
+  const match = textBefore.match(/\$[а-яёa-z_0-9]*$/i);
+  if (!match) return;
+  const from = $anchor.pos - match[0].length;
+  editor
+    .chain()
+    .focus()
+    .deleteRange({ from, to: $anchor.pos })
+    .insertContent(`$${varName} `)
+    .run();
+}
+
 export const TemplateInfoModal = ({
   open,
   onOpenChange,
   template,
   onSave,
   isLoading = false,
+  onDeactivate,
+  onActivate,
+  isDeactivating = false,
+  isActivating = false,
 }: TemplateInfoModalProps) => {
   const isEdit = !!template;
 
@@ -79,6 +112,34 @@ export const TemplateInfoModal = ({
       (template as any)?.category ?? AdmissionIntentCategory.GENERAL_INFO,
   });
 
+  const [varSuggestion, setVarSuggestion] = useState<string | null>(null);
+  const [activeVarIdx, setActiveVarIdx] = useState(0);
+
+  const { data: variables } = useVariables();
+
+  // Refs used by TipTap's handleKeyDown (avoids stale closures)
+  const editorRef = useRef<Editor | null>(null);
+  const varSuggestionRef = useRef<string | null>(null);
+  const activeVarIdxRef = useRef(0);
+  const filteredVarsRef = useRef<typeof filteredVars>([]);
+
+  const filteredVars =
+    variables?.filter((v) =>
+      v.name.toLowerCase().includes((varSuggestion ?? "").toLowerCase()),
+    ) ?? [];
+
+  // Keep refs in sync with render-time values
+  varSuggestionRef.current = varSuggestion;
+  activeVarIdxRef.current = activeVarIdx;
+  filteredVarsRef.current = filteredVars;
+
+  const handleSelectVar = (varName: string) => {
+    if (!editorRef.current) return;
+    insertVariableInEditor(editorRef.current, varName);
+    setVarSuggestion(null);
+    setActiveVarIdx(0);
+  };
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -86,7 +147,45 @@ export const TemplateInfoModal = ({
     ],
     content: template?.content ? normalizeContent(template.content) : "",
     immediatelyRender: false,
+    onUpdate: ({ editor: e }) => {
+      const query = getEditorVariableQuery(e);
+      setVarSuggestion(query);
+      if (query === null) setActiveVarIdx(0);
+    },
+    editorProps: {
+      handleKeyDown: (_view, event) => {
+        if (varSuggestionRef.current === null) return false;
+        const vars = filteredVarsRef.current;
+        if (vars.length === 0) return false;
+
+        if (event.key === "Tab" || event.key === "Enter") {
+          const varName = vars[activeVarIdxRef.current]?.name;
+          if (varName && editorRef.current) {
+            insertVariableInEditor(editorRef.current, varName);
+            setVarSuggestion(null);
+            setActiveVarIdx(0);
+          }
+          return true;
+        }
+        if (event.key === "ArrowDown") {
+          setActiveVarIdx((i) => Math.min(i + 1, filteredVarsRef.current.length - 1));
+          return true;
+        }
+        if (event.key === "ArrowUp") {
+          setActiveVarIdx((i) => Math.max(i - 1, 0));
+          return true;
+        }
+        if (event.key === "Escape") {
+          setVarSuggestion(null);
+          return true;
+        }
+        return false;
+      },
+    },
   });
+
+  // Keep editorRef in sync
+  editorRef.current = editor;
 
   useEffect(() => {
     if (!open) return;
@@ -96,6 +195,8 @@ export const TemplateInfoModal = ({
       category:
         (template as any)?.category ?? AdmissionIntentCategory.GENERAL_INFO,
     });
+    setVarSuggestion(null);
+    setActiveVarIdx(0);
     if (editor) {
       editor.commands.setContent(
         template?.content ? normalizeContent(template.content) : "",
@@ -109,7 +210,6 @@ export const TemplateInfoModal = ({
   const handleSubmit = () => {
     if (!form.title || !form.alias || !editor || editor.isEmpty) return;
     const data = { ...form, content: editor.getJSON() };
-    console.log("TemplateInfoModal submit:", data);
     onSave(data);
   };
 
@@ -196,40 +296,127 @@ export const TemplateInfoModal = ({
 
                 <Field.Root required>
                   <Field.Label fontWeight="semibold">Текст шаблона</Field.Label>
-                  <RichTextEditor.Root
-                    editor={editor}
-                    borderWidth="1px"
-                    rounded="lg"
-                    width="full"
-                    css={{
-                      "& .ProseMirror": {
-                        maxHeight: "10rem",
-                        overflowY: "auto",
-                      },
-                    }}
-                  >
-                    <RichTextEditor.Toolbar>
-                      <RichTextEditor.ControlGroup>
-                        <Control.Bold />
-                        <Control.Italic />
-                        <Control.Underline />
-                      </RichTextEditor.ControlGroup>
-                      <RichTextEditor.ControlGroup>
-                        <Control.BulletList />
-                        <Control.OrderedList />
-                      </RichTextEditor.ControlGroup>
-                      <RichTextEditor.ControlGroup>
-                        <Control.Undo />
-                        <Control.Redo />
-                      </RichTextEditor.ControlGroup>
-                    </RichTextEditor.Toolbar>
-                    <RichTextEditor.Content />
-                  </RichTextEditor.Root>
+                  <Box position="relative" width="full">
+                    {varSuggestion !== null && filteredVars.length > 0 && (
+                      <Box
+                        position="absolute"
+                        bottom="100%"
+                        left="0"
+                        right="0"
+                        zIndex="popover"
+                        bg="bg"
+                        borderWidth="1px"
+                        borderColor="border.muted"
+                        borderRadius="lg"
+                        boxShadow="md"
+                        maxH="200px"
+                        overflowY="auto"
+                        mb="1"
+                      >
+                        {filteredVars.map((v, idx) => (
+                          <Box
+                            key={v.name}
+                            px="3"
+                            py="2"
+                            cursor="pointer"
+                            bg={idx === activeVarIdx ? "bg.subtle" : undefined}
+                            _hover={{ bg: "bg.subtle" }}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              handleSelectVar(v.name);
+                            }}
+                          >
+                            <Flex justify="space-between" align="baseline" gap="2">
+                              <Flex align="center" gap="2">
+                                <Text
+                                  fontFamily="mono"
+                                  fontSize="sm"
+                                  fontWeight="semibold"
+                                  color="teal.fg"
+                                >
+                                  ${v.name}
+                                </Text>
+                                {idx === activeVarIdx && (
+                                  <Text
+                                    fontSize="xs"
+                                    color="fg.subtle"
+                                    bg="bg.muted"
+                                    px="1"
+                                    borderRadius="sm"
+                                  >
+                                    Tab
+                                  </Text>
+                                )}
+                              </Flex>
+                            </Flex>
+                            <Text fontSize="xs" color="fg.subtle">
+                              {v.description}
+                            </Text>
+                          </Box>
+                        ))}
+                      </Box>
+                    )}
+                    <RichTextEditor.Root
+                      editor={editor}
+                      borderWidth="1px"
+                      rounded="lg"
+                      width="full"
+                      css={{
+                        "& .ProseMirror": {
+                          maxHeight: "10rem",
+                          overflowY: "auto",
+                        },
+                      }}
+                    >
+                      <RichTextEditor.Toolbar>
+                        <RichTextEditor.ControlGroup>
+                          <Control.Bold />
+                          <Control.Italic />
+                          <Control.Underline />
+                        </RichTextEditor.ControlGroup>
+                        <RichTextEditor.ControlGroup>
+                          <Control.BulletList />
+                          <Control.OrderedList />
+                        </RichTextEditor.ControlGroup>
+                        <RichTextEditor.ControlGroup>
+                          <Control.Undo />
+                          <Control.Redo />
+                        </RichTextEditor.ControlGroup>
+                      </RichTextEditor.Toolbar>
+                      <RichTextEditor.Content />
+                    </RichTextEditor.Root>
+                  </Box>
                 </Field.Root>
               </Stack>
             </Dialog.Body>
 
             <Dialog.Footer p="6" gap="3">
+              {isEdit && template?.isActive && (
+                <Button
+                  variant="subtle"
+                  colorPalette="red"
+                  py="2.5"
+                  rounded="lg"
+                  onClick={onDeactivate}
+                  loading={isDeactivating}
+                  disabled={isLoading || isActivating}
+                >
+                  Деактивировать
+                </Button>
+              )}
+              {isEdit && !template?.isActive && (
+                <Button
+                  variant="subtle"
+                  colorPalette="green"
+                  py="2.5"
+                  rounded="lg"
+                  onClick={onActivate}
+                  loading={isActivating}
+                  disabled={isLoading || isDeactivating}
+                >
+                  Активировать
+                </Button>
+              )}
               <Dialog.ActionTrigger asChild>
                 <Button
                   variant="subtle"

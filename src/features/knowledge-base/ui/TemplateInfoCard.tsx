@@ -1,7 +1,7 @@
 import { JSONContent } from "@tiptap/core";
 import { Template } from "@/features/templates/model/types";
 import { Box, Flex, Text, Badge, Icon } from "@chakra-ui/react";
-import { LuUser, LuClock } from "react-icons/lu";
+import { LuClock } from "react-icons/lu";
 
 interface Props {
   template: Template;
@@ -20,12 +20,13 @@ export const TemplateInfoCard = ({ template, onClick }: Props) => {
       p="5"
       rounded="xl"
       borderWidth="1px"
-      borderColor="border.subtle"
+      borderColor={template.isActive ? "border.subtle" : "border.muted"}
       display="flex"
       flexDirection="column"
       cursor="pointer"
       onClick={onClick}
-      _hover={{ borderColor: "blue.300", shadow: "sm" }}
+      opacity={template.isActive ? 1 : 0.55}
+      _hover={{ borderColor: template.isActive ? "blue.300" : "border.muted", shadow: template.isActive ? "sm" : "none" }}
       transition="all 0.15s"
     >
       <Flex justify="space-between" align="start" mb="3" gap="4">
@@ -34,21 +35,19 @@ export const TemplateInfoCard = ({ template, onClick }: Props) => {
             <Text fontWeight="semibold" color="fg.default" truncate>
               {template.title}
             </Text>
-            <Badge
-              variant="subtle"
-              size="sm"
-              display="flex"
-              alignItems="center"
-              gap="1"
-              px="2"
-              py="0.5"
-              rounded="full"
-              textTransform="none"
-              fontSize="10px"
-            >
-              <Icon as={LuUser} />
-              {template.createdBy}
-            </Badge>
+            {!template.isActive && (
+              <Badge
+                variant="subtle"
+                colorPalette="gray"
+                size="sm"
+                px="2"
+                py="0.5"
+                rounded="full"
+                fontSize="10px"
+              >
+                Неактивный
+              </Badge>
+            )}
           </Flex>
         </Box>
 

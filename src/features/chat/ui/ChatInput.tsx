@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import {
+  Alert,
   Box,
   Button,
   Flex,
@@ -7,28 +8,52 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import { ChevronDown, Send } from "lucide-react";
+import { ChevronDown, Send, X } from "lucide-react";
 import { chatSocket } from "../api/chatSocket";
 import { useSendMessage, useTicketVariables } from "../hooks/chatQueries";
 import { clearVariableError } from "../model/chatSlice";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { toaster } from "@/shared/components/ui/toaster";
+import { useTemplates } from "@features/templates/hooks/queries/useTemplates";
+import { templatesApi } from "@features/templates/api/templatesApi";
+import type { JSONContent } from "@tiptap/core";
 
 interface ChatInputProps {
   ticketId: string;
   disabled?: boolean;
 }
 
+function extractTextFromTipTap(node: JSONContent): string {
+  if (node.type === "text") return node.text ?? "";
+  if (node.type === "hardBreak") return "\n";
+  const children = node.content?.map(extractTextFromTipTap).join("") ?? "";
+  if (node.type === "paragraph" || node.type === "heading") return children + "\n";
+  return children;
+}
+
 export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
   const [content, setContent] = React.useState("");
   const [variableQuery, setVariableQuery] = React.useState<string | null>(null);
   const [activeVariableIndex, setActiveVariableIndex] = React.useState(0);
+  const [templatePickerActive, setTemplatePickerActive] = React.useState(false);
+  const [activeTemplateIndex, setActiveTemplateIndex] = React.useState(0);
+  const [missingVariables, setMissingVariables] = React.useState<string[]>([]);
+  const [isResolvingTemplate, setIsResolvingTemplate] = React.useState(false);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTypingRef = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { mutate: sendMessage, isPending } = useSendMessage();
   const dispatch = useAppDispatch();
   const variableError = useAppSelector((state) => state.chat.variableError);
+
+  const templatePickerOpen = templatePickerActive && content.startsWith("/");
+  const templateSearchTerm = templatePickerOpen ? content.slice(1) : undefined;
+
+  const { data: templatesData } = useTemplates(
+    { searchTerm: templateSearchTerm || undefined, limit: 10 },
+    { enabled: templatePickerOpen },
+  );
+  const pickerTemplates = templatePickerOpen ? (templatesData?.items ?? []) : [];
 
   const stopTyping = () => {
     if (isTypingRef.current) {
@@ -44,18 +69,24 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value);
+    const val = e.target.value;
+    setContent(val);
 
     if (!isTypingRef.current) {
       chatSocket.sendTypingStatus(ticketId, true);
       isTypingRef.current = true;
     }
-
     if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
     typingTimerRef.current = setTimeout(stopTyping, 2000);
 
-    const query = getVariableQuery(e.target.value, e.target.selectionStart);
-    setVariableQuery(query);
+    if (val.startsWith("/")) {
+      if (!templatePickerActive) setTemplatePickerActive(true);
+      setVariableQuery(null);
+    } else {
+      if (templatePickerActive) setTemplatePickerActive(false);
+      const query = getVariableQuery(val, e.target.selectionStart);
+      setVariableQuery(query);
+    }
   };
 
   const handleSelectVariable = (varName: string) => {
@@ -65,7 +96,6 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
     const cursorPos = textarea.selectionStart;
     const before = content.slice(0, cursorPos);
     const match = before.match(/\$[а-яёa-z_0-9]*$/i);
-
     if (!match) return;
 
     const matchLength = match[0].length;
@@ -77,12 +107,28 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
     setVariableQuery(null);
     setActiveVariableIndex(0);
 
-    // Set cursor position after variable insertion
     setTimeout(() => {
-      const newCursorPos = insertStart + varName.length + 2; // +2 for "$ "
+      const newCursorPos = insertStart + varName.length + 2;
       textarea.focus();
       textarea.setSelectionRange(newCursorPos, newCursorPos);
     }, 0);
+  };
+
+  const handleSelectTemplate = async (alias: string) => {
+    setTemplatePickerActive(false);
+    setActiveTemplateIndex(0);
+    setIsResolvingTemplate(true);
+    try {
+      const resolved = await templatesApi.resolveTemplateByAlias(alias, ticketId);
+      const text = extractTextFromTipTap(resolved.content).trim();
+      setContent(text);
+      setMissingVariables(resolved.missingVariables);
+      setTimeout(() => textareaRef.current?.focus(), 0);
+    } catch {
+      toaster.create({ title: "Ошибка загрузки шаблона", type: "error" });
+    } finally {
+      setIsResolvingTemplate(false);
+    }
   };
 
   const handleSubmit = () => {
@@ -96,9 +142,33 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
     setContent("");
     setVariableQuery(null);
     setActiveVariableIndex(0);
+    setMissingVariables([]);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (templatePickerOpen && pickerTemplates.length > 0) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSelectTemplate(pickerTemplates[activeTemplateIndex].alias);
+        return;
+      }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveTemplateIndex((i) => Math.min(i + 1, pickerTemplates.length - 1));
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveTemplateIndex((i) => Math.max(i - 1, 0));
+        return;
+      }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setTemplatePickerActive(false);
+        return;
+      }
+    }
+
     if (dropdownOpen && filteredVariables.length > 0) {
       if (e.key === "Tab") {
         e.preventDefault();
@@ -112,9 +182,7 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
       }
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setActiveVariableIndex((i) =>
-          Math.min(i + 1, filteredVariables.length - 1),
-        );
+        setActiveVariableIndex((i) => Math.min(i + 1, filteredVariables.length - 1));
         return;
       }
       if (e.key === "ArrowUp") {
@@ -129,7 +197,7 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
       }
     }
 
-    if (e.key === "Enter" && !e.shiftKey && !dropdownOpen) {
+    if (e.key === "Enter" && !e.shiftKey && !dropdownOpen && !templatePickerOpen) {
       e.preventDefault();
       handleSubmit();
     }
@@ -137,14 +205,18 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
 
   const dropdownOpen = variableQuery !== null;
   const { data: variables } = useTicketVariables(ticketId, dropdownOpen);
-  const filteredVariables = variables?.filter((v) =>
-    v.name.toLowerCase().includes((variableQuery ?? "").toLowerCase()),
-  ) ?? [];
+  const filteredVariables =
+    variables?.filter((v) =>
+      v.name.toLowerCase().includes((variableQuery ?? "").toLowerCase()),
+    ) ?? [];
 
   useEffect(() => {
     setActiveVariableIndex(0);
   }, [variableQuery]);
 
+  useEffect(() => {
+    setActiveTemplateIndex(0);
+  }, [templateSearchTerm]);
 
   useEffect(() => {
     if (variableError) {
@@ -158,13 +230,25 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
   }, [variableError, dispatch]);
 
   return (
-    <Box
-      px="3"
-      py="3"
-      borderTopWidth="1px"
-      borderColor="border.muted"
-      flexShrink={0}
-    >
+    <Box px="3" py="3" borderTopWidth="1px" borderColor="border.muted" flexShrink={0}>
+      {missingVariables.length > 0 && (
+        <Alert.Root status="warning" borderRadius="lg" mb="2" fontSize="xs">
+          <Alert.Indicator />
+          <Alert.Title flex="1" fontSize="xs" fontWeight="normal">
+            Некоторые переменные не удалось подставить:{" "}
+            {missingVariables.map((v) => `$${v}`).join(", ")}. Заполните их вручную перед отправкой.
+          </Alert.Title>
+          <IconButton
+            size="xs"
+            variant="ghost"
+            aria-label="Закрыть"
+            onClick={() => setMissingVariables([])}
+          >
+            <X size={12} />
+          </IconButton>
+        </Alert.Root>
+      )}
+
       <Box
         position="relative"
         borderRadius="xl"
@@ -179,6 +263,56 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
           boxShadow: "0 0 0 3px var(--chakra-colors-blue-100)",
         }}
       >
+        {templatePickerOpen && pickerTemplates.length > 0 && (
+          <Box
+            position="absolute"
+            bottom="100%"
+            left="0"
+            right="0"
+            zIndex="popover"
+            bg="bg"
+            borderWidth="1px"
+            borderColor="border.muted"
+            borderRadius="lg"
+            boxShadow="md"
+            maxH="260px"
+            overflowY="auto"
+            mb="1"
+          >
+            {pickerTemplates.map((t, idx) => (
+              <Box
+                key={t.id}
+                px="3"
+                py="2.5"
+                cursor="pointer"
+                bg={idx === activeTemplateIndex ? "bg.subtle" : undefined}
+                _hover={{ bg: "bg.subtle" }}
+                onClick={() => handleSelectTemplate(t.alias)}
+              >
+                <Flex justify="space-between" align="center" gap="2">
+                  <Text fontSize="sm" fontWeight="semibold" color="fg">
+                    {t.title}
+                  </Text>
+                  {idx === activeTemplateIndex && (
+                    <Text
+                      fontSize="xs"
+                      color="fg.subtle"
+                      bg="bg.muted"
+                      px="1"
+                      borderRadius="sm"
+                    >
+                      Enter
+                    </Text>
+                  )}
+                </Flex>
+                <Text fontFamily="mono" fontSize="xs" color="fg.muted">
+                  /{t.alias}
+                </Text>
+              </Box>
+            ))}
+          </Box>
+        )}
+
         {dropdownOpen && filteredVariables.length > 0 && (
           <Box
             position="absolute"
@@ -239,6 +373,7 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
             ))}
           </Box>
         )}
+
         <Textarea
           ref={textareaRef}
           value={content}
@@ -258,7 +393,7 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
           color="fg"
           _placeholder={{ color: "fg.subtle" }}
           pb="10"
-          disabled={disabled || isPending}
+          disabled={disabled || isPending || isResolvingTemplate}
           css={{ overflow: "auto" }}
         />
 
@@ -281,6 +416,11 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
               variant="outline"
               colorPalette="gray"
               fontWeight="semibold"
+              onClick={() => {
+                setContent("/");
+                setTemplatePickerActive(true);
+                setTimeout(() => textareaRef.current?.focus(), 0);
+              }}
             >
               <Text color="fg.muted" fontSize="xs">
                 /

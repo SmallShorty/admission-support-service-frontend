@@ -4,14 +4,10 @@ import {
   Button,
   Box,
   createListCollection,
-  SelectContent,
-  SelectItem,
-  SelectRoot,
-  SelectTrigger,
-  SelectValueText,
-  Portal,
-  SelectPositioner,
   Select,
+  Portal,
+  Switch,
+  Text,
 } from "@chakra-ui/react";
 import { Search, Plus } from "lucide-react";
 import { AdmissionIntentCategory } from "@features/tickets/model/types";
@@ -23,6 +19,8 @@ interface TemplatesControlsProps {
   category: string[];
   onCategoryChange: (val: string[]) => void;
   onAddClick: () => void;
+  includeInactive: boolean;
+  onIncludeInactiveChange: (val: boolean) => void;
 }
 
 const categories = createListCollection({
@@ -41,6 +39,8 @@ export const TemplatesControls = ({
   category,
   onCategoryChange,
   onAddClick,
+  includeInactive,
+  onIncludeInactiveChange,
 }: TemplatesControlsProps) => {
   return (
     <HStack gap="4" justify="space-between" mb="6" width="full">
@@ -94,6 +94,20 @@ export const TemplatesControls = ({
             </Select.Positioner>
           </Portal>
         </Select.Root>
+
+        {/* Переключатель неактивных */}
+        <Switch.Root
+          checked={includeInactive}
+          onCheckedChange={({ checked }) => onIncludeInactiveChange(checked)}
+        >
+          <Switch.HiddenInput />
+          <Switch.Control />
+          <Switch.Label>
+            <Text fontSize="sm" color="fg.muted" whiteSpace="nowrap">
+              Неактивные
+            </Text>
+          </Switch.Label>
+        </Switch.Root>
       </HStack>
 
       {/* Кнопка добавления */}

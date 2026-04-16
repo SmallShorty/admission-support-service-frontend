@@ -8,9 +8,13 @@ export interface Template {
   content: JSONContent;
   category: AdmissionIntentCategory;
   isActive: boolean;
-  createdBy: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface TemplatesListResponse {
+  items: Template[];
+  total: number;
 }
 
 export interface TemplatesQueryParams {
@@ -26,6 +30,19 @@ export interface CreateTemplateDto {
   alias: string;
   content: JSONContent;
   category: AdmissionIntentCategory;
+  createdBy: string;
 }
 
 export type UpdateTemplateDto = Partial<CreateTemplateDto>;
+
+export interface ResolvedTemplateDto {
+  id: string;
+  alias: string;
+  title: string;
+  content: JSONContent;
+  category: AdmissionIntentCategory;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  missingVariables: string[];
+}
