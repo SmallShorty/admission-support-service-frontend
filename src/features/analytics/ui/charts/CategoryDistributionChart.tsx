@@ -1,5 +1,6 @@
 import { FC, useMemo } from "react";
-import { Box, Text, VStack, useRecipe } from "@chakra-ui/react";
+import { Box, Text, VStack } from "@chakra-ui/react";
+import { Panel } from "@shared/components/ui/panel";
 import { Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -50,7 +51,6 @@ const categoryLabels: Record<string, string> = {
 export const CategoryDistributionChart: FC<CategoryDistributionChartProps> = ({
   data,
 }) => {
-  const cardRecipe = useRecipe({ key: "card" });
   const { colorMode } = useColorMode();
 
   const totalCount = useMemo(() => data.reduce((sum, item) => sum + item.count, 0), [data]);
@@ -83,18 +83,18 @@ export const CategoryDistributionChart: FC<CategoryDistributionChartProps> = ({
 
   if (data.length === 0) {
     return (
-      <Box {...cardRecipe.base} p="4" gridColumn={{ base: "1 / -1", lg: "2 / 3" }}>
+      <Panel p="4" gridColumn={{ base: "1 / -1", lg: "2 / 3" }}>
         <VStack h="300px" justify="center" gap="2">
           <Text color="fg.muted" textAlign="center">
             Нет данных по категориям
           </Text>
         </VStack>
-      </Box>
+      </Panel>
     );
   }
 
   return (
-    <Box {...cardRecipe.base} p="4" gridColumn={{ base: "1 / -1", lg: "2 / 3" }} position="relative">
+    <Panel p="4" gridColumn={{ base: "1 / -1", lg: "2 / 3" }} position="relative">
       <Box h="300px" w="full" position="relative">
         <Doughnut data={chartData} options={chartOptions} />
         {/* Center overlay with total count */}
@@ -114,6 +114,6 @@ export const CategoryDistributionChart: FC<CategoryDistributionChartProps> = ({
           </Text>
         </Box>
       </Box>
-    </Box>
+    </Panel>
   );
 };

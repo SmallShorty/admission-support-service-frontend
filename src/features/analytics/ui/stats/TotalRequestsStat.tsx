@@ -1,5 +1,6 @@
 import { FC } from "react";
-import { Box, Flex, Text, Badge, VStack, Grid, useRecipe } from "@chakra-ui/react";
+import { Box, Flex, Text, Badge, VStack, Grid } from "@chakra-ui/react";
+import { Panel } from "@shared/components/ui/panel";
 import { AnalyticsRequests } from "../../model/types";
 
 interface TotalRequestsStatProps {
@@ -18,10 +19,8 @@ const getTrendArrow = (direction: "up" | "down" | "flat"): string => {
 };
 
 export const TotalRequestsStat: FC<TotalRequestsStatProps> = ({ requests }) => {
-  const cardRecipe = useRecipe({ key: "card" });
-
   return (
-    <Box {...cardRecipe.base} p="4">
+    <Panel p="4">
       <VStack align="stretch" gap="4">
         <Flex justify="space-between" align="center">
           <Text fontSize="xs" fontWeight="semibold" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
@@ -67,6 +66,6 @@ export const TotalRequestsStat: FC<TotalRequestsStatProps> = ({ requests }) => {
           </Box>
         </Grid>
       </VStack>
-    </Box>
+    </Panel>
   );
 };

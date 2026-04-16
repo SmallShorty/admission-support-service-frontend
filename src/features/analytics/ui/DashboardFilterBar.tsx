@@ -1,5 +1,5 @@
 import { FC, useState, useMemo } from "react";
-import { Flex, HStack, Text, Button, useRecipe } from "@chakra-ui/react";
+import { Flex, HStack, Text, Button } from "@chakra-ui/react";
 import {
   Combobox,
   Portal,

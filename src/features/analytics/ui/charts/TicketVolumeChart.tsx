@@ -1,5 +1,6 @@
 import { FC, useEffect, useMemo } from "react";
-import { Box, useRecipe } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
+import { Panel } from "@shared/components/ui/panel";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -20,7 +21,6 @@ interface TicketVolumeChartProps {
 }
 
 export const TicketVolumeChart: FC<TicketVolumeChartProps> = ({ data }) => {
-  const cardRecipe = useRecipe({ key: "card" });
   const { colorMode } = useColorMode();
 
   const chartData = useMemo(() => {
@@ -82,10 +82,10 @@ export const TicketVolumeChart: FC<TicketVolumeChartProps> = ({ data }) => {
   };
 
   return (
-    <Box {...cardRecipe.base} p="4" gridColumn={{ base: "1 / -1" }}>
+    <Panel p="4" gridColumn={{ base: "1 / -1" }}>
       <Box h="300px" w="full">
         <Bar data={chartData} options={chartOptions} />
       </Box>
-    </Box>
+    </Panel>
   );
 };

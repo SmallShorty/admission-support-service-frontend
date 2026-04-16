@@ -1,5 +1,6 @@
 import { FC, useMemo } from "react";
-import { Box, Flex, Text, Badge, VStack, useRecipe } from "@chakra-ui/react";
+import { Box, Flex, Text, Badge, VStack } from "@chakra-ui/react";
+import { Panel } from "@shared/components/ui/panel";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -36,7 +37,6 @@ export const AvgResponseTimeStat: FC<AvgResponseTimeStatProps> = ({
   avgRT,
   hourlyActivity,
 }) => {
-  const cardRecipe = useRecipe({ key: "card" });
   const { colorMode } = useColorMode();
 
   const chartData = useMemo(() => {
@@ -77,7 +77,7 @@ export const AvgResponseTimeStat: FC<AvgResponseTimeStatProps> = ({
         : "red";
 
   return (
-    <Box {...cardRecipe.base} p="4">
+    <Panel p="4">
       <VStack align="stretch" gap="3">
         <Flex justify="space-between" align="center">
           <Text fontSize="xs" fontWeight="semibold" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
@@ -100,6 +100,6 @@ export const AvgResponseTimeStat: FC<AvgResponseTimeStatProps> = ({
           </Box>
         )}
       </VStack>
-    </Box>
+    </Panel>
   );
 };

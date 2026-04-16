@@ -1,5 +1,6 @@
 import { FC } from "react";
-import { Box, Flex, Text, Badge, VStack, HStack, useRecipe } from "@chakra-ui/react";
+import { Box, Flex, Text, Badge, VStack, HStack } from "@chakra-ui/react";
+import { Panel } from "@shared/components/ui/panel";
 import { Star } from "lucide-react";
 import { MetricValue } from "../../model/types";
 
@@ -12,7 +13,6 @@ const CSAT_THRESHOLD = 3.5;
 export const CustomerSatisfactionStat: FC<CustomerSatisfactionStatProps> = ({
   csat,
 }) => {
-  const cardRecipe = useRecipe({ key: "card" });
   const value = csat.value ?? 0;
   const filledStars = Math.round(value);
   const isPositive = value >= CSAT_THRESHOLD;
@@ -25,7 +25,7 @@ export const CustomerSatisfactionStat: FC<CustomerSatisfactionStatProps> = ({
   };
 
   return (
-    <Box {...cardRecipe.base} p="4">
+    <Panel p="4">
       <VStack align="stretch" gap="3">
         <Flex justify="space-between" align="center">
           <Text fontSize="xs" fontWeight="semibold" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
@@ -85,6 +85,6 @@ export const CustomerSatisfactionStat: FC<CustomerSatisfactionStatProps> = ({
           </Box>
         )}
       </VStack>
-    </Box>
+    </Panel>
   );
 };

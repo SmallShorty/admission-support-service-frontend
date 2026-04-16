@@ -1,5 +1,6 @@
 import { FC } from "react";
-import { Box, Flex, Text, Badge, VStack, useRecipe } from "@chakra-ui/react";
+import { Box, Flex, Text, Badge, VStack } from "@chakra-ui/react";
+import { Panel } from "@shared/components/ui/panel";
 import { MetricValue } from "../../model/types";
 
 interface SlaStatusStatProps {
@@ -20,14 +21,13 @@ export const SlaStatusStat: FC<SlaStatusStatProps> = ({
   avgRT,
   isSlaBreached,
 }) => {
-  const cardRecipe = useRecipe({ key: "card" });
   const progressPercent =
     avgRT.value !== null
       ? Math.min((avgRT.value / SLA_THRESHOLD) * 100, 100)
       : 0;
 
   return (
-    <Box {...cardRecipe.base} p="4">
+    <Panel p="4">
       <VStack align="stretch" gap="3">
         <Flex justify="space-between" align="center">
           <Text fontSize="xs" fontWeight="semibold" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
@@ -65,6 +65,6 @@ export const SlaStatusStat: FC<SlaStatusStatProps> = ({
           Цель: 12 мин
         </Text>
       </VStack>
-    </Box>
+    </Panel>
   );
 };
