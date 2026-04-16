@@ -5,69 +5,28 @@ import {
   SimpleGrid,
   Box,
   Text,
-  Badge,
   Button,
   VStack,
   HStack,
+  Skeleton,
+  Alert,
+  Separator,
 } from "@chakra-ui/react";
 import { LuCopy, LuCheck } from "react-icons/lu";
+import { useVariables } from "../hooks/queries/useVariables";
+import { Variable } from "../model/types";
 
-// 1. Моки данных
-const variablesMock = [
-  {
-    id: "1",
-    name: "Имя",
-    description: "Полное имя абитуриента",
-    example: "Иван Иванович Иванов",
-    alias: "{fullName}",
-  },
-  {
-    id: "2",
-    name: "ID",
-    description: "Уникальный номер обращения",
-    example: "REQ-2024-0812",
-    alias: "{ticketId}",
-  },
-  {
-    id: "3",
-    name: "Программа",
-    description: "Выбранное направление подготовки",
-    example: "Прикладная информатика",
-    alias: "{programName}",
-  },
-  {
-    id: "4",
-    name: "Дата",
-    description: "Дата подачи документов",
-    example: "12 июля 2024",
-    alias: "{applyDate}",
-  },
-  {
-    id: "5",
-    name: "Статус",
-    description: "Текущий статус зачисления",
-    example: "Рекомендован к зачислению",
-    alias: "{statusText}",
-  },
-  {
-    id: "6",
-    name: "Телефон",
-    description: "Контактный номер приемной комиссии",
-    example: "+7 (495) 123-45-67",
-    alias: "{supportPhone}",
-  },
-];
-
-// 2. Компонент карточки
 interface VariableCardProps {
-  variable: (typeof variablesMock)[0];
+  variable: Variable;
 }
 
 const VariableInfoCard: FC<VariableCardProps> = ({ variable }) => {
   const [copied, setCopied] = useState(false);
 
+  const syntax = `{${variable.name}}`;
+
   const handleCopy = () => {
-    navigator.clipboard.writeText(variable.alias);
+    navigator.clipboard.writeText(syntax);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -75,94 +34,139 @@ const VariableInfoCard: FC<VariableCardProps> = ({ variable }) => {
   return (
     <Box
       bg="bg.panel"
-      p="4"
       borderRadius="xl"
       borderWidth="1px"
       borderColor="border.subtle"
+      overflow="hidden"
       display="flex"
       flexDirection="column"
-      justifyContent="space-between"
-      minH="180px"
     >
-      <Box mb="4">
-        <HStack justify="space-between" align="start" gap="2" mb="3">
-          <Text
-            fontWeight="medium"
-            color="fg.default"
-            fontSize="sm"
-            lineHeight="snug"
-          >
-            {variable.description}
-          </Text>
-          <Badge
-            variant="subtle"
-            colorPalette="teal"
-            fontFamily="mono"
-            fontSize="10px"
-            px="1.5"
-            py="0.5"
-            borderRadius="sm"
-          >
-            {variable.name}
-          </Badge>
-        </HStack>
-
-        <VStack align="stretch" gap="1.5">
-          <Text
-            fontSize="10px"
-            fontWeight="semibold"
-            textTransform="uppercase"
-            letterSpacing="wider"
-            color="fg.muted"
-          >
-            Пример вывода:
-          </Text>
-          <Box
-            bg="bg.muted"
-            p="2"
-            borderRadius="md"
-            borderWidth="1px"
-            borderColor="border.subtle"
-          >
-            <Text fontStyle="italic" color="fg.muted" fontSize="xs">
-              "{variable.example}"
-            </Text>
-          </Box>
-        </VStack>
-      </Box>
-
-      <Button
-        onClick={handleCopy}
-        fontSize="sm"
-        fontWeight="bold"
-        h="10"
-        w="full"
+      {/* Syntax + copy — главная строка */}
+      <HStack
+        px="3"
+        py="2.5"
+        bg="bg.muted"
+        borderBottomWidth="1px"
+        borderColor="border.subtle"
+        justify="space-between"
         gap="2"
       >
-        {copied ? (
-          <LuCheck size={14} />
-        ) : (
-          <LuCopy size={14} style={{ opacity: 0.6 }} />
-        )}
-        {variable.alias}
-      </Button>
+        <Text
+          fontFamily="mono"
+          fontSize="sm"
+          fontWeight="bold"
+          color="teal.fg"
+          userSelect="all"
+        >
+          {syntax}
+        </Text>
+        <Button
+          size="xs"
+          variant="ghost"
+          onClick={handleCopy}
+          color={copied ? "teal.fg" : "fg.muted"}
+          px="1.5"
+          minW="0"
+          aria-label="Скопировать"
+        >
+          {copied ? <LuCheck size={13} /> : <LuCopy size={13} />}
+        </Button>
+      </HStack>
+
+      {/* Description */}
+      <Box px="3" pt="3" pb="2.5">
+        <Text fontSize="sm" color="fg.default" lineHeight="snug">
+          {variable.description}
+        </Text>
+      </Box>
+
+      <Separator />
+
+      {/* Meta rows */}
+      <VStack align="stretch" gap="0" divideY="1px" px="3" py="2">
+        <HStack justify="space-between" gap="3" py="1.5">
+          <Text fontSize="10px" fontWeight="semibold" textTransform="uppercase" letterSpacing="wider" color="fg.subtle" flexShrink={0}>
+            Источник
+          </Text>
+          <Text fontFamily="mono" fontSize="10px" color="fg.muted" textAlign="right" lineBreak="anywhere">
+            {variable.sourceField}
+          </Text>
+        </HStack>
+        <HStack justify="space-between" gap="3" py="1.5">
+          <Text fontSize="10px" fontWeight="semibold" textTransform="uppercase" letterSpacing="wider" color="fg.subtle" flexShrink={0}>
+            Фолбэк
+          </Text>
+          <Text fontFamily="mono" fontSize="10px" color="fg.muted" textAlign="right">
+            «{variable.fallbackText}»
+          </Text>
+        </HStack>
+      </VStack>
     </Box>
   );
 };
 
-// 3. Основной компонент словаря
+const CardSkeleton: FC = () => (
+  <Box
+    bg="bg.panel"
+    borderRadius="xl"
+    borderWidth="1px"
+    borderColor="border.subtle"
+    overflow="hidden"
+  >
+    <Box px="3" py="2.5" bg="bg.muted" borderBottomWidth="1px" borderColor="border.subtle">
+      <Skeleton height="4" width="40%" />
+    </Box>
+    <Box px="3" pt="3" pb="2.5">
+      <Skeleton height="3" mb="1.5" />
+      <Skeleton height="3" width="70%" />
+    </Box>
+    <Separator />
+    <VStack align="stretch" gap="0" px="3" py="2">
+      <HStack justify="space-between" py="1.5">
+        <Skeleton height="2.5" width="20%" />
+        <Skeleton height="2.5" width="50%" />
+      </HStack>
+      <HStack justify="space-between" py="1.5">
+        <Skeleton height="2.5" width="20%" />
+        <Skeleton height="2.5" width="30%" />
+      </HStack>
+    </VStack>
+  </Box>
+);
+
 export const VariableDictionary: FC = () => {
+  const { data: variables, isLoading, isError } = useVariables();
+
+  if (isLoading) {
+    return (
+      <SimpleGrid columns={{ base: 1, sm: 2, lg: 3, xl: 4 }} gap="4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <CardSkeleton key={i} />
+        ))}
+      </SimpleGrid>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Alert.Root status="error" borderRadius="xl">
+        <Alert.Indicator />
+        <Alert.Title>Не удалось загрузить переменные</Alert.Title>
+      </Alert.Root>
+    );
+  }
+
+  if (!variables?.length) {
+    return (
+      <Box py="16" textAlign="center" color="fg.muted" fontSize="sm">
+        Переменные не найдены
+      </Box>
+    );
+  }
+
   return (
-    <SimpleGrid
-      columns={{
-        base: 1,
-        sm: 2,
-        lg: 3,
-        xl: 4,
-      }}
-      gap="4"
-    >
-      {variablesMock.map((variable) => (
+    <SimpleGrid columns={{ base: 1, sm: 2, lg: 3, xl: 4 }} gap="4">
+      {variables.map((variable) => (
         <VariableInfoCard key={variable.id} variable={variable} />
       ))}
     </SimpleGrid>
