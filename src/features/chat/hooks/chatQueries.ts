@@ -27,6 +27,7 @@ import {
 export const chatQueryKeys = {
   messages: (ticketId: string) => ["chat", "messages", ticketId] as const,
   unreadCount: (ticketId: string) => ["chat", "unread", ticketId] as const,
+  variables: (ticketId: string) => ["chat", "variables", ticketId] as const,
 };
 
 // Hook для получения истории сообщений с пагинацией (бесконечный скролл)
@@ -166,6 +167,16 @@ export const useMarkMessagesRead = () => {
         queryKey: chatQueryKeys.messages(ticketId),
       });
     },
+  });
+};
+
+// Hook для получения переменных для подстановки
+export const useTicketVariables = (ticketId: string, enabled: boolean) => {
+  return useQuery({
+    queryKey: chatQueryKeys.variables(ticketId),
+    queryFn: () => chatApi.getTicketVariables(ticketId),
+    enabled: enabled && !!ticketId,
+    staleTime: 5 * 60 * 1000,
   });
 };
 

@@ -1,6 +1,6 @@
 // src/features/chat/model/chatSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ChatState, TicketMessage } from "./types";
+import { ChatState, TicketMessage, VariableResolutionError } from "./types";
 
 const initialState: ChatState = {
   messagesByTicket: {},
@@ -12,6 +12,7 @@ const initialState: ChatState = {
   hasMoreMessages: {},
   nextCursors: {},
   loadingMessages: {},
+  variableError: null,
 };
 
 export const chatSlice = createSlice({
@@ -206,6 +207,16 @@ export const chatSlice = createSlice({
       state.loadingMessages[ticketId] = loading;
     },
 
+    // ========== Variable Errors ==========
+
+    setVariableError: (state, action: PayloadAction<VariableResolutionError>) => {
+      state.variableError = action.payload;
+    },
+
+    clearVariableError: (state) => {
+      state.variableError = null;
+    },
+
     // ========== Cleanup ==========
 
     clearChat: (state, action: PayloadAction<string>) => {
@@ -264,6 +275,10 @@ export const {
 
   // Loading
   setMessagesLoading,
+
+  // Variable Errors
+  setVariableError,
+  clearVariableError,
 
   // Cleanup
   clearChat,

@@ -62,9 +62,22 @@ export interface ChatState {
   hasMoreMessages: Record<string, boolean>;
   nextCursors: Record<string, string | null>;
   loadingMessages: Record<string, boolean>;
+  variableError: VariableResolutionError | null;
 }
 export interface LoadMessagesParams {
   ticketId: string;
   limit?: number;
   cursor?: string | null;
+}
+
+export interface VariableResolvedDto {
+  name: string;
+  description: string;
+  resolvedValue: string;
+}
+
+export interface VariableResolutionError {
+  code: string;
+  missingVariables: string[];
+  message: string;
 }

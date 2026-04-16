@@ -3,6 +3,7 @@ import {
   TicketMessage,
   MessagesResponse,
   SendMessagePayload,
+  VariableResolvedDto,
 } from "../model/types";
 
 export const chatApi = {
@@ -42,6 +43,14 @@ export const chatApi = {
   getUnreadCount: async (ticketId: string): Promise<{ count: number }> => {
     const { data } = await coreApi.get<{ count: number }>(
       `/tickets/${ticketId}/messages/unread`,
+    );
+    return data;
+  },
+
+  // Получить доступные переменные для подстановки
+  getTicketVariables: async (ticketId: string): Promise<VariableResolvedDto[]> => {
+    const { data } = await coreApi.get<VariableResolvedDto[]>(
+      `/tickets/${ticketId}/variables`,
     );
     return data;
   },

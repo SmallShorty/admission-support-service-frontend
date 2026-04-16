@@ -7,8 +7,9 @@ import {
   setTypingStatus,
   incrementUnreadCount,
   updateMessageStatus,
+  setVariableError,
 } from "../model/chatSlice";
-import { TicketMessage, SendMessagePayload } from "../model/types";
+import { TicketMessage, SendMessagePayload, VariableResolutionError } from "../model/types";
 
 class ChatSocketService {
   private socket: Socket | null = null;
@@ -94,6 +95,11 @@ class ChatSocketService {
         });
       },
     );
+
+    this.socket.on("variableResolutionError", (error: VariableResolutionError) => {
+      console.log("[ChatSocket] Variable resolution error:", error);
+      store.dispatch(setVariableError(error));
+    });
   }
 
   private joinQueueRooms() {
