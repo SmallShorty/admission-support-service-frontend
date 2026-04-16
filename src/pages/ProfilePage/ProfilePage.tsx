@@ -11,6 +11,7 @@ import {
   HStack,
   Text,
 } from "@chakra-ui/react";
+import { Panel } from "@shared/components/ui/panel";
 import {
   Briefcase,
   Calendar,
@@ -81,14 +82,7 @@ const ProfilePage: FC = () => {
       </Flex>
 
       {/* Карточка профиля */}
-      <Box
-        borderWidth="1px"
-        borderColor="gray.200"
-        borderRadius="2xl"
-        overflow="hidden"
-        bg="white"
-        _dark={{ bg: "gray.800", borderColor: "gray.700" }}
-      >
+      <Panel borderRadius="2xl" overflow="hidden" borderWidth="1px" borderColor="gray.200" _dark={{ borderColor: "gray.700" }}>
         {/* Баннер */}
         <Box
           h="112px"
@@ -174,7 +168,7 @@ const ProfilePage: FC = () => {
             />
           </Grid>
         </Box>
-      </Box>
+      </Panel>
     </Box>
   );
 };

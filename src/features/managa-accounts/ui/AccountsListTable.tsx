@@ -9,6 +9,7 @@ import {
   Pagination,
   ButtonGroup,
 } from "@chakra-ui/react";
+import { Panel } from "@shared/components/ui/panel";
 import {
   Edit,
   Trash2,
@@ -50,14 +51,7 @@ export const AccountsListTable = ({
   const end = Math.min(offset + accounts.length, totalCount);
 
   return (
-    <Box
-      bg="white"
-      borderRadius="xl"
-      border="1px solid"
-      borderColor="gray.200"
-      shadow="sm"
-      overflow="hidden"
-    >
+    <Panel overflow="hidden" borderWidth="1px" borderColor="border.subtle">
       <Table.Root size="md" variant="line">
         <Table.Header bg="gray.50">
           <Table.Row>
@@ -195,6 +189,6 @@ export const AccountsListTable = ({
           </Table.Row>
         </Table.Footer>
       </Table.Root>
-    </Box>
+    </Panel>
   );
 };

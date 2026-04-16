@@ -11,6 +11,7 @@ import {
   ButtonGroup,
   Badge,
 } from "@chakra-ui/react";
+import { Panel } from "@shared/components/ui/panel";
 import {
   MoreVertical,
   ChevronLeft,
@@ -56,14 +57,7 @@ export const IntegrationsListTable: FC<IntegrationsListTableProps> = ({
   const end = Math.min((page - 1) * limit + integrations.length, totalCount);
 
   return (
-    <Box
-      bg="white"
-      borderRadius="xl"
-      border="1px solid"
-      borderColor="gray.200"
-      shadow="sm"
-      overflow="hidden"
-    >
+    <Panel overflow="hidden" borderWidth="1px" borderColor="border.subtle">
       <Table.Root size="md" variant="line">
         <Table.Header bg="gray.50">
           <Table.Row>
@@ -246,6 +240,6 @@ export const IntegrationsListTable: FC<IntegrationsListTableProps> = ({
           </Table.Row>
         </Table.Footer>
       </Table.Root>
-    </Box>
+    </Panel>
   );
 };
