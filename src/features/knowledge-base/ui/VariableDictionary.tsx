@@ -12,6 +12,7 @@ import {
   Alert,
   Separator,
 } from "@chakra-ui/react";
+import { Panel } from "@shared/components/ui/panel";
 import { LuCopy, LuCheck } from "react-icons/lu";
 import { useVariables } from "../hooks/queries/useVariables";
 import { Variable } from "../model/types";
@@ -32,15 +33,7 @@ const VariableInfoCard: FC<VariableCardProps> = ({ variable }) => {
   };
 
   return (
-    <Box
-      bg="bg.panel"
-      borderRadius="xl"
-      borderWidth="1px"
-      borderColor="border.subtle"
-      overflow="hidden"
-      display="flex"
-      flexDirection="column"
-    >
+    <Panel overflow="hidden" display="flex" flexDirection="column" borderWidth="1px" borderColor="border.subtle">
       {/* Syntax + copy — главная строка */}
       <HStack
         px="3"
@@ -101,18 +94,12 @@ const VariableInfoCard: FC<VariableCardProps> = ({ variable }) => {
           </Text>
         </HStack>
       </VStack>
-    </Box>
+    </Panel>
   );
 };
 
 const CardSkeleton: FC = () => (
-  <Box
-    bg="bg.panel"
-    borderRadius="xl"
-    borderWidth="1px"
-    borderColor="border.subtle"
-    overflow="hidden"
-  >
+  <Panel overflow="hidden" borderWidth="1px" borderColor="border.subtle">
     <Box px="3" py="2.5" bg="bg.muted" borderBottomWidth="1px" borderColor="border.subtle">
       <Skeleton height="4" width="40%" />
     </Box>
@@ -131,7 +118,7 @@ const CardSkeleton: FC = () => (
         <Skeleton height="2.5" width="30%" />
       </HStack>
     </VStack>
-  </Box>
+  </Panel>
 );
 
 export const VariableDictionary: FC = () => {

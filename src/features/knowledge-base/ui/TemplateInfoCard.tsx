@@ -1,6 +1,7 @@
 import { JSONContent } from "@tiptap/core";
 import { Template } from "@/features/templates/model/types";
 import { Box, Flex, Text, Badge, Icon } from "@chakra-ui/react";
+import { Panel } from "@shared/components/ui/panel";
 import { LuClock } from "react-icons/lu";
 
 interface Props {
@@ -15,10 +16,8 @@ const extractText = (node: JSONContent): string => {
 
 export const TemplateInfoCard = ({ template, onClick }: Props) => {
   return (
-    <Box
-      bg="bg.panel"
+    <Panel
       p="5"
-      rounded="xl"
       borderWidth="1px"
       borderColor={template.isActive ? "border.subtle" : "border.muted"}
       display="flex"
@@ -84,6 +83,6 @@ export const TemplateInfoCard = ({ template, onClick }: Props) => {
         <Icon as={LuClock} />
         <Text>Обновлено: {template.updatedAt}</Text>
       </Flex>
-    </Box>
+    </Panel>
   );
 };
