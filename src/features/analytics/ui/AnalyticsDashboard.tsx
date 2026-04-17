@@ -1,5 +1,13 @@
 import { FC, useState, useCallback, useMemo } from "react";
-import { Box, Center, Spinner, Text, Grid, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Center,
+  Spinner,
+  Text,
+  Grid,
+  VStack,
+  Flex,
+} from "@chakra-ui/react";
 import { useAnalytics } from "../hooks/queries/useAnalytics";
 import { AnalyticsPeriod } from "../model/types";
 import { useDebounce } from "@/shared/hooks/useDebounce";
@@ -17,9 +25,9 @@ export const AnalyticsDashboard: FC = () => {
   const [agentId, setAgentId] = useState("");
   const debouncedAgentId = useDebounce(agentId, 500);
 
-  const { data, isLoading, isError } = useAnalytics(
+  const { data, isLoading, isFetching, isError } = useAnalytics(
     period,
-    debouncedAgentId || undefined
+    debouncedAgentId || undefined,
   );
 
   const handlePeriodChange = useCallback((newPeriod: AnalyticsPeriod) => {
@@ -54,7 +62,11 @@ export const AnalyticsDashboard: FC = () => {
   }
 
   return (
-    <Box p={{ base: "4", md: "6" }}>
+    <Box
+      p={{ base: "4", md: "6" }}
+      opacity={isFetching ? 0.6 : 1}
+      transition="opacity 0.2s ease"
+    >
       {/* Filter Bar */}
       <DashboardFilterBar
         period={period}
@@ -64,12 +76,7 @@ export const AnalyticsDashboard: FC = () => {
         lastUpdated={data.meta.lastUpdated}
       />
 
-      {/* Stats Grid - 2x2 responsive */}
-      <Grid
-        templateColumns={{ base: "1fr", md: "1fr 1fr" }}
-        gap="4"
-        mb="6"
-      >
+      <Flex gap="4" mb="6">
         <AvgResponseTimeStat
           avgRT={data.performance.avgRT}
           hourlyActivity={data.charts.hourlyActivity}
@@ -80,20 +87,13 @@ export const AnalyticsDashboard: FC = () => {
         />
         <TotalRequestsStat requests={data.requests} />
         <CustomerSatisfactionStat csat={data.performance.csat} />
-      </Grid>
+      </Flex>
 
       {/* Charts Grid */}
-      <Grid
-        templateColumns={{ base: "1fr", lg: "1fr 1fr" }}
-        gap="4"
-        mb="6"
-      >
+      <Grid templateColumns={{ base: "1fr", lg: "2fr 1fr" }} gap="4" mb="6">
         <HourlyActivityChart data={data.charts.hourlyActivity} />
         <CategoryDistributionChart data={data.charts.categoryStats} />
       </Grid>
-
-      {/* Ticket Volume Chart - Full Width */}
-      <TicketVolumeChart data={data.charts.hourlyTicketVolume} />
     </Box>
   );
 };

@@ -1,4 +1,4 @@
-import { AdmissionIntentCategory } from "@/features/tickets/model/types";
+export { AdmissionIntentCategory } from "@/features/tickets/model/types";
 
 export type AnalyticsPeriod = "day" | "week" | "month";
 export type AnalyticsScope = "GLOBAL" | "OPERATOR";
