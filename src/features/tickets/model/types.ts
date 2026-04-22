@@ -49,6 +49,7 @@ export interface TicketListItem {
   priorityValue: number | null;
   createdAt: string;
   lastMessageAt: string;
+  firstApplicantMessage: string | null;
 }
 
 export interface TicketDetail extends TicketListItem {

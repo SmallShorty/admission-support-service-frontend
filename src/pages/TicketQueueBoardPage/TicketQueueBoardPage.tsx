@@ -266,6 +266,7 @@ export const TicketQueueBoardPage = () => {
                         }}
                         createdAt={ticket.createdAt}
                         lastMessageAt={ticket.lastMessageAt}
+                        firstApplicantMessage={ticket.firstApplicantMessage}
                       />
                     </MotionBox>
                   ))}

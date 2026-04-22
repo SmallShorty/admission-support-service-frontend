@@ -147,6 +147,7 @@ export const SidebarTicketQueue = () => {
                 onSelect={() => handleSelectTicket(ticket.id)}
                 createdAt={ticket.createdAt}
                 lastMessageAt={ticket.lastMessageAt}
+                firstApplicantMessage={ticket.firstApplicantMessage}
                 cardVariant="editable"
               />
             ))}

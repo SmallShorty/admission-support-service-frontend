@@ -29,6 +29,7 @@ interface TicketCardProps {
   onSelect: (id: string) => void;
   createdAt: string | Date;
   lastMessageAt: string | Date;
+  firstApplicantMessage: string | null;
   cardVariant?: "editable";
 }
 
@@ -39,6 +40,7 @@ export const TicketCard = ({
   priorityValue,
   createdAt,
   lastMessageAt,
+  firstApplicantMessage,
   isSelected,
   onSelect,
   cardVariant,
@@ -119,7 +121,7 @@ export const TicketCard = ({
 
       {/* Body */}
       <Text fontSize="xs" color="fg.muted" lineClamp={2} mb="3">
-        Нажмите, чтобы просмотреть историю переписки и детали запроса...
+        {firstApplicantMessage || "Нажмите, чтобы просмотреть историю переписки и детали запроса..."}
       </Text>
 
       <Separator borderColor="gray.50" />
