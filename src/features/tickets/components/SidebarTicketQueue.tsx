@@ -12,6 +12,7 @@ import {
 import { TicketCard } from "./TicketCard";
 import { useAvailableQueue } from "../hooks/queries/useAvailableQueue";
 import { useMyTickets } from "../hooks/queries/useMyTickets";
+import { useTakeTicket } from "../hooks/mutations/useTakeTicket";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { setSelectedTicketId } from "../model/ticketsSlice";
 
@@ -24,6 +25,7 @@ export const SidebarTicketQueue = () => {
   );
 
   const [viewMode, setViewMode] = useState<ViewMode>("available");
+  const { mutate: takeTicket } = useTakeTicket();
 
   // Загрузка данных
   const {
@@ -52,6 +54,9 @@ export const SidebarTicketQueue = () => {
   }, [viewMode, availableData, myTicketsData]);
 
   const handleSelectTicket = (ticketId: string) => {
+    if (viewMode === "available") {
+      takeTicket(ticketId);
+    }
     dispatch(setSelectedTicketId(ticketId));
   };
 
@@ -60,6 +65,7 @@ export const SidebarTicketQueue = () => {
       direction="column"
       w="full"
       h="full"
+      minH="0"
       borderRightWidth="1px"
       borderColor="gray.200"
       bg="bg.panel"
@@ -103,13 +109,16 @@ export const SidebarTicketQueue = () => {
       <Box
         flex="1"
         overflowY="auto"
-        bg="bg.subtle" // Более мягкий фон для списка
+        bg="bg.subtle"
         p="3"
         css={{
           "&::-webkit-scrollbar": { width: "4px" },
           "&::-webkit-scrollbar-thumb": {
-            bg: "border.emphasized",
-            borderRadius: "full",
+            background: "#ccc",
+            borderRadius: "2px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "transparent",
           },
         }}
       >

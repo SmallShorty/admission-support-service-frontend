@@ -251,8 +251,6 @@ export const TicketQueueBoardPage = () => {
                         duration: 0.3,
                         delay: index * 0.02,
                       }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
                     >
                       <TicketCard
                         id={ticket.id}
