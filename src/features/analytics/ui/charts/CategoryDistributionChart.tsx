@@ -1,7 +1,8 @@
 import { FC, useMemo } from "react";
 import { Box, Flex, Text, VStack } from "@chakra-ui/react";
-import { Panel } from "@shared/components/ui/panel";
+import { SectionCard } from "@shared/components/ui/section-card";
 import { Doughnut } from "react-chartjs-2";
+import { PieChart } from "lucide-react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { AdmissionIntentCategory, CategoryStatEntry } from "../../model/types";
 import { useColorMode } from "@/shared/components/ui/color-mode";
@@ -58,6 +59,10 @@ export const CategoryDistributionChart: FC<CategoryDistributionChartProps> = ({ 
 
   const topCategory = sorted[0];
 
+  const description = topCategory
+    ? `Лидер: ${categoryLabels[topCategory.category as AdmissionIntentCategory]} — ${topCategory.percentage.toFixed(1)}%`
+    : "Topic Distribution";
+
   const chartData = useMemo(() => ({
     labels: sorted.map((d) => categoryLabels[d.category as AdmissionIntentCategory] || d.category),
     datasets: [
@@ -89,33 +94,35 @@ export const CategoryDistributionChart: FC<CategoryDistributionChartProps> = ({ 
     },
   };
 
+  const tooltipText = "Распределение по категориям — процентное соотношение тематик обращений за период. Помогает выявить наиболее частые запросы абитуриентов и правильно расставить приоритеты в подготовке операторов и шаблонов ответов.";
+
   if (data.length === 0) {
     return (
-      <Panel p="4" gridColumn={{ base: "1 / -1", lg: "2 / 3" }}>
+      <SectionCard
+        icon={<PieChart size={18} />}
+        title="Распределение по категориям"
+        description="Topic Distribution"
+        colorScheme="purple"
+        tooltip={tooltipText}
+        gridColumn={{ base: "1 / -1", lg: "2 / 3" }}
+      >
         <VStack h="380px" justify="center" gap="2">
           <Text color="fg.muted" textAlign="center">Нет данных по категориям</Text>
         </VStack>
-      </Panel>
+      </SectionCard>
     );
   }
 
   return (
-    <Panel p="4" gridColumn={{ base: "1 / -1", lg: "2 / 3" }}>
+    <SectionCard
+      icon={<PieChart size={18} />}
+      title="Распределение по категориям"
+      description={description}
+      colorScheme="purple"
+      tooltip={tooltipText}
+      gridColumn={{ base: "1 / -1", lg: "2 / 3" }}
+    >
       <VStack align="stretch" gap="4" h="full">
-        <Box>
-          <Text fontSize="xs" fontWeight="semibold" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
-            Распределение по категориям
-          </Text>
-          {topCategory && (
-            <Text fontSize="xs" color="fg.subtle">
-              Лидер: <Box as="span" fontWeight="semibold" color="fg.default">
-                {categoryLabels[topCategory.category as AdmissionIntentCategory]}
-              </Box>
-              {" "}— {topCategory.percentage.toFixed(1)}%
-            </Text>
-          )}
-        </Box>
-
         <Box position="relative" h="180px" flexShrink={0}>
           <Doughnut data={chartData} options={chartOptions} />
           <Box
@@ -163,6 +170,6 @@ export const CategoryDistributionChart: FC<CategoryDistributionChartProps> = ({ 
           })}
         </VStack>
       </VStack>
-    </Panel>
+    </SectionCard>
   );
 };

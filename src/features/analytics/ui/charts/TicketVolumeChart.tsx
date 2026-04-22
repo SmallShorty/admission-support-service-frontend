@@ -1,7 +1,8 @@
 import { FC, useEffect, useMemo } from "react";
 import { Box } from "@chakra-ui/react";
-import { Panel } from "@shared/components/ui/panel";
+import { SectionCard } from "@shared/components/ui/section-card";
 import { Bar } from "react-chartjs-2";
+import { BarChart3 } from "lucide-react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,7 +14,6 @@ import {
 import { HourlyVolumeEntry } from "../../model/types";
 import { useColorMode } from "@/shared/components/ui/color-mode";
 
-// Регистрация необходимых модулей Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 interface TicketVolumeChartProps {
@@ -24,8 +24,8 @@ export const TicketVolumeChart: FC<TicketVolumeChartProps> = ({ data }) => {
   const { colorMode } = useColorMode();
 
   const chartData = useMemo(() => {
-    const incomingColor = colorMode === "dark" ? "#4FD1C5" : "#2C7A7B"; // Teal / Turquoise
-    const completedColor = colorMode === "dark" ? "#68D391" : "#38A169"; // Green
+    const incomingColor = colorMode === "dark" ? "#4FD1C5" : "#2C7A7B";
+    const completedColor = colorMode === "dark" ? "#68D391" : "#38A169";
 
     return {
       labels: data.map((d) => d.label),
@@ -38,7 +38,6 @@ export const TicketVolumeChart: FC<TicketVolumeChartProps> = ({ data }) => {
           }),
           backgroundColor: incomingColor,
           borderRadius: 4,
-          // minBarLength позволяет видеть тонкую полоску даже при значении 0
           minBarLength: 5,
         },
         {
@@ -82,10 +81,17 @@ export const TicketVolumeChart: FC<TicketVolumeChartProps> = ({ data }) => {
   };
 
   return (
-    <Panel p="4" gridColumn={{ base: "1 / -1" }}>
+    <SectionCard
+      icon={<BarChart3 size={18} />}
+      title="Объём заявок"
+      description="Ticket Volume"
+      colorScheme="teal"
+      tooltip="Объём заявок — сравнение входящих и завершённых обращений по временным интервалам. Позволяет отслеживать рабочую нагрузку команды и выявлять периоды пиковой активности."
+      gridColumn={{ base: "1 / -1" }}
+    >
       <Box h="300px" w="full">
         <Bar data={chartData} options={chartOptions} />
       </Box>
-    </Panel>
+    </SectionCard>
   );
 };

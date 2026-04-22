@@ -1,7 +1,8 @@
 import { FC, useMemo } from "react";
-import { Box, Flex, Text, VStack, Grid } from "@chakra-ui/react";
-import { Panel } from "@shared/components/ui/panel";
+import { Box, Flex, Text, Grid } from "@chakra-ui/react";
+import { SectionCard } from "@shared/components/ui/section-card";
 import { Chart } from "react-chartjs-2";
+import { TrendingUp } from "lucide-react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -134,41 +135,36 @@ export const HourlyActivityChart: FC<HourlyActivityChartProps> = ({ data }) => {
   }), [gridColor, tickColor, isDark]);
 
   return (
-    <Panel p="4" gridColumn={{ base: "1 / -1", lg: "1 / 2" }}>
-      <VStack align="stretch" gap="4">
-        <Flex justify="space-between" align="flex-start">
-          <Box>
-            <Text fontSize="xs" fontWeight="semibold" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
-              Активность по часам
-            </Text>
-            <Text fontSize="xs" color="fg.subtle">Нагрузка и скорость обработки</Text>
-          </Box>
-        </Flex>
-
-        <Grid templateColumns="repeat(3, 1fr)" gap="3">
-          <Box>
-            <Text fontSize="xs" color="fg.muted" mb="0.5">Пиковый час</Text>
-            <Text fontSize="sm" fontWeight="bold">{peakEntry.hour}</Text>
-            <Text fontSize="xs" color="fg.subtle">{peakEntry.incoming} входящих</Text>
-          </Box>
-          <Box>
-            <Text fontSize="xs" color="fg.muted" mb="0.5">Ср. эффективность</Text>
-            <Text fontSize="sm" fontWeight="bold" color={avgEfficiency >= 70 ? "teal.500" : "orange.500"}>
-              {avgEfficiency}%
-            </Text>
-            <Text fontSize="xs" color="fg.subtle">разрешено / входящие</Text>
-          </Box>
-          <Box>
-            <Text fontSize="xs" color="fg.muted" mb="0.5">Всего разрешено</Text>
-            <Text fontSize="sm" fontWeight="bold" color="green.500">{totalResolved}</Text>
-            <Text fontSize="xs" color="fg.subtle">за период</Text>
-          </Box>
-        </Grid>
-
-        <Box h="380px" w="full">
-          <Chart type="bar" data={chartData} options={chartOptions} />
+    <SectionCard
+      icon={<TrendingUp size={18} />}
+      title="Активность по часам"
+      description="Нагрузка и скорость обработки"
+      colorScheme="blue"
+      tooltip="Активность по часам — распределение входящих заявок и скорость их обработки по часам суток. Столбцы показывают входящие и разрешённые обращения, линия — эффективность (отношение разрешённых к входящим в %). Помогает определить оптимальное расписание смен."
+      gridColumn={{ base: "1 / -1", lg: "1 / 2" }}
+    >
+      <Grid templateColumns="repeat(3, 1fr)" gap="3" mb="4">
+        <Box>
+          <Text fontSize="xs" color="fg.muted" mb="0.5">Пиковый час</Text>
+          <Text fontSize="sm" fontWeight="bold">{peakEntry.hour}</Text>
+          <Text fontSize="xs" color="fg.subtle">{peakEntry.incoming} входящих</Text>
         </Box>
-      </VStack>
-    </Panel>
+        <Box>
+          <Text fontSize="xs" color="fg.muted" mb="0.5">Ср. эффективность</Text>
+          <Text fontSize="sm" fontWeight="bold" color={avgEfficiency >= 70 ? "teal.500" : "orange.500"}>
+            {avgEfficiency}%
+          </Text>
+          <Text fontSize="xs" color="fg.subtle">разрешено / входящие</Text>
+        </Box>
+        <Box>
+          <Text fontSize="xs" color="fg.muted" mb="0.5">Всего разрешено</Text>
+          <Text fontSize="sm" fontWeight="bold" color="green.500">{totalResolved}</Text>
+          <Text fontSize="xs" color="fg.subtle">за период</Text>
+        </Box>
+      </Grid>
+      <Box h="380px" w="full">
+        <Chart type="bar" data={chartData} options={chartOptions} />
+      </Box>
+    </SectionCard>
   );
 };

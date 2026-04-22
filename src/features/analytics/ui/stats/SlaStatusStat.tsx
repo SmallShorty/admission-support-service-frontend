@@ -1,8 +1,7 @@
 import { FC } from "react";
-import { Box, Flex, Text, VStack, IconButton } from "@chakra-ui/react";
-import { Panel } from "@shared/components/ui/panel";
-import { CheckCircle2, Info } from "lucide-react";
-import { useColorMode } from "@/shared/components/ui/color-mode";
+import { Box, Flex, Text, VStack } from "@chakra-ui/react";
+import { SectionCard } from "@shared/components/ui/section-card";
+import { CheckCircle2 } from "lucide-react";
 import { MetricValue } from "../../model/types";
 
 interface SlaStatusStatProps {
@@ -20,68 +19,86 @@ const formatSeconds = (seconds: number | null): string => {
 };
 
 export const SlaStatusStat: FC<SlaStatusStatProps> = ({ avgRT, isSlaBreached }) => {
-  const { colorMode } = useColorMode();
   const progressPercent =
     avgRT.value !== null ? Math.min((avgRT.value / SLA_THRESHOLD) * 100, 100) : 0;
 
   const isImproving = avgRT.trend !== null && avgRT.trend < 0;
-  const trendColor = avgRT.trend === null ? "fg.muted" : isImproving ? "teal.500" : "red.500";
+  const trendColor = avgRT.trend === null ? "fg.muted" : isImproving ? "teal.600" : "red.600";
+  const trendColorDark = avgRT.trend === null ? "fg.muted" : isImproving ? "teal.300" : "red.300";
+  const trendBg = isImproving ? "teal.100" : "red.100";
+  const trendBgDark = isImproving ? "teal.900" : "red.900";
   const trendArrow = avgRT.trend === null ? "" : isImproving ? "↘" : "↗";
 
   return (
-    <Panel p="4" flex="1">
+    <SectionCard
+      icon={<CheckCircle2 size={18} />}
+      title="SLA статус"
+      description="Average Resolution Time"
+      colorScheme="purple"
+      tooltip="SLA статус — показывает, соблюдается ли соглашение об уровне обслуживания. Целевое время обработки заявки: 12 минут. Прогресс-бар отражает текущую нагрузку относительно этого порога. При превышении — статус меняется на «Нарушен»."
+      flex="1"
+    >
       <VStack align="stretch" gap="3">
-        <Flex justify="space-between" align="flex-start">
-          <Flex align="center" gap="3">
-            <Flex
-              align="center"
-              justify="center"
-              w="9"
-              h="9"
-              borderRadius="lg"
-              bg="purple.100"
-              _dark={{ bg: "purple.900" }}
-              flexShrink={0}
+        <Flex align="center" justify="space-between" gap="3">
+          <Text fontSize="3xl" fontWeight="bold" lineHeight="1">
+            {formatSeconds(avgRT.value)}
+          </Text>
+          <Box
+            px="3"
+            py="1"
+            borderRadius="full"
+            bg={isSlaBreached ? "red.100" : "teal.100"}
+            _dark={{ bg: isSlaBreached ? "red.900" : "teal.900" }}
+          >
+            <Text
+              fontSize="xs"
+              fontWeight="semibold"
+              color={isSlaBreached ? "red.600" : "teal.600"}
+              _dark={{ color: isSlaBreached ? "red.300" : "teal.300" }}
             >
-              <CheckCircle2 size={18} color={colorMode === "dark" ? "#D6BCFA" : "#6B46C1"} />
-            </Flex>
-            <Box>
-              <Text fontSize="xs" fontWeight="semibold" color="fg.muted" textTransform="uppercase" letterSpacing="wider" lineHeight="1.2">
-                SLA статус
-              </Text>
-              <Text fontSize="xs" color="fg.subtle">Average Resolution Time (RT)</Text>
-            </Box>
-          </Flex>
-          <IconButton variant="ghost" size="xs" aria-label="Информация" color="fg.subtle">
-            <Info size={14} />
-          </IconButton>
+              {isSlaBreached ? "Нарушен" : "Соблюдён"}
+            </Text>
+          </Box>
         </Flex>
 
-        <Text fontSize="2xl" fontWeight="bold">
-          {formatSeconds(avgRT.value)}
-        </Text>
-
         {avgRT.trend !== null && (
-          <Text fontSize="sm" color={trendColor}>
-            {trendArrow} {Math.abs(avgRT.trend).toFixed(1)}с за период
-          </Text>
+          <Box
+            display="inline-flex"
+            px="2"
+            py="0.5"
+            borderRadius="full"
+            bg={trendBg}
+            _dark={{ bg: trendBgDark }}
+            alignSelf="flex-start"
+          >
+            <Text fontSize="xs" fontWeight="semibold" color={trendColor} _dark={{ color: trendColorDark }}>
+              {trendArrow} {Math.abs(avgRT.trend).toFixed(1)}с за период
+            </Text>
+          </Box>
         )}
 
         <Box>
-          <Flex justify="space-between" align="center" mb="1">
-            <Text fontSize="xs" color="fg.muted">Целевое время:</Text>
-            <Text fontSize="xs" fontWeight="semibold">12м</Text>
+          <Flex justify="space-between" align="center" mb="1.5">
+            <Text fontSize="xs" color="fg.muted">Загруженность SLA</Text>
+            <Text fontSize="xs" fontWeight="semibold" color={isSlaBreached ? "red.500" : "fg.default"}>
+              {progressPercent.toFixed(0)}%
+            </Text>
           </Flex>
-          <Box h="8px" bg="gray.200" borderRadius="full" overflow="hidden" _dark={{ bg: "gray.700" }}>
+          <Box h="6px" bg="gray.200" borderRadius="full" overflow="hidden" _dark={{ bg: "gray.700" }}>
             <Box
               h="full"
               w={`${progressPercent}%`}
               bg={isSlaBreached ? "red.500" : "purple.500"}
+              borderRadius="full"
               transition="width 0.3s ease"
             />
           </Box>
+          <Flex justify="space-between" mt="1">
+            <Text fontSize="xs" color="fg.subtle">0</Text>
+            <Text fontSize="xs" color="fg.subtle">Цель: 12м</Text>
+          </Flex>
         </Box>
       </VStack>
-    </Panel>
+    </SectionCard>
   );
 };
