@@ -87,7 +87,7 @@ export const TicketVolumeChart: FC<TicketVolumeChartProps> = ({ data }) => {
       description="Ticket Volume"
       colorScheme="teal"
       tooltip="Объём заявок — сравнение входящих и завершённых обращений по временным интервалам. Позволяет отслеживать рабочую нагрузку команды и выявлять периоды пиковой активности."
-      gridColumn={{ base: "1 / -1" }}
+
     >
       <Box h="300px" w="full">
         <Bar data={chartData} options={chartOptions} />
