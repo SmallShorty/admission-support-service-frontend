@@ -356,12 +356,12 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
                       }
                       size="sm"
                     >
-                      <Select.Trigger>
+                      <Select.Trigger bg="white">
                         <Select.ValueText />
                       </Select.Trigger>
                       <Portal>
                         <Select.Positioner>
-                          <Select.Content>
+                          <Select.Content bg="white" shadow="md" borderRadius="md">
                             {escalationCauses.items.map((item) => (
                               <Select.Item key={item.value} item={item}>
                                 <Select.ItemText>{item.label}</Select.ItemText>

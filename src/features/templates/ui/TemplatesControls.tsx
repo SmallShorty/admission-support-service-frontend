@@ -66,14 +66,13 @@ export const TemplatesControls = ({
           />
         </Box>
 
-        {/* Dropdown с категориями */}
         <Select.Root
           collection={categories}
           value={category}
           onValueChange={(e) => onCategoryChange(e.value)}
           width="240px"
         >
-          <Select.Trigger>
+          <Select.Trigger bg="white">
             <Select.ValueText placeholder="Категория" bg="white" />
           </Select.Trigger>
 

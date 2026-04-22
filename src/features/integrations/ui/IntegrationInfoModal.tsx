@@ -7,6 +7,7 @@ import {
   Portal,
   SelectContent,
   SelectItem,
+  SelectPositioner,
   SelectRoot,
   SelectTrigger,
   SelectValueText,
@@ -155,16 +156,20 @@ export const IntegrationInfoModal = ({
                     value={form.eventType ? [form.eventType] : []}
                     onValueChange={(e) => setField("eventType")(e.value[0])}
                   >
-                    <SelectTrigger rounded="lg" py="2.5">
+                    <SelectTrigger rounded="lg" py="2.5" bg="white">
                       <SelectValueText placeholder="Выберите тип" />
                     </SelectTrigger>
-                    <SelectContent>
-                      {eventTypeOptions.items.map((item) => (
-                        <SelectItem item={item} key={item.value}>
-                          {item.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
+                    <Portal>
+                      <SelectPositioner zIndex="100">
+                        <SelectContent bg="white" shadow="md" borderRadius="md">
+                          {eventTypeOptions.items.map((item) => (
+                            <SelectItem item={item} key={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </SelectPositioner>
+                    </Portal>
                   </SelectRoot>
                 </Field.Root>
 

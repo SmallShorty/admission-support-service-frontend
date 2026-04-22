@@ -2,9 +2,11 @@ import { FC } from "react";
 import {
   HStack,
   Input,
+  Portal,
   SelectRoot,
   SelectTrigger,
   SelectValueText,
+  SelectPositioner,
   SelectContent,
   SelectItem,
   createListCollection,
@@ -69,13 +71,17 @@ export const IntegrationLogsControls: FC<IntegrationLogsControlsProps> = ({
         <SelectTrigger bg="white">
           <SelectValueText placeholder="Все действия" />
         </SelectTrigger>
-        <SelectContent>
-          {actionOptions.items.map((item) => (
-            <SelectItem item={item} key={item.value}>
-              {item.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
+        <Portal>
+          <SelectPositioner zIndex="100">
+            <SelectContent bg="white" shadow="md" borderRadius="md">
+              {actionOptions.items.map((item) => (
+                <SelectItem item={item} key={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </SelectPositioner>
+        </Portal>
       </SelectRoot>
 
       <SelectRoot
@@ -90,13 +96,17 @@ export const IntegrationLogsControls: FC<IntegrationLogsControlsProps> = ({
         <SelectTrigger bg="white">
           <SelectValueText placeholder="Уровень" />
         </SelectTrigger>
-        <SelectContent>
-          {severityOptions.items.map((item) => (
-            <SelectItem item={item} key={item.value}>
-              {item.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
+        <Portal>
+          <SelectPositioner zIndex="100">
+            <SelectContent bg="white" shadow="md" borderRadius="md">
+              {severityOptions.items.map((item) => (
+                <SelectItem item={item} key={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </SelectPositioner>
+        </Portal>
       </SelectRoot>
 
       <HStack gap="2">

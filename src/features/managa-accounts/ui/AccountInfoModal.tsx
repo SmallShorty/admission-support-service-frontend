@@ -163,22 +163,24 @@ export const AccountInfoModal = ({
                     onValueChange={(e) => setField("role")(e.value[0])}
                   >
                     <Select.Control>
-                      <Select.Trigger rounded="lg" py="2.5">
+                      <Select.Trigger rounded="lg" py="2.5" bg="white">
                         <Select.ValueText placeholder="Выберите роль" />
                       </Select.Trigger>
                       <Select.IndicatorGroup>
                         <Select.Indicator />
                       </Select.IndicatorGroup>
                     </Select.Control>
-                    <Select.Positioner>
-                      <Select.Content>
-                        {staffRoles.items.map((role) => (
-                          <Select.Item item={role} key={role.value}>
-                            {role.label}
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select.Positioner>
+                    <Portal>
+                      <Select.Positioner>
+                        <Select.Content bg="white" shadow="md" borderRadius="md">
+                          {staffRoles.items.map((role) => (
+                            <Select.Item item={role} key={role.value}>
+                              {role.label}
+                            </Select.Item>
+                          ))}
+                        </Select.Content>
+                      </Select.Positioner>
+                    </Portal>
                   </Select.Root>
                 </Field.Root>
               </Stack>

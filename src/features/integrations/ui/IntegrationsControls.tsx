@@ -4,9 +4,11 @@ import {
   Input,
   Button,
   Box,
+  Portal,
   SelectRoot,
   SelectTrigger,
   SelectValueText,
+  SelectPositioner,
   SelectContent,
   SelectItem,
   createListCollection,
@@ -65,13 +67,17 @@ export const IntegrationsControls: FC<IntegrationsControlsProps> = ({
           <SelectTrigger bg="white">
             <SelectValueText placeholder="Все типы" />
           </SelectTrigger>
-          <SelectContent>
-            {eventTypeOptions.items.map((item) => (
-              <SelectItem item={item} key={item.value}>
-                {item.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
+          <Portal>
+            <SelectPositioner zIndex="100">
+              <SelectContent bg="white" shadow="md" borderRadius="md">
+                {eventTypeOptions.items.map((item) => (
+                  <SelectItem item={item} key={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </SelectPositioner>
+          </Portal>
         </SelectRoot>
       </HStack>
 

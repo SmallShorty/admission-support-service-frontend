@@ -187,14 +187,14 @@ export function createSelectControl(config: SelectControlConfig) {
         {...dynamicProps}
       >
         <Tooltip content={label} ids={{ trigger: controlId }}>
-          <Select.Trigger ref={ref}>
+          <Select.Trigger ref={ref} bg="white">
             <Select.ValueText>{displayValue}</Select.ValueText>
             <Select.Indicator />
           </Select.Trigger>
         </Tooltip>
         <Portal>
           <Select.Positioner>
-            <Select.Content minW="20">
+            <Select.Content minW="20" bg="white" shadow="md" borderRadius="md">
               {options.map((opt) => (
                 <Select.Item key={opt.value} item={opt.value}>
                   {opt.icon && (

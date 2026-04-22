@@ -275,22 +275,24 @@ export const TemplateInfoModal = ({
                     onValueChange={(e) => setField("category")(e.value[0])}
                   >
                     <Select.Control>
-                      <Select.Trigger rounded="lg" py="2.5">
+                      <Select.Trigger rounded="lg" py="2.5" bg="white">
                         <Select.ValueText placeholder="Выберите категорию" />
                       </Select.Trigger>
                       <Select.IndicatorGroup>
                         <Select.Indicator />
                       </Select.IndicatorGroup>
                     </Select.Control>
-                    <Select.Positioner>
-                      <Select.Content>
-                        {CATEGORIES.items.map((cat) => (
-                          <Select.Item item={cat} key={cat.value}>
-                            {cat.label}
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select.Positioner>
+                    <Portal>
+                      <Select.Positioner>
+                        <Select.Content bg="white" shadow="md" borderRadius="md">
+                          {CATEGORIES.items.map((cat) => (
+                            <Select.Item item={cat} key={cat.value}>
+                              {cat.label}
+                            </Select.Item>
+                          ))}
+                        </Select.Content>
+                      </Select.Positioner>
+                    </Portal>
                   </Select.Root>
                 </Field.Root>
 
