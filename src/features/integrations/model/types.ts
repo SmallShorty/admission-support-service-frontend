@@ -99,3 +99,56 @@ export interface NotificationsFilters {
   page?: number;
   limit?: number;
 }
+
+export enum IntegrationLogAction {
+  INTEGRATION_SUBMITTED = "INTEGRATION_SUBMITTED",
+  INTEGRATION_SUBMISSION_NOT_FOUND = "INTEGRATION_SUBMISSION_NOT_FOUND",
+  INTEGRATION_SUBMISSION_READONLY_FIELD_VIOLATION = "INTEGRATION_SUBMISSION_READONLY_FIELD_VIOLATION",
+  INTEGRATION_CREATED = "INTEGRATION_CREATED",
+  INTEGRATION_UPDATED = "INTEGRATION_UPDATED",
+  INTEGRATION_ACTIVATED = "INTEGRATION_ACTIVATED",
+  INTEGRATION_DEACTIVATED = "INTEGRATION_DEACTIVATED",
+}
+
+export enum IntegrationLogSeverity {
+  INFO = "INFO",
+  WARN = "WARN",
+  ERROR = "ERROR",
+}
+
+export interface IntegrationLogActor {
+  id: string;
+  email: string;
+  role: string;
+  firstName: string;
+  lastName: string;
+  middleName: string | null;
+}
+
+export interface IntegrationLogDto {
+  id: string;
+  action: IntegrationLogAction;
+  severity: IntegrationLogSeverity;
+  integrationId: string | null;
+  slug: string | null;
+  actor: IntegrationLogActor | null;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface IntegrationLogListResponse {
+  items: IntegrationLogDto[];
+  total: number;
+}
+
+export interface IntegrationLogFilters {
+  action?: IntegrationLogAction;
+  severity?: IntegrationLogSeverity;
+  integrationId?: string;
+  slug?: string;
+  actorId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  page?: number;
+  limit?: number;
+}

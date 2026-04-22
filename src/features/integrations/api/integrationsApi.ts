@@ -10,6 +10,9 @@ import {
   NotificationDto,
   NotificationListResponse,
   NotificationsFilters,
+  IntegrationLogDto,
+  IntegrationLogListResponse,
+  IntegrationLogFilters,
 } from "../model/types";
 
 // Unauthenticated instance for public endpoints
@@ -126,6 +129,37 @@ export const integrationsApi = {
   getNotificationById: async (id: string): Promise<NotificationDto> => {
     const { data } = await coreApi.get<NotificationDto>(
       `/notifications/${id}`,
+    );
+    return data;
+  },
+
+  // ========== Integration Logs (authenticated, read-only) ==========
+
+  getIntegrationLogs: async (
+    filters?: IntegrationLogFilters,
+  ): Promise<IntegrationLogListResponse> => {
+    const { data } = await coreApi.get<IntegrationLogListResponse>(
+      "/integration-logs",
+      {
+        params: {
+          action: filters?.action,
+          severity: filters?.severity,
+          integrationId: filters?.integrationId,
+          slug: filters?.slug,
+          actorId: filters?.actorId,
+          dateFrom: filters?.dateFrom,
+          dateTo: filters?.dateTo,
+          page: filters?.page,
+          limit: filters?.limit,
+        },
+      },
+    );
+    return data;
+  },
+
+  getIntegrationLogById: async (id: string): Promise<IntegrationLogDto> => {
+    const { data } = await coreApi.get<IntegrationLogDto>(
+      `/integration-logs/${id}`,
     );
     return data;
   },
