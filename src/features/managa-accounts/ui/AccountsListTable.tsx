@@ -10,6 +10,7 @@ import {
   ButtonGroup,
 } from "@chakra-ui/react";
 import { Panel } from "@shared/components/ui/panel";
+import { EmptyResults } from "@shared/components/ui/empty-results";
 import {
   Edit,
   Trash2,
@@ -63,6 +64,13 @@ export const AccountsListTable = ({
         </Table.Header>
 
         <Table.Body opacity={isLoading ? 0.5 : 1} transition="opacity 0.15s">
+          {!isLoading && accounts.length === 0 && (
+            <Table.Row>
+              <Table.Cell colSpan={4} py="0">
+                <EmptyResults description="Попробуйте изменить параметры поиска" />
+              </Table.Cell>
+            </Table.Row>
+          )}
           {accounts.map((acc) => (
             <Table.Row key={acc.id} _hover={{ bg: "gray.50/50" }}>
               <Table.Cell>

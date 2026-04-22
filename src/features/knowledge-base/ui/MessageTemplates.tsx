@@ -1,5 +1,7 @@
 import { FC, useState } from "react";
+import { useDebounce } from "@shared/hooks/useDebounce";
 import { Box, SimpleGrid, Spinner, Center, Text } from "@chakra-ui/react";
+import { EmptyResults } from "@shared/components/ui/empty-results";
 import { TemplatesControls } from "@features/templates/ui/TemplatesControls";
 import { TemplateInfoModal, TemplateFormData } from "@features/templates/ui/TemplateInfoModal";
 import { useTemplates } from "@features/templates/hooks/queries/useTemplates";
@@ -18,11 +20,13 @@ export const MessageTemplates: FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
 
+  const debouncedSearch = useDebounce(search, 400);
+
   const selectedCategory =
     category[0] !== "all" ? (category[0] as AdmissionIntentCategory) : undefined;
 
   const { data, isLoading, isError } = useTemplates({
-    searchTerm: search || undefined,
+    searchTerm: debouncedSearch || undefined,
     category: selectedCategory,
     includeInactive: includeInactive || undefined,
   });
@@ -90,7 +94,11 @@ export const MessageTemplates: FC = () => {
         </Center>
       )}
 
-      {data && (
+      {data && data.items.length === 0 && (
+        <EmptyResults description="Попробуйте изменить фильтры или поисковый запрос" />
+      )}
+
+      {data && data.items.length > 0 && (
         <SimpleGrid columns={4} gap="4">
           {data.items.map((template) => (
             <TemplateInfoCard

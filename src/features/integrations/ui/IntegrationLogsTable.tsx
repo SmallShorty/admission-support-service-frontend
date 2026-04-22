@@ -10,6 +10,7 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import { Panel } from "@shared/components/ui/panel";
+import { EmptyResults } from "@shared/components/ui/empty-results";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   IntegrationLogDto,
@@ -140,10 +141,8 @@ export const IntegrationLogsTable: FC<IntegrationLogsTableProps> = ({
 
           {!isLoading && logs.length === 0 && (
             <Table.Row>
-              <Table.Cell colSpan={5}>
-                <Text fontSize="sm" color="gray.400" textAlign="center" py="6">
-                  Записи не найдены
-                </Text>
+              <Table.Cell colSpan={5} py="0">
+                <EmptyResults title="Записи не найдены" />
               </Table.Cell>
             </Table.Row>
           )}
