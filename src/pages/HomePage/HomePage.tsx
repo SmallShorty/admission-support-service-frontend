@@ -168,11 +168,7 @@ const HomePage = () => {
                 color="gray.800"
                 lineHeight="1.2"
               >
-                Добро пожаловать,{" "}
-                <Box as="span" color="teal.500">
-                  {account.firstName}
-                </Box>
-                !
+                Добро пожаловать
               </Heading>
 
               <Text color="gray.500" fontSize="lg" maxW="520px">
@@ -240,7 +236,11 @@ const HomePage = () => {
                     bg={`${card.color}.50`}
                     flexShrink={0}
                   >
-                    <Icon as={card.icon} boxSize={5} color={`${card.color}.500`} />
+                    <Icon
+                      as={card.icon}
+                      boxSize={5}
+                      color={`${card.color}.500`}
+                    />
                   </Flex>
                   {card.badge && (
                     <Badge

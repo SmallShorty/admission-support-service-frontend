@@ -19,7 +19,7 @@ export const AppLogo = ({ variant = "navbar", onClick }: AppLogoProps) => {
         w={{ base: "64px", md: "96px" }}
         h={{ base: "64px", md: "96px" }}
         borderRadius="2xl"
-        bg="teal.500"
+        bg="teal"
         flexShrink={0}
         cursor="pointer"
         onClick={handleClick}
@@ -44,7 +44,12 @@ export const AppLogo = ({ variant = "navbar", onClick }: AppLogoProps) => {
           <Icon as={GraduationCap} color="white" boxSize={6} />
         </Flex>
         <Flex direction="column" gap={0}>
-          <Text fontSize="lg" fontWeight="bold" color="teal.600" lineHeight="1.1">
+          <Text
+            fontSize="lg"
+            fontWeight="bold"
+            color="teal.600"
+            lineHeight="1.1"
+          >
             AdmissionSupport
           </Text>
           <Text fontSize="xs" color="gray.400" lineHeight="1.2">
