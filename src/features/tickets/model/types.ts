@@ -62,6 +62,12 @@ export interface TicketDetail extends TicketListItem {
   updatedAt: string;
   examScores?: ExamScore[];
   applicantPrograms?: ApplicantProgram[];
+  applicantHasBvi?: boolean;
+  applicantHasPriorityRight?: boolean;
+  applicantHasSeparateQuota?: boolean;
+  applicantHasSpecialQuota?: boolean;
+  applicantHasTargetQuota?: boolean;
+  applicantOriginalDocumentReceived?: boolean;
 }
 
 export interface TicketCounts {

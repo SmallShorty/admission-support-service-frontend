@@ -18,10 +18,15 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
+import { StudyForm, AdmissionType } from "@/app/entities/applicant/model/types";
 import {
-  StudyForm,
-  AdmissionType,
-} from "@/app/entities/applicant/model/types";
+  MoreHorizontal,
+  AlertTriangle,
+  StickyNote,
+  Tag,
+  Check,
+  X,
+} from "lucide-react";
 
 const STUDY_FORM_LABELS: Record<StudyForm, string> = {
   [StudyForm.FULL_TIME]: "Очная",
@@ -52,7 +57,6 @@ const ADMISSION_TYPE_COLORS: Record<AdmissionType, string> = {
   [AdmissionType.TARGET]: "yellow",
   [AdmissionType.PAID]: "red",
 };
-import { MoreHorizontal, AlertTriangle, StickyNote, Tag } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { useTicketDetail } from "../hooks/queries/useTicketDetail";
 import { useTakeTicket } from "../hooks/mutations/useTakeTicket";
@@ -65,6 +69,7 @@ import {
   EscalateTicketPayload,
 } from "../model/types";
 import { IntentCategoryBadge } from "../components/IntentCategoryBadge";
+import { PriorityBadge } from "../components/PriorityBadge";
 import { Panel } from "@/shared/components/ui/panel";
 
 const ESCALATION_CAUSE_LABELS: Record<EscalationCause, string> = {
@@ -177,22 +182,6 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
               {ticket.category && (
                 <IntentCategoryBadge category={ticket.category} showIcon />
               )}
-              {ticket.priorityValue !== null && (
-                <Badge
-                  colorPalette={
-                    ticket.priorityValue >= 8
-                      ? "red"
-                      : ticket.priorityValue >= 5
-                        ? "orange"
-                        : "teal"
-                  }
-                  variant="surface"
-                  size="sm"
-                  borderRadius="md"
-                >
-                  Приоритет: {ticket.priorityValue}
-                </Badge>
-              )}
             </Flex>
             <Text fontSize="xs" color="fg.muted">
               Создан: {formatDate(ticket.createdAt)}
@@ -203,6 +192,64 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
               </Text>
             )}
           </Stack>
+
+          {/* Applicant status */}
+          <Panel p="3">
+            <Stack gap="3">
+              <Flex justify="space-between" align="center">
+                <Text
+                  fontSize="xs"
+                  fontWeight="semibold"
+                  color="fg.muted"
+                  textTransform="uppercase"
+                  letterSpacing="wider"
+                >
+                  Статус абитуриента
+                </Text>
+                {ticket.priorityValue !== null && (
+                  <PriorityBadge value={ticket.priorityValue} />
+                )}
+              </Flex>
+              <Stack gap="1.5">
+                {(
+                  [
+                    [
+                      ticket.applicantOriginalDocumentReceived,
+                      "Оригинал документа сдан",
+                    ],
+                    [ticket.applicantHasBvi, "БВИ"],
+                    [
+                      ticket.applicantHasPriorityRight,
+                      "Преимущественное право",
+                    ],
+                    [ticket.applicantHasSpecialQuota, "Особая квота"],
+                    [ticket.applicantHasSeparateQuota, "Отдельная квота"],
+                    [ticket.applicantHasTargetQuota, "Целевая квота"],
+                  ] as [boolean | undefined, string][]
+                ).map(([value, label]) => (
+                  <Flex key={label} align="center" gap="2">
+                    <Flex
+                      align="center"
+                      justify="center"
+                      w="4"
+                      h="4"
+                      flexShrink={0}
+                      color={value ? "green.500" : "fg.subtle"}
+                    >
+                      {value ? <Check size={13} /> : <X size={13} />}
+                    </Flex>
+                    <Text
+                      fontSize="sm"
+                      color={value ? "fg" : "fg.muted"}
+                      fontWeight={value ? "medium" : "normal"}
+                    >
+                      {label}
+                    </Text>
+                  </Flex>
+                ))}
+              </Stack>
+            </Stack>
+          </Panel>
 
           {/* Exam scores */}
           {/* TODO: Разделение на internal/external, подсчёт баллов всего по каждому типу */}
@@ -285,7 +332,9 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
                           </Text>
                           <Flex gap="1" mt="2" wrap="wrap">
                             <Badge
-                              colorPalette={STUDY_FORM_COLORS[program.studyForm]}
+                              colorPalette={
+                                STUDY_FORM_COLORS[program.studyForm]
+                              }
                               variant="surface"
                               size="sm"
                               borderRadius="md"
@@ -293,7 +342,9 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
                               {STUDY_FORM_LABELS[program.studyForm]}
                             </Badge>
                             <Badge
-                              colorPalette={ADMISSION_TYPE_COLORS[program.admissionType]}
+                              colorPalette={
+                                ADMISSION_TYPE_COLORS[program.admissionType]
+                              }
                               variant="surface"
                               size="sm"
                               borderRadius="md"

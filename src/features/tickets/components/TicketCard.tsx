@@ -3,13 +3,13 @@ import {
   Flex,
   Text,
   HStack,
-  Badge,
   Icon,
   Separator,
   useRecipe,
 } from "@chakra-ui/react";
 import { Clock } from "lucide-react";
 import { IntentCategoryBadge } from "./IntentCategoryBadge";
+import { PriorityBadge } from "./PriorityBadge";
 import { AdmissionIntentCategory, TicketStatus } from "../model/types";
 
 interface TicketCardProps {
@@ -48,12 +48,6 @@ export const TicketCard = ({
   const isWorking = status === TicketStatus.IN_PROGRESS;
   const cardRecipe = useRecipe({ key: "card" });
   const cardStyles = cardRecipe({ variant: cardVariant });
-
-  const getPriorityPalette = (val: number) => {
-    if (val >= 8) return "red";
-    if (val >= 5) return "orange";
-    return "teal";
-  };
 
   const displayName = `${applicant.firstName} ${applicant.lastName}`;
 
@@ -96,19 +90,7 @@ export const TicketCard = ({
         >
           {displayName}
         </Text>
-        <Badge
-          variant="solid"
-          colorPalette={getPriorityPalette(priorityValue!)}
-          size="sm"
-          borderRadius="md"
-          width="25px"
-          display="inline-flex"
-          alignItems="center"
-          justifyContent="center"
-          textAlign="center"
-        >
-          {priorityValue}
-        </Badge>
+        {priorityValue !== null && <PriorityBadge value={priorityValue} />}
       </Flex>
 
       {/* Tags */}
