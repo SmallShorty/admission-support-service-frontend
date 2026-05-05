@@ -61,15 +61,20 @@ import { useTicketDetail } from "../hooks/queries/useTicketDetail";
 import { useTakeTicket } from "../hooks/mutations/useTakeTicket";
 import { useUpdateTicketStatus } from "../hooks/mutations/useUpdateTicketStatus";
 import { useEscalateTicket } from "../hooks/mutations/useEscalateTicket";
+import { useUpdateTicketCategory } from "../hooks/mutations/useUpdateTicketCategory";
+import { useUpdateTicketNote } from "../hooks/mutations/useUpdateTicketNote";
 import { openEscalateModal, closeEscalateModal } from "../model/ticketsSlice";
 import {
   TicketStatus,
   EscalationCause,
   EscalateTicketPayload,
+  AdmissionIntentCategory,
 } from "../model/types";
 import { IntentCategoryBadge } from "../components/IntentCategoryBadge";
 import { PriorityBadge } from "../components/PriorityBadge";
 import { Panel } from "@/shared/components/ui/panel";
+import { useAccountsQuery } from "@/features/managa-accounts/hooks/queries/useAccountsQuery";
+import { AccountRole, StaffAccount } from "@/app/entities/account/model/types";
 
 const ESCALATION_CAUSE_LABELS: Record<EscalationCause, string> = {
   [EscalationCause.COMPLEX_ISSUE]: "Сложный вопрос",
@@ -80,8 +85,30 @@ const ESCALATION_CAUSE_LABELS: Record<EscalationCause, string> = {
   [EscalationCause.OTHER]: "Другое",
 };
 
+const CATEGORY_LABELS: Record<AdmissionIntentCategory, string> = {
+  [AdmissionIntentCategory.TECHNICAL_ISSUES]: "Технические проблемы",
+  [AdmissionIntentCategory.DEADLINES_TIMELINES]: "Сроки",
+  [AdmissionIntentCategory.DOCUMENT_SUBMISSION]: "Подача документов",
+  [AdmissionIntentCategory.STATUS_VERIFICATION]: "Проверка статуса",
+  [AdmissionIntentCategory.SCORES_COMPETITION]: "Баллы и конкурс",
+  [AdmissionIntentCategory.PAYMENTS_CONTRACTS]: "Оплата и договоры",
+  [AdmissionIntentCategory.ENROLLMENT]: "Зачисление",
+  [AdmissionIntentCategory.DORMITORY_HOUSING]: "Общежитие",
+  [AdmissionIntentCategory.STUDIES_SCHEDULE]: "Учёба и расписание",
+  [AdmissionIntentCategory.EVENTS]: "Мероприятия",
+  [AdmissionIntentCategory.GENERAL_INFO]: "Общая информация",
+  [AdmissionIntentCategory.PROGRAM_CONSULTATION]: "Консультация по программам",
+};
+
 const escalationCauses = createListCollection({
   items: Object.entries(ESCALATION_CAUSE_LABELS).map(([value, label]) => ({
+    value,
+    label,
+  })),
+});
+
+const categories = createListCollection({
+  items: Object.entries(CATEGORY_LABELS).map(([value, label]) => ({
     value,
     label,
   })),
@@ -105,10 +132,21 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
   const isEscalateModalOpen = useAppSelector(
     (state) => state.tickets.isEscalateModalOpen,
   );
+
   const [escalateCause, setEscalateCause] = React.useState<EscalationCause>(
     EscalationCause.COMPLEX_ISSUE,
   );
   const [escalateComment, setEscalateComment] = React.useState("");
+  const [escalateToAgentId, setEscalateToAgentId] = React.useState("");
+
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = React.useState(false);
+  const [selectedCategory, setSelectedCategory] =
+    React.useState<AdmissionIntentCategory>(
+      AdmissionIntentCategory.GENERAL_INFO,
+    );
+
+  const [isNoteModalOpen, setIsNoteModalOpen] = React.useState(false);
+  const [noteText, setNoteText] = React.useState("");
 
   const { data: ticket, isLoading } = useTicketDetail(ticketId);
   const { mutate: takeTicket, isPending: isTaking } = useTakeTicket();
@@ -116,6 +154,22 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
     useUpdateTicketStatus();
   const { mutate: escalateTicket, isPending: isEscalating } =
     useEscalateTicket();
+  const { mutate: updateCategory, isPending: isUpdatingCategory } =
+    useUpdateTicketCategory();
+  const { mutate: updateNote, isPending: isUpdatingNote } =
+    useUpdateTicketNote();
+
+  const { data: accountsData } = useAccountsQuery({ isStaff: true, limit: 200 });
+  const supervisorAdminAgents = (accountsData?.items ?? []).filter(
+    (a): a is StaffAccount =>
+      a.role === AccountRole.SUPERVISOR || a.role === AccountRole.ADMIN,
+  );
+  const agentsCollection = createListCollection({
+    items: supervisorAdminAgents.map((a) => ({
+      value: a.id,
+      label: `${a.lastName} ${a.firstName}${a.middleName ? " " + a.middleName : ""} (${a.role === AccountRole.ADMIN ? "Админ" : "Супервизор"})`,
+    })),
+  });
 
   if (isLoading) {
     return (
@@ -129,11 +183,30 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
 
   const handleEscalate = () => {
     const payload: EscalateTicketPayload = {
-      toAgentId: "",
+      toAgentId: escalateToAgentId,
       cause: escalateCause,
       causeComment: escalateComment || undefined,
     };
     escalateTicket({ ticketId, payload });
+  };
+
+  const handleCategoryChange = () => {
+    updateCategory(
+      { ticketId, category: selectedCategory },
+      { onSuccess: () => setIsCategoryModalOpen(false) },
+    );
+  };
+
+  const handleNoteSubmit = () => {
+    updateNote(
+      { ticketId, text: noteText },
+      {
+        onSuccess: () => {
+          setIsNoteModalOpen(false);
+          setNoteText("");
+        },
+      },
+    );
   };
 
   return (
@@ -190,6 +263,24 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
               </Text>
             )}
           </Stack>
+
+          {/* Internal note */}
+          {ticket.noteText && (
+            <Panel p="3">
+              <Stack gap="1">
+                <Text
+                  fontSize="xs"
+                  fontWeight="semibold"
+                  color="fg.muted"
+                  textTransform="uppercase"
+                  letterSpacing="wider"
+                >
+                  Заметка
+                </Text>
+                <Text fontSize="sm">{ticket.noteText}</Text>
+              </Stack>
+            </Panel>
+          )}
 
           {/* Applicant status */}
           <Panel p="3">
@@ -383,7 +474,8 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
                 <Menu.Item
                   value="note"
                   onClick={() => {
-                    /* TODO: open leave note modal */
+                    setNoteText(ticket.noteText ?? "");
+                    setIsNoteModalOpen(true);
                   }}
                 >
                   <StickyNote size={14} />
@@ -392,7 +484,8 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
                 <Menu.Item
                   value="category"
                   onClick={() => {
-                    /* TODO: open change category modal */
+                    if (ticket.category) setSelectedCategory(ticket.category);
+                    setIsCategoryModalOpen(true);
                   }}
                 >
                   <Tag size={14} />
@@ -472,6 +565,39 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
                 <Stack gap="4">
                   <Stack gap="1">
                     <Text fontSize="sm" fontWeight="medium">
+                      Агент
+                    </Text>
+                    <Select.Root
+                      collection={agentsCollection}
+                      value={escalateToAgentId ? [escalateToAgentId] : []}
+                      onValueChange={(details) =>
+                        setEscalateToAgentId(details.value[0])
+                      }
+                      size="sm"
+                    >
+                      <Select.Trigger bg="white">
+                        <Select.ValueText placeholder="Выберите супервизора или администратора" />
+                      </Select.Trigger>
+                      <Portal>
+                        <Select.Positioner>
+                          <Select.Content
+                            bg="white"
+                            shadow="md"
+                            borderRadius="md"
+                          >
+                            {agentsCollection.items.map((item) => (
+                              <Select.Item key={item.value} item={item}>
+                                <Select.ItemText>{item.label}</Select.ItemText>
+                              </Select.Item>
+                            ))}
+                          </Select.Content>
+                        </Select.Positioner>
+                      </Portal>
+                    </Select.Root>
+                  </Stack>
+
+                  <Stack gap="1">
+                    <Text fontSize="sm" fontWeight="medium">
                       Причина
                     </Text>
                     <Select.Root
@@ -530,9 +656,127 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
                   colorPalette="orange"
                   size="sm"
                   loading={isEscalating}
+                  disabled={!escalateToAgentId}
                   onClick={handleEscalate}
                 >
                   Эскалировать
+                </Button>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
+
+      {/* Change category modal */}
+      <Dialog.Root
+        open={isCategoryModalOpen}
+        onOpenChange={(details) => {
+          if (!details.open) setIsCategoryModalOpen(false);
+        }}
+        unmountOnExit
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header>
+                <Dialog.Title>Изменить категорию</Dialog.Title>
+              </Dialog.Header>
+              <Dialog.Body>
+                <Select.Root
+                  collection={categories}
+                  value={[selectedCategory]}
+                  onValueChange={(details) =>
+                    setSelectedCategory(
+                      details.value[0] as AdmissionIntentCategory,
+                    )
+                  }
+                  size="sm"
+                >
+                  <Select.Trigger bg="white">
+                    <Select.ValueText />
+                  </Select.Trigger>
+                  <Portal>
+                    <Select.Positioner>
+                      <Select.Content
+                        bg="white"
+                        shadow="md"
+                        borderRadius="md"
+                      >
+                        {categories.items.map((item) => (
+                          <Select.Item key={item.value} item={item}>
+                            <Select.ItemText>{item.label}</Select.ItemText>
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Portal>
+                </Select.Root>
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsCategoryModalOpen(false)}
+                >
+                  Отмена
+                </Button>
+                <Button
+                  size="sm"
+                  loading={isUpdatingCategory}
+                  onClick={handleCategoryChange}
+                >
+                  Сохранить
+                </Button>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
+
+      {/* Note modal */}
+      <Dialog.Root
+        open={isNoteModalOpen}
+        onOpenChange={(details) => {
+          if (!details.open) setIsNoteModalOpen(false);
+        }}
+        unmountOnExit
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header>
+                <Dialog.Title>Внутренняя заметка</Dialog.Title>
+              </Dialog.Header>
+              <Dialog.Body>
+                <Textarea
+                  value={noteText}
+                  onChange={(e) => setNoteText(e.target.value)}
+                  placeholder="Заметка видна только сотрудникам..."
+                  rows={5}
+                  resize="none"
+                  maxLength={2000}
+                />
+                <Text fontSize="xs" color="fg.muted" mt="1" textAlign="right">
+                  {noteText.length}/2000
+                </Text>
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsNoteModalOpen(false)}
+                >
+                  Отмена
+                </Button>
+                <Button
+                  size="sm"
+                  loading={isUpdatingNote}
+                  disabled={!noteText.trim()}
+                  onClick={handleNoteSubmit}
+                >
+                  Сохранить
                 </Button>
               </Dialog.Footer>
             </Dialog.Content>

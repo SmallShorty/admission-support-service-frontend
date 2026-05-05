@@ -97,6 +97,15 @@ export interface EscalateTicketPayload {
 export interface UpdateTicketStatusPayload {
   status: TicketStatus.RESOLVED | TicketStatus.CLOSED;
 }
+export interface UpdateTicketCategoryPayload {
+  category: AdmissionIntentCategory;
+}
+export interface UpdateTicketNotePayload {
+  text: string;
+}
+export interface UpdateTicketNoteResponse {
+  noteText: string;
+}
 export interface TicketMessage {
   id: number;
   ticketId: string;

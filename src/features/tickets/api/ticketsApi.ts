@@ -5,6 +5,9 @@ import {
   TakeTicketResponse,
   EscalateTicketPayload,
   UpdateTicketStatusPayload,
+  UpdateTicketCategoryPayload,
+  UpdateTicketNotePayload,
+  UpdateTicketNoteResponse,
   AllQueueFilters,
   TicketFilters,
   TicketCounts,
@@ -115,6 +118,30 @@ export const ticketsApi = {
   ): Promise<TicketListItem> => {
     const { data } = await coreApi.patch<TicketListItem>(
       `/tickets/${ticketId}/status`,
+      payload,
+    );
+    return data;
+  },
+
+  // Change ticket category
+  updateTicketCategory: async (
+    ticketId: string,
+    payload: UpdateTicketCategoryPayload,
+  ): Promise<TicketListItem> => {
+    const { data } = await coreApi.patch<TicketListItem>(
+      `/tickets/${ticketId}/category`,
+      payload,
+    );
+    return data;
+  },
+
+  // Set internal note on ticket
+  updateTicketNote: async (
+    ticketId: string,
+    payload: UpdateTicketNotePayload,
+  ): Promise<UpdateTicketNoteResponse> => {
+    const { data } = await coreApi.patch<UpdateTicketNoteResponse>(
+      `/tickets/${ticketId}/comment`,
       payload,
     );
     return data;
