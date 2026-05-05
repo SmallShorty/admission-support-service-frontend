@@ -6,6 +6,7 @@ import { useCreateIntegration } from "../hooks/mutations/useCreateIntegration";
 import { useUpdateIntegration } from "../hooks/mutations/useUpdateIntegration";
 import { useActivateIntegration } from "../hooks/mutations/useActivateIntegration";
 import { useDeactivateIntegration } from "../hooks/mutations/useDeactivateIntegration";
+import { useTestIntegration } from "../hooks/mutations/useTestIntegration";
 import { IntegrationsControls } from "./IntegrationsControls";
 import { IntegrationsListTable } from "./IntegrationsListTable";
 import { IntegrationInfoModal, IntegrationFormData } from "./IntegrationInfoModal";
@@ -19,6 +20,7 @@ export const IntegrationsManager: FC = () => {
   const updateMutation = useUpdateIntegration();
   const activateMutation = useActivateIntegration();
   const deactivateMutation = useDeactivateIntegration();
+  const testMutation = useTestIntegration();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedIntegration, setSelectedIntegration] = useState<IntegrationDto | null>(null);
@@ -47,7 +49,7 @@ export const IntegrationsManager: FC = () => {
   };
 
   const handleTestCall = (integration: IntegrationDto) => {
-    console.log("[Integrations] Test call:", integration.slug);
+    testMutation.mutate(integration.id);
   };
 
   return (

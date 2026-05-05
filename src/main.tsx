@@ -8,6 +8,7 @@ import { Provider } from "@/shared/components/ui/provider";
 import { router } from "./routes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthInitializer } from "./shared/components/AuthInitializer";
+import { Toaster } from "@/shared/components/ui/toaster";
 
 const container = document.getElementById("root");
 if (!container) throw new Error("Root element not found");
@@ -32,6 +33,7 @@ root.render(
           <AuthInitializer>
             <RouterProvider router={router} />
           </AuthInitializer>
+          <Toaster />
         </Provider>
       </ReduxProvider>
     </QueryClientProvider>

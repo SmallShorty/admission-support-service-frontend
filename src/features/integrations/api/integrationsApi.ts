@@ -87,6 +87,13 @@ export const integrationsApi = {
     return data;
   },
 
+  testIntegration: async (id: string): Promise<NotificationDto> => {
+    const { data } = await coreApi.post<NotificationDto>(
+      `/integrations/${id}/test`,
+    );
+    return data;
+  },
+
   // ========== Public (unauthenticated) ==========
 
   getPublicIntegration: async (slug: string): Promise<IntegrationDto> => {

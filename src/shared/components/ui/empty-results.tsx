@@ -17,7 +17,13 @@ export const EmptyResults: FC<EmptyResultsProps> = ({
 }) => {
   return (
     <Center py={py}>
-      <Flex direction="column" align="center" gap="3" color="fg.muted" textAlign="center">
+      <Flex
+        direction="column"
+        align="center"
+        gap="3"
+        color="fg.muted"
+        textAlign="center"
+      >
         <Flex
           align="center"
           justify="center"
@@ -25,7 +31,7 @@ export const EmptyResults: FC<EmptyResultsProps> = ({
           borderRadius="xl"
           bg="bg.subtle"
           borderWidth="1px"
-          borderColor="border.subtle"
+          borderColor="fg.default"
         >
           {icon ?? <SearchX size={24} />}
         </Flex>
@@ -33,9 +39,7 @@ export const EmptyResults: FC<EmptyResultsProps> = ({
           <Text fontWeight="medium" color="fg.default">
             {title}
           </Text>
-          {description && (
-            <Text fontSize="sm">{description}</Text>
-          )}
+          {description && <Text fontSize="sm">{description}</Text>}
         </Flex>
       </Flex>
     </Center>

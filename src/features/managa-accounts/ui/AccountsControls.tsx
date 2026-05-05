@@ -1,3 +1,4 @@
+import { Panel } from "@/shared/components/ui/panel";
 import { HStack, Input, Button, Checkbox, Box } from "@chakra-ui/react";
 import { Search, Plus } from "lucide-react";
 
@@ -18,7 +19,7 @@ export const AccountsControls = ({
 }: AccountsControlsProps) => {
   return (
     <HStack gap="4" justify="space-between" mb="6" width="full">
-      <HStack flex="1" maxW="lg" position="relative">
+      <HStack flex="1" maxW="5xl" position="relative">
         <Box position="absolute" left="3" color="gray.400" zIndex="10">
           <Search size={18} />
         </Box>
@@ -30,16 +31,27 @@ export const AccountsControls = ({
           bg="white"
         />
 
-        <Checkbox.Root
-          checked={showApplicants}
-          onCheckedChange={(e) => onToggleApplicants(!!e.checked)}
+        <Panel
+          display="flex"
+          alignItems="center"
+          gap="2"
+          px={4}
+          py={2.5}
+          borderColor="slate-300"
+          borderRadius="1"
+          shadow="none"
         >
-          <Checkbox.HiddenInput />
-          <Checkbox.Control />
-          <Checkbox.Label fontSize="sm" fontWeight="medium">
-            Абитуриенты
-          </Checkbox.Label>
-        </Checkbox.Root>
+          <Checkbox.Root
+            checked={showApplicants}
+            onCheckedChange={(e) => onToggleApplicants(!!e.checked)}
+          >
+            <Checkbox.HiddenInput />
+            <Checkbox.Control />
+            <Checkbox.Label fontSize="sm" fontWeight="medium">
+              Показать абитуриентов
+            </Checkbox.Label>
+          </Checkbox.Root>
+        </Panel>
       </HStack>
 
       <Button onClick={onAddClick} gap="2">

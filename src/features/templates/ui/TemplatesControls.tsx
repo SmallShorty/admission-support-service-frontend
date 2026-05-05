@@ -44,7 +44,7 @@ export const TemplatesControls = ({
 }: TemplatesControlsProps) => {
   return (
     <HStack gap="4" justify="space-between" mb="6" width="full">
-      <HStack flex="1" maxW="2xl" gap="4">
+      <HStack flex="1" maxW="5xl" gap="4">
         {/* Поиск */}
         <Box position="relative" flex="1">
           <Box
@@ -58,7 +58,7 @@ export const TemplatesControls = ({
             <Search size={18} />
           </Box>
           <Input
-            placeholder="Поиск шаблонов по названию или alias..."
+            placeholder="Поиск шаблонов по названию или сокращению..."
             value={search}
             onChange={(e) => onSearch(e.target.value)}
             pl="10"

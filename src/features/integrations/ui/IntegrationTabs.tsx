@@ -1,8 +1,9 @@
 import { FC } from "react";
 import { Tabs, Box, Link } from "@chakra-ui/react";
-import { LuZap, LuScrollText } from "react-icons/lu";
+import { LuZap, LuScrollText, LuBell } from "react-icons/lu";
 import { IntegrationsManager } from "./IntegrationsManager";
 import { IntegrationsLogs } from "./IntegrationsLogs";
+import { NotificationsManager } from "./NotificationsManager";
 
 export const IntegrationTabs: FC = () => {
   return (
@@ -27,6 +28,13 @@ export const IntegrationTabs: FC = () => {
               Журнал вызовов
             </Link>
           </Tabs.Trigger>
+
+          <Tabs.Trigger value="notifications" asChild>
+            <Link unstyled href="#notifications">
+              <LuBell />
+              Уведомления
+            </Link>
+          </Tabs.Trigger>
         </Tabs.List>
 
         <Box mt={6}>
@@ -36,6 +44,10 @@ export const IntegrationTabs: FC = () => {
 
           <Tabs.Content value="log">
             <IntegrationsLogs />
+          </Tabs.Content>
+
+          <Tabs.Content value="notifications">
+            <NotificationsManager />
           </Tabs.Content>
         </Box>
       </Tabs.Root>

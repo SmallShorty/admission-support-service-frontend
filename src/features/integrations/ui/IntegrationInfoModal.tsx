@@ -15,6 +15,7 @@ import {
   Textarea,
   Checkbox,
   SimpleGrid,
+  Text,
   createListCollection,
 } from "@chakra-ui/react";
 import { useState } from "react";
@@ -69,14 +70,20 @@ export const IntegrationInfoModal = ({
     (value: (typeof form)[K]) =>
       setForm((prev) => ({ ...prev, [field]: value }));
 
+  const [contentError, setContentError] = useState(false);
+
   const handleSubmit = () => {
     if (!form.slug || !form.name || !form.eventType || !form.source) return;
 
     let parsedContent: Record<string, unknown> = {};
-    try {
-      parsedContent = form.content ? JSON.parse(form.content) : {};
-    } catch {
-      return;
+    if (form.content.trim()) {
+      try {
+        parsedContent = JSON.parse(form.content);
+        setContentError(false);
+      } catch {
+        setContentError(true);
+        return;
+      }
     }
 
     onSave({
@@ -195,7 +202,7 @@ export const IntegrationInfoModal = ({
                   />
                 </Field.Root>
 
-                <Field.Root>
+                <Field.Root invalid={contentError}>
                   <Field.Label fontWeight="semibold">
                     Содержимое (JSON)
                   </Field.Label>
@@ -206,8 +213,16 @@ export const IntegrationInfoModal = ({
                     fontFamily="mono"
                     fontSize="sm"
                     value={form.content}
-                    onChange={(e) => setField("content")(e.target.value)}
+                    onChange={(e) => {
+                      setContentError(false);
+                      setField("content")(e.target.value);
+                    }}
                   />
+                  {contentError && (
+                    <Text fontSize="xs" color="red.500" mt="1">
+                      Невалидный JSON
+                    </Text>
+                  )}
                 </Field.Root>
 
                 <Field.Root>

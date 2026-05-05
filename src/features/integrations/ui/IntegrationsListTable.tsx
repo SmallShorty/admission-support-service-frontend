@@ -10,7 +10,9 @@ import {
   Pagination,
   ButtonGroup,
   Badge,
+  Input,
 } from "@chakra-ui/react";
+import { Tooltip } from "@/shared/components/ui/tooltip";
 import { Panel } from "@shared/components/ui/panel";
 import { EmptyResults } from "@shared/components/ui/empty-results";
 import {
@@ -21,8 +23,53 @@ import {
   Play,
   PowerOff,
   Power,
+  Copy,
+  Check,
 } from "lucide-react";
 import { IntegrationDto, EventType } from "../model/types";
+import { useState } from "react";
+import { toaster } from "@/shared/components/ui/toaster";
+
+const PublicLinkCell: FC<{ slug: string }> = ({ slug }) => {
+  const [copied, setCopied] = useState(false);
+  const url = `${window.location.origin}/integrations/public/${slug}`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      toaster.create({ title: "Ссылка скопирована", type: "success" });
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  return (
+    <HStack gap="1" maxW="260px">
+      <Input
+        value={url}
+        readOnly
+        size="xs"
+        fontFamily="mono"
+        fontSize="10px"
+        color="gray.500"
+        bg="gray.50"
+        borderColor="gray.200"
+        flex="1"
+        minW="0"
+      />
+      <Tooltip content="Скопировать ссылку">
+        <IconButton
+          variant="ghost"
+          size="xs"
+          aria-label="Скопировать"
+          onClick={handleCopy}
+          color={copied ? "green.500" : "gray.400"}
+        >
+          {copied ? <Check size={13} /> : <Copy size={13} />}
+        </IconButton>
+      </Tooltip>
+    </HStack>
+  );
+};
 
 const EVENT_TYPE_LABEL: Record<EventType, string> = {
   [EventType.INFORMATIONAL]: "Информационное",
@@ -65,7 +112,7 @@ export const IntegrationsListTable: FC<IntegrationsListTableProps> = ({
             <Table.ColumnHeader>Название</Table.ColumnHeader>
             <Table.ColumnHeader>Тип</Table.ColumnHeader>
             <Table.ColumnHeader>Статус</Table.ColumnHeader>
-            <Table.ColumnHeader>Автор</Table.ColumnHeader>
+            <Table.ColumnHeader>Публичная ссылка</Table.ColumnHeader>
             <Table.ColumnHeader>Дата</Table.ColumnHeader>
             <Table.ColumnHeader textAlign="right"></Table.ColumnHeader>
           </Table.Row>
@@ -115,9 +162,7 @@ export const IntegrationsListTable: FC<IntegrationsListTableProps> = ({
               </Table.Cell>
 
               <Table.Cell>
-                <Text fontSize="sm" color="gray.500">
-                  —
-                </Text>
+                <PublicLinkCell slug={item.slug} />
               </Table.Cell>
 
               <Table.Cell>

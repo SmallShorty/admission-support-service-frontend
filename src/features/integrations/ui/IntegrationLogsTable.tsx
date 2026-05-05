@@ -21,7 +21,8 @@ import {
 const ACTION_LABEL: Record<IntegrationLogAction, string> = {
   [IntegrationLogAction.INTEGRATION_SUBMITTED]: "Отправка формы",
   [IntegrationLogAction.INTEGRATION_SUBMISSION_NOT_FOUND]: "Форма не найдена",
-  [IntegrationLogAction.INTEGRATION_SUBMISSION_READONLY_FIELD_VIOLATION]: "Нарушение полей",
+  [IntegrationLogAction.INTEGRATION_SUBMISSION_READONLY_FIELD_VIOLATION]:
+    "Нарушение полей",
   [IntegrationLogAction.INTEGRATION_CREATED]: "Создание",
   [IntegrationLogAction.INTEGRATION_UPDATED]: "Изменение",
   [IntegrationLogAction.INTEGRATION_ACTIVATED]: "Активация",
@@ -72,7 +73,7 @@ export const IntegrationLogsTable: FC<IntegrationLogsTableProps> = ({
             <Table.ColumnHeader>Действие</Table.ColumnHeader>
             <Table.ColumnHeader>Уровень</Table.ColumnHeader>
             <Table.ColumnHeader>Интеграция</Table.ColumnHeader>
-            <Table.ColumnHeader>Актор</Table.ColumnHeader>
+            <Table.ColumnHeader>Создатель</Table.ColumnHeader>
             <Table.ColumnHeader>Дата</Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
@@ -106,7 +107,9 @@ export const IntegrationLogsTable: FC<IntegrationLogsTableProps> = ({
                     {item.slug}
                   </Text>
                 ) : (
-                  <Text fontSize="sm" color="gray.400">—</Text>
+                  <Text fontSize="sm" color="gray.400">
+                    —
+                  </Text>
                 )}
               </Table.Cell>
 
@@ -121,7 +124,9 @@ export const IntegrationLogsTable: FC<IntegrationLogsTableProps> = ({
                     </Text>
                   </Box>
                 ) : (
-                  <Text fontSize="sm" color="gray.400">—</Text>
+                  <Text fontSize="sm" color="gray.400">
+                    —
+                  </Text>
                 )}
               </Table.Cell>
 
@@ -164,7 +169,12 @@ export const IntegrationLogsTable: FC<IntegrationLogsTableProps> = ({
                   page={page}
                   onPageChange={onPageChange}
                 >
-                  <ButtonGroup variant="outline" size="xs" attached={false} gap="1">
+                  <ButtonGroup
+                    variant="outline"
+                    size="xs"
+                    attached={false}
+                    gap="1"
+                  >
                     <Pagination.PrevTrigger asChild>
                       <IconButton
                         variant="ghost"

@@ -73,14 +73,22 @@ const CATEGORIES = createListCollection({
 
 function getEditorVariableQuery(editor: Editor): string | null {
   const { $anchor } = editor.state.selection;
-  const textBefore = editor.state.doc.textBetween($anchor.start(), $anchor.pos, "");
+  const textBefore = editor.state.doc.textBetween(
+    $anchor.start(),
+    $anchor.pos,
+    "",
+  );
   const match = textBefore.match(/\$([а-яёa-z_0-9]*)$/i);
   return match !== null ? match[1] : null;
 }
 
 function insertVariableInEditor(editor: Editor, varName: string): void {
   const { $anchor } = editor.state.selection;
-  const textBefore = editor.state.doc.textBetween($anchor.start(), $anchor.pos, "");
+  const textBefore = editor.state.doc.textBetween(
+    $anchor.start(),
+    $anchor.pos,
+    "",
+  );
   const match = textBefore.match(/\$[а-яёa-z_0-9]*$/i);
   if (!match) return;
   const from = $anchor.pos - match[0].length;
@@ -168,7 +176,9 @@ export const TemplateInfoModal = ({
           return true;
         }
         if (event.key === "ArrowDown") {
-          setActiveVarIdx((i) => Math.min(i + 1, filteredVarsRef.current.length - 1));
+          setActiveVarIdx((i) =>
+            Math.min(i + 1, filteredVarsRef.current.length - 1),
+          );
           return true;
         }
         if (event.key === "ArrowUp") {
@@ -256,7 +266,7 @@ export const TemplateInfoModal = ({
                 </Field.Root>
 
                 <Field.Root required>
-                  <Field.Label fontWeight="semibold">Alias</Field.Label>
+                  <Field.Label fontWeight="semibold">Сокращение</Field.Label>
                   <Input
                     placeholder="welcome"
                     py="2.5"
@@ -284,7 +294,11 @@ export const TemplateInfoModal = ({
                     </Select.Control>
                     <Portal>
                       <Select.Positioner>
-                        <Select.Content bg="white" shadow="md" borderRadius="md">
+                        <Select.Content
+                          bg="white"
+                          shadow="md"
+                          borderRadius="md"
+                        >
                           {CATEGORIES.items.map((cat) => (
                             <Select.Item item={cat} key={cat.value}>
                               {cat.label}
@@ -328,7 +342,11 @@ export const TemplateInfoModal = ({
                               handleSelectVar(v.name);
                             }}
                           >
-                            <Flex justify="space-between" align="baseline" gap="2">
+                            <Flex
+                              justify="space-between"
+                              align="baseline"
+                              gap="2"
+                            >
                               <Flex align="center" gap="2">
                                 <Text
                                   fontFamily="mono"

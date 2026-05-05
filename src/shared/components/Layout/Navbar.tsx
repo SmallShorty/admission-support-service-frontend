@@ -25,6 +25,7 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAppSelector } from "@/app/store/hooks";
 import { NavbarAccount } from "@/app/entities/account/ui/NavbarAccount";
+import { NotificationBell } from "@/shared/components/ui/NotificationBell";
 
 interface NavItem {
   href: string;
@@ -118,6 +119,7 @@ export const Navbar: FC = () => {
 
         {/* Right: account / login + mobile burger */}
         <HStack gap="2">
+          {isAuth && <NotificationBell />}
           {isAuth ? (
             <NavbarAccount onLogout={handleLogout} />
           ) : (

@@ -27,6 +27,9 @@ const AnalyticsDashboardPage = lazy(
   () => import("@/pages/AnalyticsDashboardPage/AnalyticsDashboardPage"),
 );
 const ProfilePage = lazy(() => import("@/pages/ProfilePage/ProfilePage"));
+const PublicIntegrationPage = lazy(
+  () => import("@/pages/PublicIntegrationPage/PublicIntegrationPage"),
+);
 
 const PageLoader = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={null}>{children}</Suspense>
@@ -138,6 +141,14 @@ export const router = createBrowserRouter([
     // --- СЛУЖЕБНЫЕ ---
     element: <BareLayout />,
     children: [
+      {
+        path: "integrations/public/:slug",
+        element: (
+          <PageLoader>
+            <PublicIntegrationPage />
+          </PageLoader>
+        ),
+      },
       {
         path: "*",
         element: (

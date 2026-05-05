@@ -4,7 +4,7 @@ import { AnalyticsDashboard } from "@/features/analytics/ui/AnalyticsDashboard";
 
 const AnalyticsDashboardPage: FC = () => {
   return (
-    <Box h="full" overflow="auto">
+    <Box h="full">
       <AnalyticsDashboard />
     </Box>
   );

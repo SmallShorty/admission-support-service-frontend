@@ -144,7 +144,6 @@ export const AccountsListTable = ({
                   Показано {start}–{end} из {totalCount}
                 </Text>
 
-                {/* ИСПОЛЬЗУЕМ ПАТТЕРН ИЗ ТВОЕГО ПРИМЕРА */}
                 <Pagination.Root
                   count={totalCount}
                   pageSize={limit}

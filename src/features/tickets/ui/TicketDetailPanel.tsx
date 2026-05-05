@@ -3,9 +3,12 @@ import {
   Badge,
   Box,
   Button,
+  Circle,
   createListCollection,
   Dialog,
   Flex,
+  Heading,
+  HStack,
   IconButton,
   Menu,
   Portal,
@@ -28,6 +31,7 @@ import {
   EscalateTicketPayload,
 } from "../model/types";
 import { IntentCategoryBadge } from "../components/IntentCategoryBadge";
+import { Panel } from "@/shared/components/ui/panel";
 
 const ESCALATION_CAUSE_LABELS: Record<EscalationCause, string> = {
   [EscalationCause.COMPLEX_ISSUE]: "Сложный вопрос",
@@ -99,9 +103,22 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
       direction="column"
       h="full"
       w="full"
-      borderLeftWidth="1px"
       borderColor="gray.200"
+      bg="bg.panel"
     >
+      <Flex
+        px="4"
+        py="3"
+        borderBottomWidth="1px"
+        align="center"
+        justify="space-between"
+        gap="2"
+      >
+        <Heading size="sm" flexShrink={0}>
+          Основная информация об абитуриенте
+        </Heading>
+      </Flex>
+
       <Box
         flex="1"
         overflowY="auto"
@@ -112,40 +129,16 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
         <Stack gap="5">
           {/* Applicant info */}
           <Stack gap="1">
-            <Text
-              fontSize="xs"
-              fontWeight="semibold"
-              color="fg.muted"
-              textTransform="uppercase"
-              letterSpacing="wider"
-            >
-              Абитуриент
+            <Text fontSize="sm" fontWeight="bold">
+              {ticket.applicant.name}
             </Text>
-            <Text fontWeight="semibold" fontSize="sm">
-              {ticket.applicant.name ||
-                `${ticket.applicant.firstName} ${ticket.applicant.lastName}`}
-            </Text>
-            {ticket.applicant.middleName && (
-              <Text fontSize="sm" color="fg.muted">
-                {ticket.applicant.middleName}
-              </Text>
-            )}
-            <Text fontSize="sm" color="fg.muted">
+            <Text fontSize="sm" color="fg.muted" fontWeight="medium">
               {ticket.applicant.email}
             </Text>
           </Stack>
 
           {/* Ticket meta */}
           <Stack gap="2">
-            <Text
-              fontSize="xs"
-              fontWeight="semibold"
-              color="fg.muted"
-              textTransform="uppercase"
-              letterSpacing="wider"
-            >
-              Тикет
-            </Text>
             <Flex wrap="wrap" gap="2">
               {ticket.category && (
                 <IntentCategoryBadge category={ticket.category} showIcon />
@@ -178,58 +171,91 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
           </Stack>
 
           {/* Exam scores */}
-          {ticket.examScores && ticket.examScores.length > 0 && (
-            <Stack gap="2">
-              <Text
-                fontSize="xs"
-                fontWeight="semibold"
-                color="fg.muted"
-                textTransform="uppercase"
-                letterSpacing="wider"
-              >
-                Баллы
-              </Text>
-              <Stack gap="1">
-                {ticket.examScores.map((score, i) => (
-                  <Flex key={i} justify="space-between" align="center">
-                    <Text fontSize="sm" color="fg.muted">
-                      {score.subjectName}
-                    </Text>
-                    <Badge variant="surface" size="sm">
-                      {score.score}
-                    </Badge>
-                  </Flex>
-                ))}
+          {/* TODO: Разделение на internal/external, подсчёт баллов всего по каждому типу */}
+          <Panel p="3">
+            {ticket.examScores && ticket.examScores.length > 0 && (
+              <Stack gap="2">
+                <Text
+                  fontSize="xs"
+                  fontWeight="semibold"
+                  color="fg.muted"
+                  textTransform="uppercase"
+                  letterSpacing="wider"
+                >
+                  Баллы
+                </Text>
+                <Stack gap="1">
+                  {ticket.examScores.map((score, i) => (
+                    <Flex key={i} justify="space-between" align="center">
+                      <Text fontSize="sm" color="fg.muted">
+                        {score.subjectName}
+                      </Text>
+                      <Badge variant="surface" size="sm">
+                        {score.score}
+                      </Badge>
+                    </Flex>
+                  ))}
+                </Stack>
+                <Flex justify="space-between" borderColor="border.muted">
+                  <Text
+                    fontSize="xs"
+                    fontWeight="semibold"
+                    color="fg.muted"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                  >
+                    Всего баллов
+                  </Text>
+                  <Text>200</Text>
+                </Flex>
               </Stack>
-            </Stack>
-          )}
+            )}
+          </Panel>
 
           {/* Programs */}
-          {ticket.applicantPrograms && ticket.applicantPrograms.length > 0 && (
-            <Stack gap="2">
-              <Text
-                fontSize="xs"
-                fontWeight="semibold"
-                color="fg.muted"
-                textTransform="uppercase"
-                letterSpacing="wider"
-              >
-                Программы
-              </Text>
-              <Stack gap="1">
-                {ticket.applicantPrograms.map((program, i) => (
-                  <Box key={i} p="2" borderRadius="md" bg="bg.subtle">
-                    <Text fontSize="xs" fontWeight="medium">
-                      {program.programCode}
-                    </Text>
-                    <Text fontSize="11px" color="fg.muted">
-                      Приоритет: {program.priority}
-                    </Text>
-                  </Box>
-                ))}
-              </Stack>
-            </Stack>
-          )}
+          <Panel p="3">
+            {ticket.applicantPrograms &&
+              ticket.applicantPrograms.length > 0 && (
+                <Stack gap="2">
+                  <Text
+                    fontSize="xs"
+                    fontWeight="semibold"
+                    color="fg.muted"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                  >
+                    Программы
+                  </Text>
+                  <Stack gap="1">
+                    {ticket.applicantPrograms.map((program, i) => (
+                      <Panel key={i} position="relative" mt="4" p="4">
+                        <Circle
+                          size="5"
+                          bg="teal.500"
+                          color="white"
+                          fontWeight="bold"
+                          fontSize="xs"
+                          position="absolute"
+                          top="-2"
+                          left="-2"
+                        >
+                          {program.priority}
+                        </Circle>
+
+                        <Box ml="4">
+                          <Text fontSize="sm" fontWeight="bold">
+                            {program.programCode}
+                          </Text>
+                          <Text fontSize="xs" color="fg.muted" lineClamp={2}>
+                            {program.programCode}
+                          </Text>
+                        </Box>
+                      </Panel>
+                    ))}
+                  </Stack>
+                </Stack>
+              )}
+          </Panel>
         </Stack>
       </Box>
 
@@ -299,7 +325,6 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
         {(ticket.status === TicketStatus.IN_PROGRESS ||
           ticket.status === TicketStatus.ESCALATED) && (
           <Button
-            colorPalette="green"
             size="sm"
             flex="1"
             loading={isUpdating}
@@ -361,7 +386,11 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
                       </Select.Trigger>
                       <Portal>
                         <Select.Positioner>
-                          <Select.Content bg="white" shadow="md" borderRadius="md">
+                          <Select.Content
+                            bg="white"
+                            shadow="md"
+                            borderRadius="md"
+                          >
                             {escalationCauses.items.map((item) => (
                               <Select.Item key={item.value} item={item}>
                                 <Select.ItemText>{item.label}</Select.ItemText>

@@ -1,12 +1,18 @@
 import { Box, Container } from "@chakra-ui/react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Navbar } from "./Navbar";
+import { useAppSelector } from "@/app/store/hooks";
+import { useNotificationWebSocket } from "@/features/integrations/hooks/websockets/useNotificationWebSocket";
 
 const NO_PADDING_PATHS = ["/workspace", "/queue"];
 
 const Layout = () => {
   const { pathname } = useLocation();
   const noPadding = NO_PADDING_PATHS.includes(pathname);
+  const accessToken = useAppSelector((state) => state.account.accessToken);
+  const isAuth = useAppSelector((state) => state.account.isAuth);
+
+  useNotificationWebSocket(accessToken, isAuth);
 
   return (
     <Box bg="mainBg" height="100vh" display="flex" flexDirection="column">

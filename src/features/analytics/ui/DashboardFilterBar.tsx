@@ -73,7 +73,9 @@ export const DashboardFilterBar: FC<DashboardFilterBarProps> = ({
             onAgentIdChange(details.value[0]);
           }
         }}
-        width={{ base: "full", md: "200px" }}
+        width={{ base: "full" }}
+        bg="white"
+        maxW="5xl"
       >
         <Combobox.Control>
           <Combobox.Input

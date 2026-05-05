@@ -6,10 +6,13 @@ interface PanelProps extends BoxProps {
   variant?: "editable";
 }
 
-export const Panel = forwardRef<HTMLDivElement, PanelProps>(
-  function Panel({ variant, ...props }, ref) {
-    const recipe = useRecipe({ key: "card" });
-    const styles = recipe({ variant });
-    return <Box ref={ref} css={styles} {...props} />;
-  }
-);
+// TODO добавить border
+
+export const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
+  { variant, ...props },
+  ref,
+) {
+  const recipe = useRecipe({ key: "card" });
+  const styles = recipe({ variant });
+  return <Box ref={ref} css={styles} {...props} borderWidth="1px" />;
+});
