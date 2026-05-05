@@ -3,6 +3,7 @@ import {
   CloseButton,
   Dialog,
   Field,
+  Flex,
   Input,
   Portal,
   SelectContent,
@@ -10,14 +11,13 @@ import {
   SelectPositioner,
   SelectRoot,
   SelectTrigger,
-  SelectValueText,
   Stack,
+  Switch,
   Textarea,
-  Checkbox,
-  SimpleGrid,
   Text,
   createListCollection,
 } from "@chakra-ui/react";
+import { Info, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import {
   IntegrationDto,
@@ -28,8 +28,8 @@ import {
 
 const eventTypeOptions = createListCollection({
   items: [
-    { label: "Информационное", value: EventType.INFORMATIONAL },
-    { label: "Ошибка", value: EventType.FAILURE },
+    { label: "Информационное", value: EventType.INFORMATIONAL, icon: <Info size={14} color="#3182ce" /> },
+    { label: "Ошибка", value: EventType.FAILURE, icon: <AlertCircle size={14} color="#e53e3e" /> },
   ],
 });
 
@@ -131,59 +131,44 @@ export const IntegrationInfoModal = ({
             <Dialog.Body p="6">
               <Stack gap="4">
                 <Field.Root required>
-                  <Field.Label fontWeight="semibold">Название</Field.Label>
+                  <Field.Label fontWeight="semibold">Системное имя</Field.Label>
                   <Input
-                    placeholder="Telegram Failure Alerts"
-                    py="2.5"
-                    rounded="lg"
-                    value={form.name}
-                    onChange={(e) => setField("name")(e.target.value)}
-                  />
-                </Field.Root>
-
-                <Field.Root required>
-                  <Field.Label fontWeight="semibold">Slug</Field.Label>
-                  <Input
-                    placeholder="telegram-failure-alert"
+                    placeholder="event.technical.key"
                     py="2.5"
                     rounded="lg"
                     value={form.slug}
                     onChange={(e) =>
                       setField("slug")(
-                        e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""),
+                        e.target.value.toLowerCase().replace(/[^a-z0-9-.]/g, ""),
                       )
                     }
                   />
                 </Field.Root>
 
-                <Field.Root required>
-                  <Field.Label fontWeight="semibold">Тип события</Field.Label>
-                  <SelectRoot
-                    collection={eventTypeOptions}
-                    value={form.eventType ? [form.eventType] : []}
-                    onValueChange={(e) => setField("eventType")(e.value[0])}
-                  >
-                    <SelectTrigger rounded="lg" py="2.5" bg="white">
-                      <SelectValueText placeholder="Выберите тип" />
-                    </SelectTrigger>
-                    <Portal>
-                      <SelectPositioner zIndex="100">
-                        <SelectContent bg="white" shadow="md" borderRadius="md">
-                          {eventTypeOptions.items.map((item) => (
-                            <SelectItem item={item} key={item.value}>
-                              {item.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </SelectPositioner>
-                    </Portal>
-                  </SelectRoot>
-                </Field.Root>
-
                 <Field.Root>
-                  <Field.Label fontWeight="semibold">Тема</Field.Label>
+                  <Flex justify="space-between" align="center" mb="1.5" w="full">
+                    <Field.Label fontWeight="semibold" mb="0">
+                      Тема
+                    </Field.Label>
+                    <Flex align="center" gap="2">
+                      <Text fontSize="xs" color="gray.500">
+                        Редактировать
+                      </Text>
+                      <Switch.Root
+                        size="sm"
+                        colorPalette="teal"
+                        checked={form.isThemeEditable}
+                        onCheckedChange={(e) =>
+                          setField("isThemeEditable")(e.checked)
+                        }
+                      >
+                        <Switch.HiddenInput />
+                        <Switch.Control />
+                      </Switch.Root>
+                    </Flex>
+                  </Flex>
                   <Input
-                    placeholder="dark"
+                    placeholder="Admissions, Technical, Communications..."
                     py="2.5"
                     rounded="lg"
                     value={form.theme}
@@ -191,23 +176,30 @@ export const IntegrationInfoModal = ({
                   />
                 </Field.Root>
 
-                <Field.Root required>
-                  <Field.Label fontWeight="semibold">URL источника</Field.Label>
-                  <Input
-                    placeholder="https://api.telegram.org/bot123/sendMessage"
-                    py="2.5"
-                    rounded="lg"
-                    value={form.source}
-                    onChange={(e) => setField("source")(e.target.value)}
-                  />
-                </Field.Root>
-
                 <Field.Root invalid={contentError}>
-                  <Field.Label fontWeight="semibold">
-                    Содержимое (JSON)
-                  </Field.Label>
+                  <Flex justify="space-between" align="center" mb="1.5" w="full">
+                    <Field.Label fontWeight="semibold" mb="0">
+                      Тело сообщения
+                    </Field.Label>
+                    <Flex align="center" gap="2">
+                      <Text fontSize="xs" color="gray.500">
+                        Редактировать
+                      </Text>
+                      <Switch.Root
+                        size="sm"
+                        colorPalette="teal"
+                        checked={form.isContentEditable}
+                        onCheckedChange={(e) =>
+                          setField("isContentEditable")(e.checked)
+                        }
+                      >
+                        <Switch.HiddenInput />
+                        <Switch.Control />
+                      </Switch.Root>
+                    </Flex>
+                  </Flex>
                   <Textarea
-                    placeholder='{"text": "Ticket {{id}} failed", "chatId": "-100123"}'
+                    placeholder='{"текст": "Студент {{имя}} обновил статус", "chatId": "-100123"}'
                     rounded="lg"
                     rows={4}
                     fontFamily="mono"
@@ -225,57 +217,91 @@ export const IntegrationInfoModal = ({
                   )}
                 </Field.Root>
 
-                <Field.Root>
-                  <Field.Label fontWeight="semibold">
-                    Редактируемые поля
-                  </Field.Label>
-                  <SimpleGrid columns={2} gap="3" mt="1">
-                    <Checkbox.Root
-                      checked={form.isTypeEditable}
-                      onCheckedChange={(e) =>
-                        setField("isTypeEditable")(!!e.checked)
-                      }
-                    >
-                      <Checkbox.HiddenInput />
-                      <Checkbox.Control />
-                      <Checkbox.Label fontSize="sm">Тип события</Checkbox.Label>
-                    </Checkbox.Root>
+                <Field.Root required>
+                  <Flex justify="space-between" align="center" mb="1.5" w="full">
+                    <Field.Label fontWeight="semibold" mb="0">
+                      Система-источник
+                    </Field.Label>
+                    <Flex align="center" gap="2">
+                      <Text fontSize="xs" color="gray.500">
+                        Редактировать
+                      </Text>
+                      <Switch.Root
+                        size="sm"
+                        colorPalette="teal"
+                        checked={form.isSourceEditable}
+                        onCheckedChange={(e) =>
+                          setField("isSourceEditable")(e.checked)
+                        }
+                      >
+                        <Switch.HiddenInput />
+                        <Switch.Control />
+                      </Switch.Root>
+                    </Flex>
+                  </Flex>
+                  <Input
+                    placeholder="External API, Internal System..."
+                    py="2.5"
+                    rounded="lg"
+                    value={form.source}
+                    onChange={(e) => setField("source")(e.target.value)}
+                  />
+                </Field.Root>
 
-                    <Checkbox.Root
-                      checked={form.isThemeEditable}
-                      onCheckedChange={(e) =>
-                        setField("isThemeEditable")(!!e.checked)
-                      }
-                    >
-                      <Checkbox.HiddenInput />
-                      <Checkbox.Control />
-                      <Checkbox.Label fontSize="sm">Тема</Checkbox.Label>
-                    </Checkbox.Root>
-
-                    <Checkbox.Root
-                      checked={form.isSourceEditable}
-                      onCheckedChange={(e) =>
-                        setField("isSourceEditable")(!!e.checked)
-                      }
-                    >
-                      <Checkbox.HiddenInput />
-                      <Checkbox.Control />
-                      <Checkbox.Label fontSize="sm">
-                        URL источника
-                      </Checkbox.Label>
-                    </Checkbox.Root>
-
-                    <Checkbox.Root
-                      checked={form.isContentEditable}
-                      onCheckedChange={(e) =>
-                        setField("isContentEditable")(!!e.checked)
-                      }
-                    >
-                      <Checkbox.HiddenInput />
-                      <Checkbox.Control />
-                      <Checkbox.Label fontSize="sm">Содержимое</Checkbox.Label>
-                    </Checkbox.Root>
-                  </SimpleGrid>
+                <Field.Root required>
+                  <Flex justify="space-between" align="center" mb="1.5" w="full">
+                    <Field.Label fontWeight="semibold" mb="0">
+                      Тип события
+                    </Field.Label>
+                    <Flex align="center" gap="2">
+                      <Text fontSize="xs" color="gray.500">
+                        Редактировать
+                      </Text>
+                      <Switch.Root
+                        size="sm"
+                        colorPalette="teal"
+                        checked={form.isTypeEditable}
+                        onCheckedChange={(e) =>
+                          setField("isTypeEditable")(e.checked)
+                        }
+                      >
+                        <Switch.HiddenInput />
+                        <Switch.Control />
+                      </Switch.Root>
+                    </Flex>
+                  </Flex>
+                  <SelectRoot
+                    collection={eventTypeOptions}
+                    value={form.eventType ? [form.eventType] : []}
+                    onValueChange={(e) => setField("eventType")(e.value[0])}
+                  >
+                    <SelectTrigger rounded="lg" py="2.5" bg="white">
+                      {form.eventType ? (
+                        <Flex align="center" gap="2">
+                          {eventTypeOptions.items.find((i) => i.value === form.eventType)?.icon}
+                          <Text>
+                            {eventTypeOptions.items.find((i) => i.value === form.eventType)?.label}
+                          </Text>
+                        </Flex>
+                      ) : (
+                        <Text color="gray.400">Выберите тип</Text>
+                      )}
+                    </SelectTrigger>
+                    <Portal>
+                      <SelectPositioner zIndex="100">
+                        <SelectContent bg="white" shadow="md" borderRadius="md">
+                          {eventTypeOptions.items.map((item) => (
+                            <SelectItem item={item} key={item.value}>
+                              <Flex align="center" gap="2">
+                                {item.icon}
+                                <Text>{item.label}</Text>
+                              </Flex>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </SelectPositioner>
+                    </Portal>
+                  </SelectRoot>
                 </Field.Root>
               </Stack>
             </Dialog.Body>
@@ -301,7 +327,7 @@ export const IntegrationInfoModal = ({
                 disabled={isSubmitDisabled}
                 loading={isLoading}
               >
-                {isEdit ? "Сохранить" : "Добавить"}
+                {isEdit ? "Сохранить изменения" : "Добавить"}
               </Button>
             </Dialog.Footer>
           </Dialog.Content>
