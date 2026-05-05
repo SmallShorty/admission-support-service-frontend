@@ -6,10 +6,10 @@ import {
   createListCollection,
   Select,
   Portal,
-  Switch,
-  Text,
+  Checkbox,
 } from "@chakra-ui/react";
 import { Search, Plus } from "lucide-react";
+import { Panel } from "@/shared/components/ui/panel";
 import { AdmissionIntentCategory } from "@features/tickets/model/types";
 import { INTENT_METADATA } from "@features/tickets/model/intentMetadata";
 
@@ -94,19 +94,34 @@ export const TemplatesControls = ({
           </Portal>
         </Select.Root>
 
-        {/* Переключатель неактивных */}
-        <Switch.Root
-          checked={includeInactive}
-          onCheckedChange={({ checked }) => onIncludeInactiveChange(checked)}
+        <Panel
+          display="flex"
+          alignItems="center"
+          gap="2"
+          px={4}
+          py={2.5}
+          borderColor="slate-300"
+          borderRadius="4px"
+          shadow="none"
+          flexShrink={0}
         >
-          <Switch.HiddenInput />
-          <Switch.Control />
-          <Switch.Label>
-            <Text fontSize="sm" color="fg.muted" whiteSpace="nowrap">
-              Неактивные
-            </Text>
-          </Switch.Label>
-        </Switch.Root>
+          <Checkbox.Root
+            checked={includeInactive}
+            onCheckedChange={(e) => onIncludeInactiveChange(!!e.checked)}
+          >
+            <Checkbox.HiddenInput />
+            <Checkbox.Control />
+            <Checkbox.Label
+              fontSize="sm"
+              fontWeight="medium"
+              whiteSpace="nowrap"
+              overflow="hidden"
+              textOverflow="ellipsis"
+            >
+              Показать неактивные
+            </Checkbox.Label>
+          </Checkbox.Root>
+        </Panel>
       </HStack>
 
       {/* Кнопка добавления */}

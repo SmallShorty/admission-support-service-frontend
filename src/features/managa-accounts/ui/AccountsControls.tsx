@@ -30,7 +30,6 @@ export const AccountsControls = ({
           pl="10"
           bg="white"
         />
-
         <Panel
           display="flex"
           alignItems="center"
@@ -38,8 +37,9 @@ export const AccountsControls = ({
           px={4}
           py={2.5}
           borderColor="slate-300"
-          borderRadius="1"
+          borderRadius="4px"
           shadow="none"
+          flexShrink={0}
         >
           <Checkbox.Root
             checked={showApplicants}
@@ -47,7 +47,13 @@ export const AccountsControls = ({
           >
             <Checkbox.HiddenInput />
             <Checkbox.Control />
-            <Checkbox.Label fontSize="sm" fontWeight="medium">
+            <Checkbox.Label
+              fontSize="sm"
+              fontWeight="medium"
+              whiteSpace="nowrap"
+              overflow="hidden"
+              textOverflow="ellipsis"
+            >
               Показать абитуриентов
             </Checkbox.Label>
           </Checkbox.Root>
