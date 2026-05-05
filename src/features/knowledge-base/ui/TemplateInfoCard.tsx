@@ -1,5 +1,4 @@
-import { JSONContent } from "@tiptap/core";
-import { Template } from "@/features/templates/model/types";
+import { Template, TemplateContent } from "@/features/templates/model/types";
 import { Box, Flex, Text, Badge, Icon } from "@chakra-ui/react";
 import { Panel } from "@shared/components/ui/panel";
 import { LuClock } from "react-icons/lu";
@@ -9,7 +8,9 @@ interface Props {
   onClick: () => void;
 }
 
-const extractText = (node: JSONContent): string => {
+const extractText = (content: TemplateContent): string => {
+  if ("text" in content && !("type" in content)) return (content as { text: string }).text;
+  const node = content as import("@tiptap/core").JSONContent;
   if (node.type === "text") return node.text ?? "";
   return (node.content ?? []).map(extractText).join("");
 };

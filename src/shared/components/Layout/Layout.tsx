@@ -1,4 +1,4 @@
-import { Box, Container } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Navbar } from "./Navbar";
 import { useAppSelector } from "@/app/store/hooks";
@@ -15,19 +15,17 @@ const Layout = () => {
   useNotificationWebSocket(accessToken, isAuth);
 
   return (
-    <Box bg="mainBg" height="100vh" display="flex" flexDirection="column">
+    <Flex direction="column" h="100vh" bg="mainBg" overflow="hidden">
       <Navbar />
-      <Container
-        maxW="full"
-        p={noPadding ? "0" : { base: "4", md: "6", lg: "8" }}
-        mx="0"
+      <Box
         flex="1"
         minH="0"
-        overflowY="auto"
+        overflow="hidden"
+        p={noPadding ? "0" : { base: "4", md: "6", lg: "8" }}
       >
         <Outlet />
-      </Container>
-    </Box>
+      </Box>
+    </Flex>
   );
 };
 

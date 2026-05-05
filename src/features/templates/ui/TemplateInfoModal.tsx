@@ -23,7 +23,7 @@ import {
   RichTextEditor,
 } from "@shared/components/ui/rich-text-editor";
 import { useVariables } from "@features/knowledge-base/hooks/queries/useVariables";
-import { Template } from "../model/types";
+import { Template, TemplateContent } from "../model/types";
 
 export interface TemplateFormData {
   title: string;
@@ -53,7 +53,11 @@ const NODE_TYPE_MAP: Record<string, string> = {
   code_block: "codeBlock",
 };
 
-function normalizeContent(node: JSONContent): JSONContent {
+function normalizeContent(content: TemplateContent): JSONContent {
+  if ("text" in content && !("type" in content)) {
+    return { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: (content as { text: string }).text }] }] };
+  }
+  const node = content as JSONContent;
   const type = node.type ? (NODE_TYPE_MAP[node.type] ?? node.type) : node.type;
   return {
     ...node,

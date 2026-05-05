@@ -1,4 +1,4 @@
-import { Flex, Grid, Text } from "@chakra-ui/react";
+import { Box, Flex, Grid, Text } from "@chakra-ui/react";
 import { useAppSelector } from "@/app/hooks";
 import { SidebarTicketQueue } from "@/features/tickets/components/SidebarTicketQueue";
 import { ChatWindow } from "@/features/chat/ui/ChatWindow";
@@ -17,22 +17,42 @@ const WorkspacePage = () => {
   useTicketWebSocket(accessToken, isAuth);
 
   return (
-    <Grid templateColumns="340px 1fr 340px" h="full" overflow="hidden">
-      <SidebarTicketQueue />
+    <Grid
+      templateColumns="340px 1fr 340px"
+      h="100%"
+      overflow="hidden"
+      borderTopWidth="1px"
+      borderColor="border.muted"
+    >
+      {/* Колонка 1: очередь тикетов */}
+      <Box overflow="hidden" borderRightWidth="1px" borderColor="border.muted">
+        <SidebarTicketQueue />
+      </Box>
 
+      {/* Колонка 2: чат */}
       {selectedTicketId ? (
-        <ChatWindow key={`chat-${selectedTicketId}`} ticketId={selectedTicketId} />
+        <Flex direction="column" overflow="hidden" key={`chat-${selectedTicketId}`}>
+          <ChatWindow ticketId={selectedTicketId} />
+        </Flex>
       ) : (
-        <Flex align="center" justify="center" gridColumn="span 2">
+        <Flex align="center" justify="center">
           <Text fontSize="sm" color="fg.muted">
             Выберите тикет для начала чата
           </Text>
         </Flex>
       )}
 
-      {selectedTicketId && (
-        <TicketDetailPanel key={`detail-${selectedTicketId}`} ticketId={selectedTicketId} />
-      )}
+      {/* Колонка 3: детали тикета */}
+      <Box
+        overflow="hidden"
+        borderLeftWidth="1px"
+        borderColor="border.muted"
+        key={selectedTicketId ? `detail-${selectedTicketId}` : "detail-empty"}
+      >
+        {selectedTicketId ? (
+          <TicketDetailPanel ticketId={selectedTicketId} />
+        ) : null}
+      </Box>
     </Grid>
   );
 };

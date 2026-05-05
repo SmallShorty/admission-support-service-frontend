@@ -65,9 +65,6 @@ export const SidebarTicketQueue = () => {
       direction="column"
       w="full"
       h="full"
-      minH="0"
-      borderRightWidth="1px"
-      borderColor="gray.200"
       bg="bg.panel"
     >
       {/* Header & Navigation */}

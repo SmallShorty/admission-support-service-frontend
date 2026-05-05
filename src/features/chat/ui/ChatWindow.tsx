@@ -49,7 +49,6 @@ export const ChatWindow = ({ ticketId }: ChatWindowProps) => {
     };
   }, [ticketId, dispatch]);
 
-  // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (messages.length > prevMessagesLength.current) {
       bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -57,7 +56,6 @@ export const ChatWindow = ({ ticketId }: ChatWindowProps) => {
     prevMessagesLength.current = messages.length;
   }, [messages.length]);
 
-  // Mark unread messages as read when chat is active
   useEffect(() => {
     if (activeChatId !== ticketId) return;
 
@@ -78,59 +76,58 @@ export const ChatWindow = ({ ticketId }: ChatWindowProps) => {
   const isResolved =
     ticket?.status === "RESOLVED" || ticket?.status === "CLOSED";
 
+  if (ticketLoading) {
+    return (
+      <Flex flex="1" align="center" justify="center">
+        <Spinner size="sm" />
+      </Flex>
+    );
+  }
+
+  if (!ticket) return null;
+
   return (
-    <Flex direction="column" h="full" overflow="hidden">
-      {ticketLoading ? (
-        <Flex flex="1" align="center" justify="center">
-          <Spinner size="sm" />
-        </Flex>
-      ) : ticket ? (
-        <>
-          <Flex direction="column" flex="1" overflow="hidden">
-            {/* Load older messages */}
-            {hasMore && (
-              <Flex justify="center" py="2" flexShrink={0}>
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  onClick={() => fetchNextPage()}
-                  loading={isFetchingNextPage}
-                >
-                  Загрузить ранее
-                </Button>
-              </Flex>
-            )}
-
-            {/* Message list */}
-            <Box flex="1" overflowY="auto" py="2">
-              {loadingMessages && messages.length === 0 ? (
-                <Flex justify="center" align="center" h="full">
-                  <Spinner size="sm" />
-                </Flex>
-              ) : messages.length === 0 ? (
-                <Flex justify="center" align="center" h="full">
-                  <Text fontSize="sm" color="fg.muted">
-                    Нет сообщений
-                  </Text>
-                </Flex>
-              ) : (
-                messages.map((message) => (
-                  <MessageBubble
-                    key={message.id}
-                    message={message}
-                    isOwnMessage={message.authorId === currentUserId}
-                  />
-                ))
-              )}
-              <div ref={bottomRef} />
-            </Box>
+    <Flex direction="column" flex="1" minH="0" overflow="hidden">
+      {/* Список сообщений */}
+      <Box flex="1" minH="0" overflowY="auto" py="2">
+        {hasMore && (
+          <Flex justify="center" py="2">
+            <Button
+              size="xs"
+              variant="ghost"
+              onClick={() => fetchNextPage()}
+              loading={isFetchingNextPage}
+            >
+              Загрузить ранее
+            </Button>
           </Flex>
+        )}
 
-          <TypingIndicator ticketId={ticketId} />
+        {loadingMessages && messages.length === 0 ? (
+          <Flex justify="center" align="center" h="full">
+            <Spinner size="sm" />
+          </Flex>
+        ) : messages.length === 0 ? (
+          <Flex justify="center" align="center" h="full">
+            <Text fontSize="sm" color="fg.muted">
+              Нет сообщений
+            </Text>
+          </Flex>
+        ) : (
+          messages.map((message) => (
+            <MessageBubble
+              key={message.id}
+              message={message}
+              isOwnMessage={message.authorId === currentUserId}
+            />
+          ))
+        )}
+        <div ref={bottomRef} />
+      </Box>
 
-          <ChatInput ticketId={ticketId} disabled={isResolved} />
-        </>
-      ) : null}
+      <TypingIndicator ticketId={ticketId} />
+
+      <ChatInput ticketId={ticketId} disabled={isResolved} />
     </Flex>
   );
 };

@@ -8,7 +8,6 @@ import {
   Dialog,
   Flex,
   Heading,
-  HStack,
   IconButton,
   Menu,
   Portal,
@@ -142,7 +141,6 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
       direction="column"
       h="full"
       w="full"
-      borderColor="gray.200"
       bg="bg.panel"
     >
       <Flex

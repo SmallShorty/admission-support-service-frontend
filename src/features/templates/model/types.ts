@@ -1,11 +1,13 @@
 import { JSONContent } from "@tiptap/core";
 import { AdmissionIntentCategory } from "@/features/tickets/model/types";
 
+export type TemplateContent = JSONContent | { text: string };
+
 export interface Template {
   id: string;
   title: string;
   alias: string;
-  content: JSONContent;
+  content: TemplateContent;
   category: AdmissionIntentCategory;
   isActive: boolean;
   createdAt: string;

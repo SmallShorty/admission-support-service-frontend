@@ -1,3 +1,13 @@
+export const SYSTEM_MESSAGES = {
+  TICKET_ASSIGNED: "assigned",
+  TICKET_ESCALATED: "escalated",
+} as const;
+
+export const SYSTEM_MESSAGE_LABELS: Record<string, string> = {
+  [SYSTEM_MESSAGES.TICKET_ASSIGNED]: "Тикет взят в работу",
+  [SYSTEM_MESSAGES.TICKET_ESCALATED]: "Тикет эскалирован",
+};
+
 export enum MessageType {
   FROM_CUSTOMER = "FROM_CUSTOMER",
   FROM_AGENT = "FROM_AGENT",
