@@ -24,7 +24,7 @@ const WorkspacePage = () => {
       borderTopWidth="1px"
       borderColor="border.muted"
     >
-      {/* Колонка 1: очередь тикетов */}
+      {/* Колонка 1: очередь заявок */}
       <Box overflow="hidden" borderRightWidth="1px" borderColor="border.muted">
         <SidebarTicketQueue />
       </Box>
@@ -37,12 +37,12 @@ const WorkspacePage = () => {
       ) : (
         <Flex align="center" justify="center">
           <Text fontSize="sm" color="fg.muted">
-            Выберите тикет для начала чата
+            Выберите заявку для начала чата
           </Text>
         </Flex>
       )}
 
-      {/* Колонка 3: детали тикета */}
+      {/* Колонка 3: детали заявки */}
       <Box
         overflow="hidden"
         borderLeftWidth="1px"

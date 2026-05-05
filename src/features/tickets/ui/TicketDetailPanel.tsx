@@ -419,7 +419,7 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
             loading={isTaking}
             onClick={() => takeTicket(ticketId)}
           >
-            Взять тикет
+            Взять заявку
           </Button>
         )}
 
@@ -466,7 +466,7 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
           <Dialog.Positioner>
             <Dialog.Content>
               <Dialog.Header>
-                <Dialog.Title>Эскалация тикета</Dialog.Title>
+                <Dialog.Title>Эскалация заявки</Dialog.Title>
               </Dialog.Header>
               <Dialog.Body>
                 <Stack gap="4">

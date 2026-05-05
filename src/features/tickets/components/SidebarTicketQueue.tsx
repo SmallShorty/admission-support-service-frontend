@@ -77,7 +77,7 @@ export const SidebarTicketQueue = () => {
         gap="2"
       >
         <Heading size="sm" flexShrink={0}>
-          Очередь тикетов
+          Очередь заявок
         </Heading>
 
         <Flex bg="bg.muted" rounded="l3" p="0.5" gap="0.5">
@@ -162,8 +162,8 @@ export const SidebarTicketQueue = () => {
           <Center h="40">
             <Text fontSize="sm" color="fg.muted">
               {viewMode === "available"
-                ? "Нет доступных тикетов"
-                : "У вас нет активных тикетов"}
+                ? "Нет доступных заявок"
+                : "У вас нет активных заявок"}
             </Text>
           </Center>
         )}
