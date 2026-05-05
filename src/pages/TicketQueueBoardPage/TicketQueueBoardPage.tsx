@@ -76,13 +76,17 @@ export const TicketQueueBoardPage = () => {
     }
   }, [ticketsData, page]);
 
-  // Intersection Observer для бесконечной прокрутки
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const [target] = entries;
-      if (target.isIntersecting && hasMore && !isFetching && !isLoading) {
+      if (!target.isIntersecting || !hasMore || isFetching || isLoading) return;
+
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = setTimeout(() => {
         setPage((prev) => prev + 1);
-      }
+      }, 400);
     },
     [hasMore, isFetching, isLoading],
   );
@@ -93,14 +97,11 @@ export const TicketQueueBoardPage = () => {
       rootMargin: "100px",
     });
 
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
+    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
 
     return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
-      }
+      observer.disconnect();
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
     };
   }, [handleObserver]);
 
@@ -112,21 +113,15 @@ export const TicketQueueBoardPage = () => {
     );
   }
 
-  // Анимации для карточек
   const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-    exit: { opacity: 0, x: -100 },
+    hidden: { opacity: 0, y: 8 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
+    exit: { opacity: 0, transition: { duration: 0.15 } },
   };
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.05,
-      },
-    },
+    visible: { opacity: 1, transition: { duration: 0.2 } },
   };
 
   // Функция для получения счетчика по колонке
@@ -238,7 +233,7 @@ export const TicketQueueBoardPage = () => {
                 }}
               >
                 <AnimatePresence mode="popLayout">
-                  {columnApplicants.map((ticket: any, index: number) => (
+                  {columnApplicants.map((ticket: any) => (
                     <MotionBox
                       key={ticket.id}
                       position="relative"
@@ -247,10 +242,6 @@ export const TicketQueueBoardPage = () => {
                       initial="hidden"
                       animate="visible"
                       exit="exit"
-                      transition={{
-                        duration: 0.3,
-                        delay: index * 0.02,
-                      }}
                     >
                       <TicketCard
                         id={ticket.id}
