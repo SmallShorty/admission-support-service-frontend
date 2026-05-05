@@ -45,6 +45,7 @@ const NAV_ITEMS: NavItem[] = [
 
 interface NavbarItemProps extends NavItem {
   onClick?: () => void;
+  iconOnly?: boolean;
 }
 
 const NavbarItem = ({
@@ -52,10 +53,11 @@ const NavbarItem = ({
   icon: IconComponent,
   label,
   onClick,
+  iconOnly = false,
 }: NavbarItemProps) => (
   <ChakraLink
     asChild
-    px="4"
+    px={iconOnly ? "2.5" : "4"}
     py="2"
     borderRadius="md"
     transition="all 0.2s"
@@ -64,6 +66,7 @@ const NavbarItem = ({
     fontWeight="medium"
     borderWidth="2px"
     borderColor="transparent"
+    title={iconOnly ? label : undefined}
     _hover={{ bg: "teal.50", color: "teal.700", textDecoration: "none" }}
     _currentPage={{ bg: "teal.50", color: "teal.800", borderColor: "teal.200" }}
     onClick={onClick}
@@ -71,7 +74,7 @@ const NavbarItem = ({
     <NavLink to={href}>
       <HStack gap="2">
         <IconComponent size={20} />
-        <Text fontSize="sm">{label}</Text>
+        {!iconOnly && <Text fontSize="sm">{label}</Text>}
       </HStack>
     </NavLink>
   </ChakraLink>
@@ -102,11 +105,25 @@ export const Navbar: FC = () => {
       borderBottomWidth="1px"
       borderColor="gray.200"
     >
-      <Flex h="16" px="6" align="center" justify="space-between" gap="4">
-        {/* Left: logo + desktop nav */}
-        <HStack gap="8">
+      <Flex
+        h="16"
+        px={{ base: "3", sm: "4", md: "6" }}
+        align="center"
+        justify="space-between"
+        gap="4"
+      >
+        {/* Left: logo + nav */}
+        <HStack gap={{ base: "4", md: "3", lg: "6" }} minW="0">
           <AppLogo variant="navbar" />
 
+          {/* md–lg: icon-only */}
+          <HStack gap="1" display={{ base: "none", md: "flex", lg: "none" }}>
+            {NAV_ITEMS.map((item) => (
+              <NavbarItem key={item.href} {...item} iconOnly />
+            ))}
+          </HStack>
+
+          {/* lg+: full labels */}
           <HStack gap="1" display={{ base: "none", lg: "flex" }}>
             {NAV_ITEMS.map((item) => (
               <NavbarItem key={item.href} {...item} />
@@ -115,7 +132,7 @@ export const Navbar: FC = () => {
         </HStack>
 
         {/* Right: account / login + mobile burger */}
-        <HStack gap="2">
+        <HStack gap="2" flexShrink={0}>
           {isAuth && <NotificationBell />}
           {isAuth ? (
             <NavbarAccount onLogout={handleLogout} />
@@ -128,12 +145,12 @@ export const Navbar: FC = () => {
               loading={isLoading}
             >
               <LogIn size={18} />
-              Войти
+              <Text display={{ base: "none", sm: "inline" }}>Войти</Text>
             </Button>
           )}
 
-          {/* Mobile burger — visible only below lg */}
-          <Box display={{ base: "flex", lg: "none" }}>
+          {/* Mobile burger — visible only below md */}
+          <Box display={{ base: "flex", md: "none" }}>
             <Button
               variant="ghost"
               size="sm"
@@ -146,7 +163,7 @@ export const Navbar: FC = () => {
         </HStack>
       </Flex>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer (< md) */}
       <Drawer.Root
         open={drawerOpen}
         onOpenChange={(e) => setDrawerOpen(e.open)}
@@ -157,9 +174,7 @@ export const Navbar: FC = () => {
           <Drawer.Positioner>
             <Drawer.Content maxW="72">
               <Drawer.Header borderBottomWidth="1px">
-                <Text fontSize="lg" fontWeight="bold" color="teal.500">
-                  ЛОГО
-                </Text>
+                <AppLogo variant="navbar" />
                 <Drawer.CloseTrigger asChild>
                   <CloseButton size="sm" />
                 </Drawer.CloseTrigger>

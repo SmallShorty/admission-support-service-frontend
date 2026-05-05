@@ -20,7 +20,7 @@ export const RoleProtectedRoute = ({
   if (!isInitialized || isLoading) {
     return (
       <Center h="100vh">
-        <Spinner size="xl" color="blue" />
+        <Spinner size="xl" color="teal" />
       </Center>
     );
   }
@@ -50,7 +50,7 @@ export const PublicRoute = ({ redirectIfAuth = "/" }: PublicRouteProps) => {
   if (!isInitialized || isLoading) {
     return (
       <Center h="100vh">
-        <Spinner size="xl" color="blue" />
+        <Spinner size="xl" color="teal" />
       </Center>
     );
   }

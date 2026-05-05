@@ -61,12 +61,7 @@ export const SidebarTicketQueue = () => {
   };
 
   return (
-    <Flex
-      direction="column"
-      w="full"
-      h="full"
-      bg="bg.panel"
-    >
+    <Flex direction="column" w="full" h="full" bg="bg.panel">
       {/* Header & Navigation */}
       <Flex
         px="3"
@@ -122,7 +117,7 @@ export const SidebarTicketQueue = () => {
         {isLoading ? (
           <Center h="40">
             <VStack gap="2">
-              <Spinner size="sm" color="blue.500" />
+              <Spinner size="sm" color="teal.500" />
               <Text fontSize="xs" color="fg.muted">
                 Загрузка...
               </Text>

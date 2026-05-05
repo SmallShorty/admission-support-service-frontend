@@ -27,7 +27,8 @@ function extractTextFromTipTap(node: JSONContent): string {
   if (node.type === "text") return node.text ?? "";
   if (node.type === "hardBreak") return "\n";
   const children = node.content?.map(extractTextFromTipTap).join("") ?? "";
-  if (node.type === "paragraph" || node.type === "heading") return children + "\n";
+  if (node.type === "paragraph" || node.type === "heading")
+    return children + "\n";
   return children;
 }
 
@@ -53,7 +54,9 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
     { searchTerm: templateSearchTerm || undefined, limit: 10 },
     { enabled: templatePickerOpen },
   );
-  const pickerTemplates = templatePickerOpen ? (templatesData?.items ?? []) : [];
+  const pickerTemplates = templatePickerOpen
+    ? (templatesData?.items ?? [])
+    : [];
 
   const stopTyping = () => {
     if (isTypingRef.current) {
@@ -119,7 +122,10 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
     setActiveTemplateIndex(0);
     setIsResolvingTemplate(true);
     try {
-      const resolved = await templatesApi.resolveTemplateByAlias(alias, ticketId);
+      const resolved = await templatesApi.resolveTemplateByAlias(
+        alias,
+        ticketId,
+      );
       const text = extractTextFromTipTap(resolved.content).trim();
       setContent(text);
       setMissingVariables(resolved.missingVariables);
@@ -154,7 +160,9 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
       }
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setActiveTemplateIndex((i) => Math.min(i + 1, pickerTemplates.length - 1));
+        setActiveTemplateIndex((i) =>
+          Math.min(i + 1, pickerTemplates.length - 1),
+        );
         return;
       }
       if (e.key === "ArrowUp") {
@@ -182,7 +190,9 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
       }
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setActiveVariableIndex((i) => Math.min(i + 1, filteredVariables.length - 1));
+        setActiveVariableIndex((i) =>
+          Math.min(i + 1, filteredVariables.length - 1),
+        );
         return;
       }
       if (e.key === "ArrowUp") {
@@ -197,7 +207,12 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
       }
     }
 
-    if (e.key === "Enter" && !e.shiftKey && !dropdownOpen && !templatePickerOpen) {
+    if (
+      e.key === "Enter" &&
+      !e.shiftKey &&
+      !dropdownOpen &&
+      !templatePickerOpen
+    ) {
       e.preventDefault();
       handleSubmit();
     }
@@ -230,13 +245,20 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
   }, [variableError, dispatch]);
 
   return (
-    <Box px="3" py="3" borderTopWidth="1px" borderColor="border.muted" flexShrink={0}>
+    <Box
+      px="3"
+      py="3"
+      borderTopWidth="1px"
+      borderColor="border.muted"
+      flexShrink={0}
+    >
       {missingVariables.length > 0 && (
         <Alert.Root status="warning" borderRadius="lg" mb="2" fontSize="xs">
           <Alert.Indicator />
           <Alert.Title flex="1" fontSize="xs" fontWeight="normal">
             Некоторые переменные не удалось подставить:{" "}
-            {missingVariables.map((v) => `$${v}`).join(", ")}. Заполните их вручную перед отправкой.
+            {missingVariables.map((v) => `$${v}`).join(", ")}. Заполните их
+            вручную перед отправкой.
           </Alert.Title>
           <IconButton
             size="xs"
@@ -259,8 +281,8 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
         boxShadow="sm"
         transition="all 0.2s"
         _focusWithin={{
-          borderColor: "blue.500",
-          boxShadow: "0 0 0 3px var(--chakra-colors-blue-100)",
+          borderColor: "teal.500",
+          boxShadow: "0 0 0 3px var(--chakra-colors-teal-100)",
         }}
       >
         {templatePickerOpen && pickerTemplates.length > 0 && (

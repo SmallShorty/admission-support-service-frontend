@@ -78,7 +78,7 @@ const NotFoundPage: FC = () => {
 
         <Button
           variant="solid"
-          colorScheme="blue" // или ваш основной цвет 'aspa-brand'
+          colorScheme="teal" // или ваш основной цвет 'aspa-brand'
           flex="1"
           onClick={() => navigate("/")}
         >
