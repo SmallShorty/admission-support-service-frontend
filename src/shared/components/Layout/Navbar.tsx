@@ -26,6 +26,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAppSelector } from "@/app/store/hooks";
 import { NavbarAccount } from "@/app/entities/account/ui/NavbarAccount";
 import { NotificationBell } from "@/shared/components/ui/NotificationBell";
+import { AppLogo } from "@/shared/components/ui/AppLogo";
 
 interface NavItem {
   href: string;
@@ -104,11 +105,7 @@ export const Navbar: FC = () => {
       <Flex h="16" px="6" align="center" justify="space-between" gap="4">
         {/* Left: logo + desktop nav */}
         <HStack gap="8">
-          <Box cursor="pointer" onClick={() => navigate("/")}>
-            <Text fontSize="xl" fontWeight="bold" color="teal.500">
-              ЛОГО
-            </Text>
-          </Box>
+          <AppLogo variant="navbar" />
 
           <HStack gap="1" display={{ base: "none", lg: "flex" }}>
             {NAV_ITEMS.map((item) => (
