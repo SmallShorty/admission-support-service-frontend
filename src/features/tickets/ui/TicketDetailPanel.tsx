@@ -18,6 +18,40 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
+import {
+  StudyForm,
+  AdmissionType,
+} from "@/app/entities/applicant/model/types";
+
+const STUDY_FORM_LABELS: Record<StudyForm, string> = {
+  [StudyForm.FULL_TIME]: "Очная",
+  [StudyForm.PART_TIME]: "Заочная",
+  [StudyForm.EVENING]: "Вечерняя",
+};
+
+const STUDY_FORM_COLORS: Record<StudyForm, string> = {
+  [StudyForm.FULL_TIME]: "blue",
+  [StudyForm.PART_TIME]: "purple",
+  [StudyForm.EVENING]: "orange",
+};
+
+const ADMISSION_TYPE_LABELS: Record<AdmissionType, string> = {
+  [AdmissionType.BUDGET_COMPETITIVE]: "Бюджет (конкурс)",
+  [AdmissionType.BUDGET_BVI]: "БВИ",
+  [AdmissionType.BUDGET_SPECIAL_QUOTA]: "Особая квота",
+  [AdmissionType.BUDGET_SEPARATE_QUOTA]: "Отдельная квота",
+  [AdmissionType.TARGET]: "Целевое",
+  [AdmissionType.PAID]: "Платное",
+};
+
+const ADMISSION_TYPE_COLORS: Record<AdmissionType, string> = {
+  [AdmissionType.BUDGET_COMPETITIVE]: "teal",
+  [AdmissionType.BUDGET_BVI]: "green",
+  [AdmissionType.BUDGET_SPECIAL_QUOTA]: "cyan",
+  [AdmissionType.BUDGET_SEPARATE_QUOTA]: "blue",
+  [AdmissionType.TARGET]: "yellow",
+  [AdmissionType.PAID]: "red",
+};
 import { MoreHorizontal, AlertTriangle, StickyNote, Tag } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { useTicketDetail } from "../hooks/queries/useTicketDetail";
@@ -244,11 +278,29 @@ export const TicketDetailPanel = ({ ticketId }: TicketDetailPanelProps) => {
 
                         <Box ml="4">
                           <Text fontSize="sm" fontWeight="bold">
+                            {program.programName}
+                          </Text>
+                          <Text fontSize="xs" color="fg.muted">
                             {program.programCode}
                           </Text>
-                          <Text fontSize="xs" color="fg.muted" lineClamp={2}>
-                            {program.programCode}
-                          </Text>
+                          <Flex gap="1" mt="2" wrap="wrap">
+                            <Badge
+                              colorPalette={STUDY_FORM_COLORS[program.studyForm]}
+                              variant="surface"
+                              size="sm"
+                              borderRadius="md"
+                            >
+                              {STUDY_FORM_LABELS[program.studyForm]}
+                            </Badge>
+                            <Badge
+                              colorPalette={ADMISSION_TYPE_COLORS[program.admissionType]}
+                              variant="surface"
+                              size="sm"
+                              borderRadius="md"
+                            >
+                              {ADMISSION_TYPE_LABELS[program.admissionType]}
+                            </Badge>
+                          </Flex>
                         </Box>
                       </Panel>
                     ))}

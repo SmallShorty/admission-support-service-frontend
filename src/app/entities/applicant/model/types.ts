@@ -42,6 +42,7 @@ export interface ExamScore {
 export interface ApplicantProgram {
   programId: number;
   programCode: string;
+  programName: string;
   studyForm: StudyForm;
   admissionType: AdmissionType;
   priority: number;
