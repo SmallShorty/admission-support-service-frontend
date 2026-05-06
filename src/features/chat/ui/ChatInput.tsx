@@ -410,11 +410,13 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onSelect={(e) => {
-            lastCursorPosRef.current = (e.target as HTMLTextAreaElement).selectionStart;
+            lastCursorPosRef.current = (
+              e.target as HTMLTextAreaElement
+            ).selectionStart;
           }}
           placeholder="Введите сообщение... (Нажмите '/' для вызова шаблонов)"
           resize="none"
-          rows={3}
+          rows={5}
           bg="transparent"
           border="none"
           outline="none"
@@ -452,6 +454,7 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
               onClick={() => {
                 setContent("/");
                 setTemplatePickerActive(true);
+                setVariableQuery(null);
                 setTimeout(() => textareaRef.current?.focus(), 0);
               }}
             >
@@ -466,7 +469,11 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
               variant="outline"
               colorPalette="gray"
               fontWeight="semibold"
-              onClick={() => setVariableQuery("")}
+              onClick={() => {
+                setTemplatePickerActive(false);
+                setContent((prev) => (prev.startsWith("/") ? "" : prev));
+                setVariableQuery("");
+              }}
             >
               <Text color="fg.muted" fontSize="xs">
                 {"{ }"}
