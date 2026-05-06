@@ -75,7 +75,6 @@ const NAV_CARDS: NavCard[] = [
     description:
       "Подключайте внешние каналы: сайт, мессенджеры, почту. Управляйте виджетами и публичными API.",
     color: "orange",
-    badge: "Новое",
     adminOnly: true,
   },
   {
