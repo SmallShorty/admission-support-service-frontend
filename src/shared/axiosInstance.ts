@@ -142,3 +142,9 @@ export const ticketsApi = setupInterceptors(
   }),
   "TICKETS",
 );
+export const classifierApi = setupInterceptors(
+  axios.create({
+    baseURL: import.meta.env.VITE_CLASSIFIER_API_URL,
+  }),
+  "CLASSIFIER",
+);

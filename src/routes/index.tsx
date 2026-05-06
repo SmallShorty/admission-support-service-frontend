@@ -30,6 +30,7 @@ const ProfilePage = lazy(() => import("@/pages/ProfilePage/ProfilePage"));
 const PublicIntegrationPage = lazy(
   () => import("@/pages/PublicIntegrationPage/PublicIntegrationPage"),
 );
+const DemoPage = lazy(() => import("@/pages/DemoPage/DemoPage"));
 
 const PageLoader = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={null}>{children}</Suspense>
@@ -141,6 +142,14 @@ export const router = createBrowserRouter([
     // --- СЛУЖЕБНЫЕ ---
     element: <BareLayout />,
     children: [
+      {
+        path: "demo",
+        element: (
+          <PageLoader>
+            <DemoPage />
+          </PageLoader>
+        ),
+      },
       {
         path: "integrations/public/:slug",
         element: (
