@@ -12,15 +12,12 @@ import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import {
   setMessages,
   addOldMessages,
-  addMessage,
   setMessagesLoading,
   setUnreadCount,
 } from "../model/chatSlice";
 import {
-  TicketMessage,
   SendMessagePayload,
   MessageType,
-  DeliveryStatus,
 } from "../model/types";
 
 // Query Keys
@@ -73,7 +70,6 @@ export const useTicketMessages = (ticketId: string, limit: number = 50) => {
 // Hook для отправки сообщения
 export const useSendMessage = () => {
   const queryClient = useQueryClient();
-  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.account.data);
   const userRole = useAppSelector((state) => state.account.data?.role);
 
@@ -99,28 +95,7 @@ export const useSendMessage = () => {
         authorType,
       };
 
-      const tempMessage: TicketMessage = {
-        id: Date.now(),
-        ticketId,
-        authorId: user.id,
-        authorType,
-        content,
-        status: DeliveryStatus.SENT,
-        deliveredAt: null,
-        seenAt: null,
-        createdAt: new Date().toISOString(),
-        author: {
-          id: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-        },
-      };
-
-      dispatch(addMessage(tempMessage));
       chatSocket.sendMessage(payload);
-
-      return tempMessage;
     },
     onSuccess: (_, { ticketId }) => {
       queryClient.invalidateQueries({

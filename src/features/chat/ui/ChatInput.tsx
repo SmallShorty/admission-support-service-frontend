@@ -43,6 +43,7 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTypingRef = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const lastCursorPosRef = useRef<number>(0);
   const { mutate: sendMessage, isPending } = useSendMessage();
   const dispatch = useAppDispatch();
   const variableError = useAppSelector((state) => state.chat.variableError);
@@ -73,6 +74,7 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
+    lastCursorPosRef.current = e.target.selectionStart;
     setContent(val);
 
     if (!isTypingRef.current) {
@@ -96,22 +98,28 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
-    const cursorPos = textarea.selectionStart;
+    const cursorPos = lastCursorPosRef.current;
     const before = content.slice(0, cursorPos);
     const match = before.match(/\$[а-яёa-z_0-9]*$/i);
-    if (!match) return;
-
-    const matchLength = match[0].length;
-    const insertStart = cursorPos - matchLength;
     const after = content.slice(cursorPos);
-    const newContent = content.slice(0, insertStart) + `$${varName} ` + after;
+
+    let newContent: string;
+    let newCursorPos: number;
+
+    if (match) {
+      const insertStart = cursorPos - match[0].length;
+      newContent = content.slice(0, insertStart) + `$${varName} ` + after;
+      newCursorPos = insertStart + varName.length + 2;
+    } else {
+      newContent = before + `$${varName} ` + after;
+      newCursorPos = cursorPos + varName.length + 2;
+    }
 
     setContent(newContent);
     setVariableQuery(null);
     setActiveVariableIndex(0);
 
     setTimeout(() => {
-      const newCursorPos = insertStart + varName.length + 2;
       textarea.focus();
       textarea.setSelectionRange(newCursorPos, newCursorPos);
     }, 0);
@@ -401,6 +409,9 @@ export const ChatInput = ({ ticketId, disabled = false }: ChatInputProps) => {
           value={content}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
+          onSelect={(e) => {
+            lastCursorPosRef.current = (e.target as HTMLTextAreaElement).selectionStart;
+          }}
           placeholder="Введите сообщение... (Нажмите '/' для вызова шаблонов)"
           resize="none"
           rows={3}
